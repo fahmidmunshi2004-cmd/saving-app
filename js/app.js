@@ -398,7 +398,7 @@
             }
         });
 
-        clearDataBtn.addEventListener("click", () => {
+        clearDataBtn.addEventListener("click", async () => {
             const ok = window.confirm("Are you sure? This will clear all app data.");
             if (!ok) return;
 
@@ -415,7 +415,11 @@
 
             applyTheme("light");
             updateUI();
-            applyAuthState(auth ? auth.currentUser : null);
+            if (auth && auth.currentUser) {
+                await auth.signOut();
+            } else {
+                applyAuthState(null);
+            }
             loginError.innerText = "";
         });
 
