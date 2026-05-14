@@ -353,7 +353,14 @@ async function handleGoogleAuthUser(user) {
 }
 
 async function loginOrCreateGroupAccount() {
-  if (!db) return;
+  if (!db) {
+    window.alert("Database ready না। 2-3 সেকেন্ড wait করে আবার চেষ্টা করুন।");
+    return;
+  }
+  if (!firebaseUser) {
+    window.alert("Invite group join করার আগে Google দিয়ে login করুন, তারপর username/password দিন।");
+    return;
+  }
   const username = groupUsername.value.trim();
   const password = groupPassword.value;
   if (!username || !password) {
@@ -362,8 +369,15 @@ async function loginOrCreateGroupAccount() {
   }
 
   const usernameKey = username.toLowerCase();
-  const ref = db.collection("group_accounts").doc(usernameKey);
-  const snap = await ref.get();
+  let ref;
+  let snap;
+  try {
+    ref = db.collection("group_accounts").doc(usernameKey);
+    snap = await ref.get();
+  } catch (error) {
+    window.alert(`Group account load fail: ${error?.message || "unknown error"}`);
+    return;
+  }
 
   let account = snap.exists ? snap.data() : null;
 
@@ -379,21 +393,36 @@ async function loginOrCreateGroupAccount() {
       canEdit: !pendingInviteInfo,
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
     };
-    await ref.set(account);
+    try {
+      await ref.set(account);
+    } catch (error) {
+      window.alert(`Group account create fail: ${error?.message || "unknown error"}`);
+      return;
+    }
 
     const g = await getGroupDoc(groupId);
     if (!g) {
-      await saveGroupDoc(groupId, {
+      try {
+        await saveGroupDoc(groupId, {
         adminUsername: pendingInviteInfo ? "" : username,
         members: [{ memberId, type: "group", label: username, role: account.role, canEdit: account.canEdit }],
         invites: [],
         accessRequests: []
       });
+      } catch (error) {
+        window.alert(`Group তৈরি করা যায়নি: ${error?.message || "unknown error"}`);
+        return;
+      }
     } else {
       const members = g.members || [];
       if (!members.some((m) => m.memberId === memberId)) {
         members.push({ memberId, type: "group", label: username, role: "viewer", canEdit: false });
-        await saveGroupDoc(groupId, { members });
+        try {
+          await saveGroupDoc(groupId, { members });
+        } catch (error) {
+          window.alert(`Group member add fail: ${error?.message || "unknown error"}`);
+          return;
+        }
       }
     }
   } else {
@@ -420,10 +449,20 @@ async function loginOrCreateGroupAccount() {
       return;
     }
     inv.status = "accepted";
-    await saveGroupDoc(g.id, { invites });
+    try {
+      await saveGroupDoc(g.id, { invites });
+    } catch (error) {
+      window.alert(`Invite accept update fail: ${error?.message || "unknown error"}`);
+      return;
+    }
     account.role = "viewer";
     account.canEdit = false;
-    await ref.set({ role: "viewer", canEdit: false }, { merge: true });
+    try {
+      await ref.set({ role: "viewer", canEdit: false }, { merge: true });
+    } catch (error) {
+      window.alert(`Role update fail: ${error?.message || "unknown error"}`);
+      return;
+    }
   }
 
   currentSession = {
@@ -438,6 +477,7 @@ async function loginOrCreateGroupAccount() {
   groupLoginBtn.innerText = "Create/Login Group";
   saveSession();
   await applyAuthState();
+  window.alert("Group login successful.");
 }
 
 async function sendInviteToGmail() {
@@ -615,7 +655,13 @@ navButtons.forEach((btn) => btn.addEventListener("click", () => showView(btn.dat
 downloadPdfBtn.addEventListener("click", downloadReportPdf);
 
 groupModeBtn.addEventListener("click", () => groupLoginFields.classList.toggle("hidden"));
-groupLoginBtn.addEventListener("click", () => { loginOrCreateGroupAccount(); });
+groupLoginBtn.addEventListener("click", async () => {
+  try {
+    await loginOrCreateGroupAccount();
+  } catch (error) {
+    window.alert(`Group login failed: ${error?.message || "unknown error"}`);
+  }
+});
 sendInviteBtn.addEventListener("click", () => { sendInviteToGmail(); });
 requestAccessBtn.addEventListener("click", () => { requestEditAccess(); });
 
