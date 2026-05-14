@@ -1,167 +1,359 @@
-<!DOCTYPE html>
-<html lang="en">
+﻿<!DOCTYPE html>
+<html lang="en" data-theme="light">
 
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Easy Budget</title>
+    <title>VaultBudget</title>
+    <meta name="theme-color" content="#ecf5ff" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23ff8a00'/%3E%3Cstop offset='1' stop-color='%23ff3d81'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect x='6' y='6' width='52' height='52' rx='16' fill='%23fff3e8'/%3E%3Cpath d='M21 30h22a3 3 0 0 1 3 3v13a4 4 0 0 1-4 4H22a4 4 0 0 1-4-4V33a3 3 0 0 1 3-3z' fill='url(%23g)'/%3E%3Cpath d='M24 30v-4a8 8 0 1 1 16 0v4' fill='none' stroke='%23ff7f5f' stroke-width='3.5' stroke-linecap='round'/%3E%3Ccircle cx='32' cy='39' r='2.8' fill='%23fff3e8'/%3E%3Cpath d='M32 41.8v3.8' stroke='%23fff3e8' stroke-width='2.4' stroke-linecap='round'/%3E%3C/svg%3E" />
 
     <style>
+        :root {
+            --bg: #f6f9ff;
+            --bg-soft: #eef5ff;
+            --surface: #ffffff;
+            --surface-2: #f8fbff;
+            --txt: #19253a;
+            --muted: #6f8098;
+            --primary: #ff7a18;
+            --primary-2: #ff4f81;
+            --accent: #3e8bff;
+            --income: #00a86b;
+            --expense: #e54366;
+            --balance: #2a78ff;
+            --stroke: #dbe6f4;
+            --shadow: 0 14px 40px rgba(47, 84, 140, 0.14);
+        }
+
+        html[data-theme="dark"] {
+            --bg: #151b26;
+            --bg-soft: #1a2333;
+            --surface: #212d42;
+            --surface-2: #24324a;
+            --txt: #f6f9ff;
+            --muted: #a8b8d3;
+            --primary: #ff9f43;
+            --primary-2: #ff5e96;
+            --accent: #7ba5ff;
+            --income: #36dc98;
+            --expense: #ff7594;
+            --balance: #7db8ff;
+            --stroke: #30415e;
+            --shadow: 0 14px 40px rgba(0, 0, 0, 0.25);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
         body {
             margin: 0;
-            font-family: Arial;
-            background: #0b0f1a;
-            color: white;
+            min-height: 100vh;
+            font-family: "Sora", sans-serif;
+            color: var(--txt);
+            background:
+                radial-gradient(700px 280px at -10% -10%, #ffd5be 0%, transparent 65%),
+                radial-gradient(700px 260px at 110% 0%, #ffc4e3 0%, transparent 55%),
+                linear-gradient(160deg, var(--bg), var(--bg-soft));
+            padding: 18px 12px;
         }
 
-        .container {
-            max-width: 420px;
-            margin: auto;
-            padding: 15px;
+        html[data-theme="dark"] body {
+            background:
+                radial-gradient(700px 280px at -10% -10%, #3b2a1f 0%, transparent 65%),
+                radial-gradient(700px 260px at 110% 0%, #41223d 0%, transparent 55%),
+                linear-gradient(160deg, var(--bg), var(--bg-soft));
         }
 
-        h1 {
-            text-align: center;
-            margin-bottom: 15px;
+        .app-shell {
+            width: min(980px, 100%);
+            margin: 0 auto;
+            display: grid;
+            gap: 16px;
+            grid-template-columns: 1.3fr 0.9fr;
         }
 
-        /* TOP BOXES */
-        .top {
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--stroke);
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+        }
+
+        .main {
+            padding: 18px;
+        }
+
+        .topbar {
             display: flex;
+            align-items: center;
+            justify-content: space-between;
             gap: 10px;
         }
 
-        .box {
-            flex: 1;
-            background: rgba(255, 255, 255, 0.06);
-            padding: 12px;
-            border-radius: 12px;
-            text-align: center;
-            backdrop-filter: blur(10px);
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
 
-        .box h3 {
-            margin: 5px 0;
-            font-size: 14px;
-            color: #aaa;
+        .logo {
+            width: 52px;
+            height: 52px;
+            border-radius: 16px;
+            background: linear-gradient(140deg, var(--primary), var(--primary-2));
+            color: #fff;
+            display: grid;
+            place-items: center;
+            font-size: 1.2rem;
+            box-shadow: 0 10px 26px rgba(255, 87, 101, 0.34);
         }
 
-        .box p {
-            font-size: 18px;
+        h1 {
             margin: 0;
+            font-size: 1.4rem;
         }
 
-        .incomeBox p {
-            color: #2DE2E6;
+        .sub {
+            margin: 4px 0 0;
+            color: var(--muted);
+            font-size: 0.9rem;
         }
 
-        .expenseBox p {
-            color: #FF5C5C;
+        .theme-btn {
+            border: 1px solid var(--stroke);
+            background: var(--surface-2);
+            color: var(--txt);
+            width: 44px;
+            height: 44px;
+            border-radius: 14px;
+            cursor: pointer;
+            font-size: 1rem;
         }
 
-        .balanceBox p {
-            color: #7CFF6B;
+        .stats {
+            margin-top: 16px;
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 10px;
         }
 
-        /* INPUT CARD */
-        .card {
-            margin-top: 15px;
-            background: rgba(255, 255, 255, 0.06);
+        .stat {
+            background: var(--surface-2);
+            border: 1px solid var(--stroke);
+            border-radius: 14px;
             padding: 12px;
-            border-radius: 12px;
+        }
+
+        .stat .label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--muted);
+            font-size: 0.76rem;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+        }
+
+        .stat .value {
+            margin-top: 8px;
+            font-size: 1.08rem;
+            font-weight: 700;
+        }
+
+        .income .value { color: var(--income); }
+        .expense .value { color: var(--expense); }
+        .balance .value { color: var(--balance); }
+
+        .grid {
+            margin-top: 14px;
+            display: grid;
+            gap: 10px;
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .input-card {
+            background: var(--surface-2);
+            border: 1px solid var(--stroke);
+            border-radius: 14px;
+            padding: 12px;
+        }
+
+        .input-card h3 {
+            margin: 0 0 8px;
+            font-size: 1rem;
         }
 
         input {
             width: 100%;
-            padding: 10px;
             margin-top: 8px;
-            border: none;
-            border-radius: 8px;
+            border: 1px solid var(--stroke);
+            background: var(--surface);
+            color: var(--txt);
+            border-radius: 12px;
+            padding: 11px;
+            font: inherit;
             outline: none;
         }
 
-        button {
+        input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 24%, transparent);
+        }
+
+        .btn {
+            margin-top: 9px;
             width: 100%;
-            margin-top: 10px;
-            padding: 10px;
-            border: none;
-            border-radius: 8px;
-            background: #2DE2E6;
-            font-weight: bold;
+            border: 0;
+            border-radius: 12px;
+            padding: 11px;
+            font: inherit;
+            font-weight: 700;
+            color: #fff;
             cursor: pointer;
         }
 
-        /* LIST */
-        ul {
-            list-style: none;
-            padding: 0;
+        .btn-income { background: linear-gradient(130deg, #03b978, #00dba1); }
+        .btn-expense { background: linear-gradient(130deg, #4285ff, #66b3ff); }
+
+        .side {
+            padding: 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
         }
 
-        li {
-            padding: 6px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        .side h3 {
+            margin: 0;
+            font-size: 1.02rem;
+        }
+
+        .list {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        .list li {
+            display: flex;
+            justify-content: space-between;
+            gap: 8px;
+            padding: 11px;
+            border: 1px solid var(--stroke);
+            background: var(--surface-2);
+            border-radius: 12px;
+            margin-top: 8px;
+            font-size: 0.93rem;
+        }
+
+        .hero-note {
+            margin-top: 8px;
+            font-size: 0.9rem;
+            color: var(--muted);
+            background: var(--surface-2);
+            border: 1px solid var(--stroke);
+            border-radius: 12px;
+            padding: 11px;
+            line-height: 1.5;
+        }
+
+        .empty {
+            color: var(--muted);
+            font-size: 0.9rem;
+            margin-top: 8px;
+        }
+
+        @media (max-width: 900px) {
+            .app-shell {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 560px) {
+            .grid, .stats {
+                grid-template-columns: 1fr;
+            }
+
+            .main, .side {
+                padding: 14px;
+            }
         }
     </style>
-
 </head>
 
 <body>
-
-    <div class="container">
-
-        <h1>💰 Easy Budget</h1>
-
-        <!-- TOP BOXES -->
-        <div class="top">
-
-            <div class="box incomeBox">
-                <h3>Income</h3>
-                <p id="income">0</p>
+    <div class="app-shell">
+        <section class="card main">
+            <div class="topbar">
+                <div class="brand">
+                    <div class="logo"><i class="fa-solid fa-shield-heart"></i></div>
+                    <div>
+                        <h1>VaultBudget Pro</h1>
+                        <p class="sub">Realistic personal finance app interface</p>
+                    </div>
+                </div>
+                <button id="themeToggle" class="theme-btn" title="Toggle theme" aria-label="Toggle theme"><i class="fa-solid fa-moon"></i></button>
             </div>
 
-            <div class="box expenseBox">
-                <h3>Expense</h3>
-                <p id="expense">0</p>
+            <div class="stats">
+                <div class="stat income">
+                    <div class="label"><i class="fa-solid fa-arrow-trend-up"></i> Income</div>
+                    <div class="value" id="income">0 BDT</div>
+                </div>
+                <div class="stat expense">
+                    <div class="label"><i class="fa-solid fa-arrow-trend-down"></i> Expense</div>
+                    <div class="value" id="expense">0 BDT</div>
+                </div>
+                <div class="stat balance">
+                    <div class="label"><i class="fa-solid fa-wallet"></i> Balance</div>
+                    <div class="value" id="balance">0 BDT</div>
+                </div>
             </div>
 
-            <div class="box balanceBox">
-                <h3>Balance</h3>
-                <p id="balance">0</p>
+            <div class="grid">
+                <div class="input-card">
+                    <h3><i class="fa-solid fa-plus"></i> Add Income</h3>
+                    <input type="number" id="incomeInput" placeholder="Income amount" />
+                    <button class="btn btn-income" onclick="addIncome()">Save Income</button>
+                </div>
+
+                <div class="input-card">
+                    <h3><i class="fa-solid fa-receipt"></i> Add Expense</h3>
+                    <input type="number" id="expenseInput" placeholder="Expense amount" />
+                    <input type="text" id="categoryInput" placeholder="Category (Food, Travel...)" />
+                    <button class="btn btn-expense" onclick="addExpense()">Save Expense</button>
+                </div>
             </div>
+        </section>
 
-        </div>
+        <aside class="card side">
+            <h3><i class="fa-solid fa-chart-pie"></i> Spending Categories</h3>
+            <ul class="list" id="list"></ul>
+            <p class="empty" id="emptyState" hidden>No expense category yet.</p>
 
-        <!-- ADD INCOME -->
-        <div class="card">
-            <h3>Add Income</h3>
-            <input type="number" id="incomeInput" placeholder="Enter income" />
-            <button onclick="addIncome()">Add Income</button>
-        </div>
-
-        <!-- ADD EXPENSE -->
-        <div class="card">
-            <h3>Add Expense</h3>
-
-            <input type="number" id="expenseInput" placeholder="Enter expense" />
-
-            <input type="text" id="categoryInput" placeholder="Category (Food/Travel/Hotel)" />
-
-            <button onclick="addExpense()">Add Expense</button>
-        </div>
-
-        <!-- BREAKDOWN -->
-        <div class="card">
-            <h3>📊 Where you spent</h3>
-            <ul id="list"></ul>
-        </div>
-
+            <div class="hero-note">
+                <i class="fa-solid fa-lock"></i>
+                Data is saved locally in your browser storage for a private, secure feeling.
+            </div>
+        </aside>
     </div>
 
     <script>
         let income = 0;
         let expense = 0;
+        const breakdown = JSON.parse(localStorage.getItem("breakdown")) || {};
 
-        let breakdown = JSON.parse(localStorage.getItem("breakdown")) || {};
+        const root = document.documentElement;
+        const themeToggle = document.getElementById("themeToggle");
+
+        function formatMoney(value) {
+            return `${value.toLocaleString("en-BD")} BDT`;
+        }
 
         function save() {
             localStorage.setItem("income", income);
@@ -174,18 +366,41 @@
             expense = Number(localStorage.getItem("expense")) || 0;
         }
 
+        function applyTheme(theme) {
+            root.setAttribute("data-theme", theme);
+            localStorage.setItem("theme", theme);
+            themeToggle.innerHTML = theme === "dark"
+                ? '<i class="fa-solid fa-sun"></i>'
+                : '<i class="fa-solid fa-moon"></i>';
+        }
+
+        function loadTheme() {
+            const savedTheme = localStorage.getItem("theme") || "light";
+            applyTheme(savedTheme);
+        }
+
         function updateUI() {
+            document.getElementById("income").innerText = formatMoney(income);
+            document.getElementById("expense").innerText = formatMoney(expense);
+            document.getElementById("balance").innerText = formatMoney(income - expense);
 
-            document.getElementById("income").innerText = income;
-            document.getElementById("expense").innerText = expense;
-            document.getElementById("balance").innerText = income - expense;
-
-            let list = document.getElementById("list");
+            const list = document.getElementById("list");
+            const emptyState = document.getElementById("emptyState");
             list.innerHTML = "";
 
-            for (let key in breakdown) {
-                let li = document.createElement("li");
-                li.innerText = `${key} → ${breakdown[key]} BDT`;
+            const categories = Object.keys(breakdown);
+            emptyState.hidden = categories.length > 0;
+
+            for (const key of categories) {
+                const li = document.createElement("li");
+                const cat = document.createElement("span");
+                const amount = document.createElement("strong");
+
+                cat.innerText = key;
+                amount.innerText = formatMoney(breakdown[key]);
+
+                li.appendChild(cat);
+                li.appendChild(amount);
                 list.appendChild(li);
             }
 
@@ -193,38 +408,35 @@
         }
 
         function addIncome() {
-            let val = Number(document.getElementById("incomeInput").value);
-            if (!val) return;
-
+            const val = Number(document.getElementById("incomeInput").value);
+            if (!val || val < 0) return;
             income += val;
             document.getElementById("incomeInput").value = "";
             updateUI();
         }
 
         function addExpense() {
-            let val = Number(document.getElementById("expenseInput").value);
-            let cat = document.getElementById("categoryInput").value.trim();
-
-            if (!val || cat === "") return;
+            const val = Number(document.getElementById("expenseInput").value);
+            const cat = document.getElementById("categoryInput").value.trim();
+            if (!val || val < 0 || cat === "") return;
 
             expense += val;
-
-            if (!breakdown[cat]) {
-                breakdown[cat] = 0;
-            }
-
-            breakdown[cat] += val;
+            breakdown[cat] = (breakdown[cat] || 0) + val;
 
             document.getElementById("expenseInput").value = "";
             document.getElementById("categoryInput").value = "";
-
             updateUI();
         }
 
+        themeToggle.addEventListener("click", () => {
+            const current = root.getAttribute("data-theme") === "dark" ? "dark" : "light";
+            applyTheme(current === "dark" ? "light" : "dark");
+        });
+
+        loadTheme();
         load();
         updateUI();
     </script>
-
 </body>
 
 </html>
