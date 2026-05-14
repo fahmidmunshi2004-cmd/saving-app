@@ -148,11 +148,8 @@ function loadFinanceCache() {
 async function loadFinanceData() {
   const scopeId = getDataScopeId();
   if (!scopeId || !db) {
-        income = 0;
-        expense = 0;
-        Object.keys(breakdown).forEach((k) => delete breakdown[k]);
-        transactions.length = 0;
-        return;
+    // Keep current in-memory/cache state until auth/session is ready.
+    return;
   }
 
   let snap;
@@ -751,12 +748,16 @@ clearDataBtn.addEventListener("click", async () => {
     await applyAuthState();
 });
 
-loadTheme();
-updateUI();
-loadSession();
-initFirebaseCore();
-applyAuthState();
-initGoogleAuthListener();
+async function bootApp() {
+  loadTheme();
+  loadSession();
+  initFirebaseCore();
+  await applyAuthState();
+  initGoogleAuthListener();
+  updateUI();
+}
+
+bootApp();
 
 const params = new URLSearchParams(window.location.search);
 const token = params.get("inviteToken");
