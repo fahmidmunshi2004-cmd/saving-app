@@ -41,6 +41,7 @@ const groupMemberCount = document.getElementById("groupMemberCount");
 const inviteCard = document.getElementById("inviteCard");
 const inviteEmailInput = document.getElementById("inviteEmailInput");
 const sendInviteBtn = document.getElementById("sendInviteBtn");
+const inviteStatusText = document.getElementById("inviteStatusText");
 const requestAccessCard = document.getElementById("requestAccessCard");
 const requestAccessEmailInput = document.getElementById("requestAccessEmailInput");
 const requestAccessBtn = document.getElementById("requestAccessBtn");
@@ -457,9 +458,30 @@ async function sendInviteToGmail() {
   const subject = encodeURIComponent("VaultBudget Group Invite");
   const body = encodeURIComponent(`Please join my group account. Click this link: ${link}`);
 
-  window.open(`mailto:${email}?subject=${subject}&body=${body}`, "_blank");
+  let copied = false;
+  try {
+    await navigator.clipboard.writeText(link);
+    copied = true;
+  } catch (_) {
+    copied = false;
+  }
+
+  const mailWindow = window.open(`mailto:${email}?subject=${subject}&body=${body}`, "_blank");
+  const popupBlocked = !mailWindow;
+
   inviteEmailInput.value = "";
-  window.alert("Invite compose window খুলেছে। Send করলে invite যাবে।");
+  inviteStatusText.innerText = copied
+    ? `Invite ready. Link copied for ${email}.`
+    : `Invite created for ${email}.`;
+
+  if (popupBlocked) {
+    window.alert(`Popup blocked. এই invite link manually share করুন:\n\n${link}`);
+    return;
+  }
+
+  if (!copied) {
+    window.alert(`Invite compose opened. প্রয়োজনে এই link manually share করুন:\n\n${link}`);
+  }
 }
 
 function renderTransactions() {
