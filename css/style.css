@@ -159,6 +159,15 @@ body {
     font-size: 0.85rem;
 }
 
+.login-actions {
+    display: grid;
+    gap: 10px;
+}
+
+.group-login {
+    margin-top: 10px;
+}
+
 .login-error {
     margin-top: 8px;
     color: #e54869;
@@ -704,6 +713,19 @@ tbody tr:last-child td {
     color: var(--muted);
     font-size: 0.9rem;
     margin-top: 10px;
+}
+
+.simple-list {
+    margin: 8px 0 0;
+    padding: 0;
+    list-style: none;
+}
+
+.simple-list li {
+    margin-top: 8px;
+    padding: 8px;
+    border-radius: 10px;
+    background: #f7f7f7;
 }
 
 @media (max-width: 620px) {

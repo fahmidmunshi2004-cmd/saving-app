@@ -29,8 +29,24 @@
         <div class="login-card">
             <h2>Login Required</h2>
             <p class="login-help">Continue with Google (Gmail) to access the app.</p>
-            <button id="googleLoginBtn" class="btn expense-btn" type="button"><i class="fa-brands fa-google"></i>
-                Continue with Google</button>
+            <div class="login-actions">
+                <button id="googleLoginBtn" class="btn expense-btn" type="button"><i class="fa-brands fa-google"></i>
+                    Continue with Google</button>
+                <button id="groupModeBtn" class="btn income-btn" type="button"><i class="fa-solid fa-users"></i>
+                    Group Account</button>
+            </div>
+            <div id="groupLoginFields" class="group-login hidden">
+                <div class="field">
+                    <input id="groupUsername" type="text" placeholder=" " />
+                    <label class="floating-label" for="groupUsername">Group user name</label>
+                </div>
+                <div class="field">
+                    <input id="groupPassword" type="password" placeholder=" " />
+                    <label class="floating-label" for="groupPassword">Password</label>
+                </div>
+                <button id="groupLoginBtn" class="btn expense-btn" type="button">Create/Login Group</button>
+                <p class="login-help">New username দিলে নতুন group account open হবে, existing হলে login হবে।</p>
+            </div>
         </div>
     </section>
 
@@ -156,6 +172,38 @@
             <h3><i class="fa-solid fa-sliders"></i> Settings</h3><span class="pill">Control</span>
         </div>
         <div class="settings-grid">
+            <div class="settings-item">
+                <strong>Account Type</strong><br />
+                <span id="accountTypeText">-</span>
+            </div>
+            <div class="settings-item">
+                <strong>Role</strong><br />
+                <span id="accountRoleText">-</span>
+            </div>
+            <div id="groupMembersCard" class="settings-item hidden">
+                <strong>Group Members</strong><br />
+                <span id="groupMemberCount">0</span> জন
+            </div>
+            <div id="inviteCard" class="settings-item hidden">
+                <strong>Invite Member (Admin)</strong><br />
+                <div class="field">
+                    <input id="inviteEmailInput" type="email" placeholder=" " />
+                    <label class="floating-label" for="inviteEmailInput">Friend Gmail</label>
+                </div>
+                <button id="sendInviteBtn" class="btn expense-btn" type="button">Send Invite</button>
+            </div>
+            <div id="requestAccessCard" class="settings-item hidden">
+                <strong>Request Edit Access</strong><br />
+                <div class="field">
+                    <input id="requestAccessEmailInput" type="email" placeholder=" " />
+                    <label class="floating-label" for="requestAccessEmailInput">Admin Gmail</label>
+                </div>
+                <button id="requestAccessBtn" class="btn income-btn" type="button">Request Access</button>
+            </div>
+            <div id="pendingRequestsCard" class="settings-item hidden">
+                <strong>Pending Access Requests</strong><br />
+                <ul id="pendingRequestsList" class="simple-list"></ul>
+            </div>
             <div class="settings-item">Theme mode এখন উপরের moon/sun button থেকে change করতে পারবেন।</div>
             <div class="settings-item">এই session এর login lock active আছে। page refresh করলে পুনরায় login লাগবে।</div>
             <div class="settings-item">Data local browser storage-এ save হয়।</div>
