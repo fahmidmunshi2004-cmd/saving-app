@@ -178,6 +178,8 @@ async function loadFinanceData() {
 async function saveFinanceData() {
   const scopeId = getDataScopeId();
   if (!scopeId || !db) return;
+  // Save immediate cache first so quick reload won't lose data.
+  saveFinanceCache();
 
   try {
     await db.collection("finance_data").doc(scopeId).set({
@@ -637,8 +639,9 @@ function updateUI() {
         list.appendChild(li);
     }
 
-    renderTransactions();
-    renderExpenseChart();
+  renderTransactions();
+  renderExpenseChart();
+  saveFinanceCache();
 }
 
 async function addIncome() {
