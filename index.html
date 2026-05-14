@@ -10,7 +10,6 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
-    <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 
     <style>
         :root {
@@ -97,31 +96,47 @@
             color: var(--muted);
         }
 
-        .auth-actions {
-            display: flex;
-            gap: 8px;
-        }
-
-        .auth-btn {
-            border: 1px solid var(--stroke);
-            background: var(--surface-soft);
-            color: var(--text);
-            border-radius: 10px;
-            padding: 8px 12px;
-            font: inherit;
-            font-size: 0.82rem;
-            font-weight: 700;
-            cursor: pointer;
-        }
-
-        .auth-btn.primary {
-            border: 0;
-            color: #fff;
-            background: linear-gradient(120deg, var(--brand), var(--brand-2));
-        }
-
         .hidden {
             display: none !important;
+        }
+
+        .login-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(9, 17, 33, 0.52);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 16px;
+        }
+
+        .login-card {
+            width: min(420px, 100%);
+            border: 1px solid var(--stroke);
+            border-radius: 16px;
+            background: var(--surface);
+            box-shadow: var(--shadow);
+            padding: 16px;
+        }
+
+        .login-card h2 {
+            margin: 0 0 8px;
+            font-size: 1.1rem;
+        }
+
+        .login-help {
+            margin: 0 0 8px;
+            color: var(--muted);
+            font-size: 0.85rem;
+        }
+
+        .login-error {
+            margin-top: 8px;
+            color: #e54869;
+            font-size: 0.85rem;
+            min-height: 18px;
         }
 
         .panel {
@@ -512,10 +527,17 @@
 
 <body>
     <section id="authBar" class="auth-shell">
-        <div id="authInfo" class="auth-info">Login required to access your app.</div>
-        <div class="auth-actions">
-            <button id="loginBtn" class="auth-btn primary" type="button">Login</button>
-            <button id="logoutBtn" class="auth-btn hidden" type="button">Logout</button>
+        <div id="authInfo" class="auth-info">Private mode is enabled.</div>
+    </section>
+
+    <section id="loginOverlay" class="login-overlay">
+        <div class="login-card">
+            <h2>Login Required</h2>
+            <p class="login-help">Username and password diye login korun.</p>
+            <input id="loginUsername" type="text" placeholder="Username" />
+            <input id="loginPassword" type="password" placeholder="Password" />
+            <button id="loginSubmit" class="btn expense-btn" type="button">Login</button>
+            <p id="loginError" class="login-error"></p>
         </div>
     </section>
 
@@ -612,14 +634,20 @@
         const root = document.documentElement;
         const themeToggle = document.getElementById("themeToggle");
         const authInfo = document.getElementById("authInfo");
-        const loginBtn = document.getElementById("loginBtn");
-        const logoutBtn = document.getElementById("logoutBtn");
         const appShell = document.querySelector(".app");
+        const bottomNav = document.querySelector(".bottom-nav");
+        const loginOverlay = document.getElementById("loginOverlay");
+        const loginUsername = document.getElementById("loginUsername");
+        const loginPassword = document.getElementById("loginPassword");
+        const loginSubmit = document.getElementById("loginSubmit");
+        const loginError = document.getElementById("loginError");
         const incomeInput = document.getElementById("incomeInput");
         const expenseInput = document.getElementById("expenseInput");
         const categoryInput = document.getElementById("categoryInput");
         const incomeBtn = document.getElementById("incomeBtn");
         const expenseBtn = document.getElementById("expenseBtn");
+        const LOGIN_USER = "Saving By Fahmid";
+        const LOGIN_PASS = "Fahmid 1234";
 
         function formatMoney(value) {
             return `${value.toLocaleString("en-BD")} BDT`;
@@ -660,36 +688,20 @@
             expenseBtn.style.opacity = enabled ? "1" : "0.55";
         }
 
-        function checkRoles(user) {
-            const roles = user?.app_metadata?.roles || [];
-            return roles.includes("admin") || roles.includes("editor");
-        }
-
-        function applyAuthState(user) {
-            if (!user) {
-                authInfo.innerText = "Login required. Without login, nobody can access app data.";
-                loginBtn.classList.remove("hidden");
-                logoutBtn.classList.add("hidden");
+        function applyAuthState(isLoggedIn) {
+            if (!isLoggedIn) {
+                authInfo.innerText = "Private mode is enabled. Login first.";
                 appShell.classList.add("hidden");
-                document.querySelector(".bottom-nav").classList.add("hidden");
+                bottomNav.classList.add("hidden");
+                loginOverlay.classList.remove("hidden");
                 setEditAccess(false);
                 return;
             }
-
-            loginBtn.classList.add("hidden");
-            logoutBtn.classList.remove("hidden");
+            authInfo.innerText = "Logged in as Saving By Fahmid.";
             appShell.classList.remove("hidden");
-            document.querySelector(".bottom-nav").classList.remove("hidden");
-
-            const editable = checkRoles(user);
-            setEditAccess(editable);
-            authInfo.innerText = editable
-                ? `Logged in as ${user.email} (editor access)`
-                : `Logged in as ${user.email} (view only)`;
-        }
-
-        function openGoogleLogin() {
-            netlifyIdentity.open("login", { provider: "google" });
+            bottomNav.classList.remove("hidden");
+            loginOverlay.classList.add("hidden");
+            setEditAccess(true);
         }
 
         function renderTransactions() {
@@ -810,34 +822,23 @@
             applyTheme(current === "dark" ? "light" : "dark");
         });
 
-        loginBtn.addEventListener("click", () => {
-            openGoogleLogin();
-        });
-
-        logoutBtn.addEventListener("click", () => {
-            netlifyIdentity.logout();
-        });
-
-        netlifyIdentity.on("init", (user) => {
-            applyAuthState(user);
-            if (!user) {
-                openGoogleLogin();
+        loginSubmit.addEventListener("click", () => {
+            const user = loginUsername.value.trim();
+            const pass = loginPassword.value;
+            if (user === LOGIN_USER && pass === LOGIN_PASS) {
+                sessionStorage.setItem("sbf_logged_in", "1");
+                loginError.innerText = "";
+                applyAuthState(true);
+                loginPassword.value = "";
+            } else {
+                loginError.innerText = "Username or password incorrect.";
             }
-        });
-
-        netlifyIdentity.on("login", (user) => {
-            applyAuthState(user);
-            netlifyIdentity.close();
-        });
-
-        netlifyIdentity.on("logout", () => {
-            applyAuthState(null);
         });
 
         loadTheme();
         load();
         updateUI();
-        netlifyIdentity.init();
+        applyAuthState(sessionStorage.getItem("sbf_logged_in") === "1");
     </script>
 </body>
 
