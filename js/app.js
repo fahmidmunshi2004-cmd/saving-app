@@ -64,6 +64,7 @@ let auth = null;
 let googleProvider = null;
 let firebaseUser = null;
 let currentSession = null;
+let pendingInviteInfo = null;
 
 function getGroups() {
   return JSON.parse(localStorage.getItem(GROUPS_KEY)) || [];
@@ -260,47 +261,17 @@ function applyAuthState() {
 }
 
 function processInviteLink() {
-  if (!firebaseUser) return;
   const params = new URLSearchParams(window.location.search);
   const token = params.get("inviteToken");
   const groupId = params.get("groupId");
   const invitedEmail = params.get("email");
 
-  if (!token || !groupId || !invitedEmail) return;
-  if (firebaseUser.email?.toLowerCase() !== invitedEmail.toLowerCase()) return;
+  if (!token || !groupId) return;
 
-  const groups = getGroups();
-  const group = groups.find((g) => g.id === groupId);
-  if (!group) return;
-
-  const invite = (group.invites || []).find((i) => i.token === token && i.status === "pending");
-  if (!invite) return;
-
-  const memberId = `gmail_${firebaseUser.uid}`;
-  const exists = group.members.some((m) => m.memberId === memberId);
-  if (!exists) {
-    group.members.push({
-      memberId,
-      type: "gmail",
-      label: firebaseUser.email,
-      role: "viewer",
-      canEdit: false
-    });
-  }
-  invite.status = "accepted";
-  saveGroups(groups);
-
-  currentSession = {
-    type: "gmail",
-    uid: firebaseUser.uid,
-    email: firebaseUser.email,
-    groupId,
-    memberId,
-    role: "viewer",
-    canEdit: false
-  };
-  saveSession();
-  applyAuthState();
+  pendingInviteInfo = { token, groupId, invitedEmail: invitedEmail || "" };
+  groupLoginFields.classList.remove("hidden");
+  groupLoginBtn.innerText = "Join Group";
+  window.alert("Invite link detected. Username + Password দিন, তারপর group-এ join হবে।");
 
   params.delete("inviteToken");
   params.delete("groupId");
@@ -362,24 +333,67 @@ function loginOrCreateGroupAccount() {
 
   if (!account) {
     const groupId = `grp_${Date.now()}`;
+    const finalGroupId = pendingInviteInfo?.groupId || groupId;
     account = { username, password, groupId, role: "admin", canEdit: true, memberId: `group_${username}` };
+    account.groupId = finalGroupId;
+    account.role = pendingInviteInfo ? "viewer" : "admin";
+    account.canEdit = !pendingInviteInfo;
     accounts.push(account);
     saveGroupAccounts(accounts);
 
     const groups = getGroups();
-    groups.push({
-      id: groupId,
-      adminUsername: username,
-      members: [{ memberId: account.memberId, type: "group", label: username, role: "admin", canEdit: true }],
-      invites: [],
-      accessRequests: []
-    });
+    const existingGroup = groups.find((g) => g.id === finalGroupId);
+    if (!existingGroup) {
+      groups.push({
+        id: finalGroupId,
+        adminUsername: username,
+        members: [{ memberId: account.memberId, type: "group", label: username, role: "admin", canEdit: true }],
+        invites: [],
+        accessRequests: []
+      });
+    } else {
+      const existsMember = existingGroup.members.some((m) => m.memberId === account.memberId);
+      if (!existsMember) {
+        existingGroup.members.push({
+          memberId: account.memberId,
+          type: "group",
+          label: username,
+          role: "viewer",
+          canEdit: false
+        });
+      }
+    }
     saveGroups(groups);
   } else {
     if (account.password !== password) {
       window.alert("Password ভুল।");
       return;
     }
+    if (pendingInviteInfo && account.groupId !== pendingInviteInfo.groupId) {
+      window.alert("এই username অন্য group-এর। নতুন username দিয়ে join করুন।");
+      return;
+    }
+  }
+
+  if (pendingInviteInfo) {
+    const groups = getGroups();
+    const group = groups.find((g) => g.id === pendingInviteInfo.groupId);
+    if (group) {
+      const invite = (group.invites || []).find((i) => i.token === pendingInviteInfo.token && i.status === "pending");
+      if (!invite) {
+        window.alert("Invite expired বা invalid।");
+        return;
+      }
+      const exists = group.members.some((m) => m.memberId === account.memberId);
+      if (!exists) {
+        group.members.push({ memberId: account.memberId, type: "group", label: account.username, role: "viewer", canEdit: false });
+      }
+      invite.status = "accepted";
+      saveGroups(groups);
+    }
+    account.role = "viewer";
+    account.canEdit = false;
+    saveGroupAccounts(accounts);
   }
 
   currentSession = {
@@ -387,10 +401,12 @@ function loginOrCreateGroupAccount() {
     username: account.username,
     groupId: account.groupId,
     memberId: account.memberId,
-    role: account.role || "admin",
+    role: account.role || "viewer",
     canEdit: account.canEdit !== false
   };
   saveSession();
+  pendingInviteInfo = null;
+  groupLoginBtn.innerText = "Create/Login Group";
   applyAuthState();
 }
 
@@ -665,6 +681,7 @@ loadTheme();
 loadData();
 updateUI();
 loadSession();
+processInviteLink();
 applyAuthState();
 initGoogleAuth();
 
