@@ -8,6 +8,7 @@ let googleProvider = null;
 let firebaseUser = null;
 let currentSession = null;
 let pendingInviteInfo = null;
+let dbOfflineWarned = false;
 
 const breakdown = {};
 const transactions = [];
@@ -159,11 +160,16 @@ async function loadFinanceData() {
     snap = await db.collection("finance_data").doc(scopeId).get();
   } catch (error) {
     const loaded = loadFinanceCache();
-    if (!loaded) {
+    const isOfflineErr = String(error?.message || "").toLowerCase().includes("offline");
+    if (!loaded && !isOfflineErr) {
       window.alert(`Data load fail: ${error?.message || "unknown error"}`);
+    } else if (isOfflineErr && !dbOfflineWarned) {
+      dbOfflineWarned = true;
+      window.alert("Internet/Firestore offline. Cached data দেখানো হচ্ছে।");
     }
     return;
   }
+  dbOfflineWarned = false;
   const data = snap.exists ? snap.data() : null;
 
     income = Number(data?.income || 0);
@@ -687,6 +693,9 @@ function initFirebaseCore() {
     firebase.initializeApp(firebaseConfig);
   }
   db = firebase.firestore();
+  db.enablePersistence({ synchronizeTabs: true }).catch(() => {
+    // Ignore persistence init errors (private mode / multiple tabs with restrictions).
+  });
   auth = firebase.auth();
   googleProvider = new firebase.auth.GoogleAuthProvider();
 }
