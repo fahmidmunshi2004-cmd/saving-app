@@ -5,46 +5,46 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>VaultBudget</title>
-    <meta name="theme-color" content="#ecf5ff" />
+    <meta name="theme-color" content="#f4f7ff" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23ff8a00'/%3E%3Cstop offset='1' stop-color='%23ff3d81'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect x='6' y='6' width='52' height='52' rx='16' fill='%23fff3e8'/%3E%3Cpath d='M21 30h22a3 3 0 0 1 3 3v13a4 4 0 0 1-4 4H22a4 4 0 0 1-4-4V33a3 3 0 0 1 3-3z' fill='url(%23g)'/%3E%3Cpath d='M24 30v-4a8 8 0 1 1 16 0v4' fill='none' stroke='%23ff7f5f' stroke-width='3.5' stroke-linecap='round'/%3E%3Ccircle cx='32' cy='39' r='2.8' fill='%23fff3e8'/%3E%3Cpath d='M32 41.8v3.8' stroke='%23fff3e8' stroke-width='2.4' stroke-linecap='round'/%3E%3C/svg%3E" />
+    <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 
     <style>
         :root {
-            --bg: #f6f9ff;
-            --bg-soft: #eef5ff;
+            --bg: #f4f7ff;
+            --bg-2: #edf4ff;
             --surface: #ffffff;
-            --surface-2: #f8fbff;
-            --txt: #19253a;
-            --muted: #6f8098;
-            --primary: #ff7a18;
-            --primary-2: #ff4f81;
-            --accent: #3e8bff;
-            --income: #00a86b;
-            --expense: #e54366;
-            --balance: #2a78ff;
-            --stroke: #dbe6f4;
-            --shadow: 0 14px 40px rgba(47, 84, 140, 0.14);
+            --surface-soft: #f8fbff;
+            --text: #1c2638;
+            --muted: #6d7f99;
+            --stroke: #d7e2f2;
+            --brand: #2f6df6;
+            --brand-2: #42a7ff;
+            --income: #0fab72;
+            --expense: #f25576;
+            --balance: #2f6df6;
+            --shadow: 0 20px 45px rgba(53, 90, 150, 0.12);
+            --hero-grad: linear-gradient(135deg, #2f6df6 0%, #42a7ff 55%, #6ad9ff 100%);
         }
 
         html[data-theme="dark"] {
-            --bg: #151b26;
-            --bg-soft: #1a2333;
-            --surface: #212d42;
-            --surface-2: #24324a;
-            --txt: #f6f9ff;
-            --muted: #a8b8d3;
-            --primary: #ff9f43;
-            --primary-2: #ff5e96;
-            --accent: #7ba5ff;
-            --income: #36dc98;
-            --expense: #ff7594;
-            --balance: #7db8ff;
-            --stroke: #30415e;
-            --shadow: 0 14px 40px rgba(0, 0, 0, 0.25);
+            --bg: #1f2635;
+            --bg-2: #222d40;
+            --surface: #2a374d;
+            --surface-soft: #31415b;
+            --text: #eef4ff;
+            --muted: #a6b7d2;
+            --stroke: #405470;
+            --brand: #7cb4ff;
+            --brand-2: #93d4ff;
+            --income: #53d7a6;
+            --expense: #ff8ea7;
+            --balance: #8ec0ff;
+            --shadow: 0 22px 50px rgba(0, 0, 0, 0.28);
+            --hero-grad: linear-gradient(135deg, #4068b5 0%, #4886c8 60%, #4ca2bd 100%);
         }
 
         * {
@@ -53,46 +53,96 @@
 
         body {
             margin: 0;
+            font-family: "Manrope", sans-serif;
+            color: var(--text);
             min-height: 100vh;
-            font-family: "Sora", sans-serif;
-            color: var(--txt);
             background:
-                radial-gradient(700px 280px at -10% -10%, #ffd5be 0%, transparent 65%),
-                radial-gradient(700px 260px at 110% 0%, #ffc4e3 0%, transparent 55%),
-                linear-gradient(160deg, var(--bg), var(--bg-soft));
-            padding: 18px 12px;
+                radial-gradient(600px 220px at 0% 0%, #d8e7ff 0%, transparent 60%),
+                radial-gradient(600px 260px at 100% 0%, #d9f2ff 0%, transparent 62%),
+                linear-gradient(160deg, var(--bg), var(--bg-2));
+            padding: 16px;
         }
 
         html[data-theme="dark"] body {
             background:
-                radial-gradient(700px 280px at -10% -10%, #3b2a1f 0%, transparent 65%),
-                radial-gradient(700px 260px at 110% 0%, #41223d 0%, transparent 55%),
-                linear-gradient(160deg, var(--bg), var(--bg-soft));
+                radial-gradient(600px 220px at 0% 0%, #2f3f58 0%, transparent 60%),
+                radial-gradient(600px 260px at 100% 0%, #2a3d57 0%, transparent 62%),
+                linear-gradient(160deg, var(--bg), var(--bg-2));
         }
 
-        .app-shell {
-            width: min(980px, 100%);
+        .app {
+            max-width: 1060px;
             margin: 0 auto;
             display: grid;
-            gap: 16px;
-            grid-template-columns: 1.3fr 0.9fr;
+            grid-template-columns: 1.5fr 0.9fr;
+            gap: 14px;
         }
 
-        .card {
-            background: var(--surface);
+        .auth-shell {
+            max-width: 1060px;
+            margin: 0 auto 12px;
             border: 1px solid var(--stroke);
-            border-radius: 20px;
+            border-radius: 16px;
+            background: var(--surface);
+            box-shadow: var(--shadow);
+            padding: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .auth-info {
+            font-size: 0.88rem;
+            color: var(--muted);
+        }
+
+        .auth-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .auth-btn {
+            border: 1px solid var(--stroke);
+            background: var(--surface-soft);
+            color: var(--text);
+            border-radius: 10px;
+            padding: 8px 12px;
+            font: inherit;
+            font-size: 0.82rem;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .auth-btn.primary {
+            border: 0;
+            color: #fff;
+            background: linear-gradient(120deg, var(--brand), var(--brand-2));
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .panel {
+            border: 1px solid var(--stroke);
+            border-radius: 24px;
+            background: var(--surface);
             box-shadow: var(--shadow);
         }
 
         .main {
-            padding: 18px;
+            padding: 16px;
         }
 
-        .topbar {
+        .hero {
+            background: var(--hero-grad);
+            border-radius: 18px;
+            padding: 16px;
+            color: #fff;
             display: flex;
-            align-items: center;
             justify-content: space-between;
+            align-items: center;
             gap: 10px;
         }
 
@@ -103,107 +153,114 @@
         }
 
         .logo {
-            width: 52px;
-            height: 52px;
-            border-radius: 16px;
-            background: linear-gradient(140deg, var(--primary), var(--primary-2));
-            color: #fff;
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
             display: grid;
             place-items: center;
-            font-size: 1.2rem;
-            box-shadow: 0 10px 26px rgba(255, 87, 101, 0.34);
+            background: rgba(255, 255, 255, 0.24);
+            border: 1px solid rgba(255, 255, 255, 0.36);
+            font-size: 1.1rem;
         }
 
         h1 {
             margin: 0;
-            font-size: 1.4rem;
+            font-size: 1.35rem;
+            font-weight: 800;
         }
 
         .sub {
             margin: 4px 0 0;
-            color: var(--muted);
-            font-size: 0.9rem;
+            font-size: 0.88rem;
+            opacity: 0.9;
         }
 
         .theme-btn {
-            border: 1px solid var(--stroke);
-            background: var(--surface-2);
-            color: var(--txt);
+            border: 1px solid rgba(255, 255, 255, 0.42);
+            background: rgba(255, 255, 255, 0.18);
+            color: #fff;
             width: 44px;
             height: 44px;
-            border-radius: 14px;
+            border-radius: 13px;
             cursor: pointer;
-            font-size: 1rem;
         }
 
         .stats {
-            margin-top: 16px;
+            margin-top: 12px;
             display: grid;
             grid-template-columns: repeat(3, minmax(0, 1fr));
             gap: 10px;
         }
 
         .stat {
-            background: var(--surface-2);
+            background: var(--surface-soft);
             border: 1px solid var(--stroke);
             border-radius: 14px;
             padding: 12px;
         }
 
-        .stat .label {
+        .label {
+            font-size: 0.75rem;
+            letter-spacing: 0.7px;
+            text-transform: uppercase;
+            color: var(--muted);
             display: flex;
             align-items: center;
             gap: 6px;
-            color: var(--muted);
-            font-size: 0.76rem;
-            text-transform: uppercase;
-            letter-spacing: 0.8px;
         }
 
-        .stat .value {
-            margin-top: 8px;
-            font-size: 1.08rem;
-            font-weight: 700;
+        .value {
+            margin-top: 7px;
+            font-size: 1.14rem;
+            font-weight: 800;
         }
 
-        .income .value { color: var(--income); }
-        .expense .value { color: var(--expense); }
-        .balance .value { color: var(--balance); }
+        .income .value {
+            color: var(--income);
+        }
 
-        .grid {
-            margin-top: 14px;
+        .expense .value {
+            color: var(--expense);
+        }
+
+        .balance .value {
+            color: var(--balance);
+        }
+
+        .forms {
+            margin-top: 12px;
             display: grid;
-            gap: 10px;
             grid-template-columns: 1fr 1fr;
+            gap: 10px;
         }
 
-        .input-card {
-            background: var(--surface-2);
+        .box {
+            background: var(--surface-soft);
             border: 1px solid var(--stroke);
             border-radius: 14px;
             padding: 12px;
         }
 
-        .input-card h3 {
+        .box h3 {
             margin: 0 0 8px;
-            font-size: 1rem;
+            font-size: 0.98rem;
         }
 
         input {
             width: 100%;
             margin-top: 8px;
             border: 1px solid var(--stroke);
-            background: var(--surface);
-            color: var(--txt);
             border-radius: 12px;
-            padding: 11px;
+            background: var(--surface);
+            color: var(--text);
             font: inherit;
+            padding: 11px;
             outline: none;
         }
 
         input:focus {
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 24%, transparent);
+            border-color: var(--brand);
+            box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand) 18%, transparent);
         }
 
         .btn {
@@ -218,95 +275,270 @@
             cursor: pointer;
         }
 
-        .btn-income { background: linear-gradient(130deg, #03b978, #00dba1); }
-        .btn-expense { background: linear-gradient(130deg, #4285ff, #66b3ff); }
-
-        .side {
-            padding: 18px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
+        .income-btn {
+            background: linear-gradient(120deg, #0fab72, #32d79a);
         }
 
-        .side h3 {
+        .expense-btn {
+            background: linear-gradient(120deg, #2f6df6, #58a7ff);
+        }
+
+        .history {
+            margin-top: 12px;
+            background: var(--surface-soft);
+            border: 1px solid var(--stroke);
+            border-radius: 14px;
+            padding: 12px;
+        }
+
+        .history-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .history h3 {
             margin: 0;
-            font-size: 1.02rem;
+            font-size: 0.98rem;
+        }
+
+        .history-count {
+            font-size: 0.78rem;
+            color: var(--muted);
+        }
+
+        .table-wrap {
+            overflow-x: auto;
+            border: 1px solid var(--stroke);
+            border-radius: 12px;
+            background: var(--surface);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 460px;
+        }
+
+        th,
+        td {
+            text-align: left;
+            padding: 10px;
+            font-size: 0.86rem;
+            border-bottom: 1px solid var(--stroke);
+        }
+
+        th {
+            color: var(--muted);
+            font-weight: 700;
+            background: var(--surface-soft);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .type-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            border-radius: 999px;
+            padding: 3px 8px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .type-income {
+            background: linear-gradient(120deg, #0fab72, #32d79a);
+        }
+
+        .type-expense {
+            background: linear-gradient(120deg, #2f6df6, #58a7ff);
+        }
+
+        .amount-income {
+            color: var(--income);
+            font-weight: 700;
+        }
+
+        .amount-expense {
+            color: var(--expense);
+            font-weight: 700;
+        }
+
+        .side {
+            padding: 16px;
+        }
+
+        .side-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .side-head h3 {
+            margin: 0;
+            font-size: 1rem;
+        }
+
+        .pill {
+            font-size: 0.73rem;
+            color: #fff;
+            padding: 6px 9px;
+            border-radius: 999px;
+            background: linear-gradient(120deg, var(--brand), var(--brand-2));
         }
 
         .list {
-            margin: 0;
+            margin: 10px 0 0;
             padding: 0;
             list-style: none;
         }
 
         .list li {
+            background: var(--surface-soft);
+            border: 1px solid var(--stroke);
+            border-radius: 12px;
+            padding: 10px;
+            margin-top: 8px;
+        }
+
+        .row {
             display: flex;
             justify-content: space-between;
             gap: 8px;
-            padding: 11px;
-            border: 1px solid var(--stroke);
-            background: var(--surface-2);
-            border-radius: 12px;
-            margin-top: 8px;
-            font-size: 0.93rem;
+            font-size: 0.92rem;
         }
 
-        .hero-note {
+        .bar {
             margin-top: 8px;
-            font-size: 0.9rem;
-            color: var(--muted);
-            background: var(--surface-2);
-            border: 1px solid var(--stroke);
-            border-radius: 12px;
-            padding: 11px;
-            line-height: 1.5;
+            height: 8px;
+            border-radius: 999px;
+            background: color-mix(in srgb, var(--brand) 14%, transparent);
+            overflow: hidden;
+        }
+
+        .bar>span {
+            display: block;
+            height: 100%;
+            width: 0;
+            border-radius: inherit;
+            background: linear-gradient(120deg, var(--brand), var(--brand-2));
+            transition: width 0.25s ease;
         }
 
         .empty {
             color: var(--muted);
             font-size: 0.9rem;
-            margin-top: 8px;
+            margin-top: 10px;
         }
 
-        @media (max-width: 900px) {
-            .app-shell {
+        .note {
+            margin-top: 12px;
+            border: 1px solid var(--stroke);
+            background: var(--surface-soft);
+            border-radius: 12px;
+            padding: 10px;
+            color: var(--muted);
+            font-size: 0.88rem;
+            line-height: 1.45;
+        }
+
+        .bottom-nav {
+            position: sticky;
+            bottom: 10px;
+            margin: 12px auto 0;
+            max-width: 1060px;
+            background: color-mix(in srgb, var(--surface) 88%, transparent);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--stroke);
+            border-radius: 16px;
+            padding: 8px;
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 8px;
+        }
+
+        .nav-btn {
+            border: 0;
+            border-radius: 10px;
+            padding: 9px 6px;
+            background: transparent;
+            color: var(--muted);
+            font: inherit;
+            font-size: 0.78rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .nav-btn i {
+            font-size: 0.95rem;
+        }
+
+        .nav-btn.active {
+            color: #fff;
+            background: linear-gradient(120deg, var(--brand), var(--brand-2));
+        }
+
+        @media (max-width: 930px) {
+            .app {
                 grid-template-columns: 1fr;
             }
         }
 
-        @media (max-width: 560px) {
-            .grid, .stats {
+        @media (max-width: 620px) {
+            .stats,
+            .forms {
                 grid-template-columns: 1fr;
             }
 
-            .main, .side {
-                padding: 14px;
+            body {
+                padding-bottom: 74px;
             }
         }
     </style>
 </head>
 
 <body>
-    <div class="app-shell">
-        <section class="card main">
-            <div class="topbar">
+    <section id="authBar" class="auth-shell">
+        <div id="authInfo" class="auth-info">Login required to access your app.</div>
+        <div class="auth-actions">
+            <button id="loginBtn" class="auth-btn primary" type="button">Login</button>
+            <button id="logoutBtn" class="auth-btn hidden" type="button">Logout</button>
+        </div>
+    </section>
+
+    <div class="app">
+        <section class="panel main">
+            <div class="hero">
                 <div class="brand">
-                    <div class="logo"><i class="fa-solid fa-shield-heart"></i></div>
+                    <div class="logo"><i class="fa-solid fa-shield-halved"></i></div>
                     <div>
-                        <h1>VaultBudget Pro</h1>
-                        <p class="sub">Realistic personal finance app interface</p>
+                        <h1>VaultBudget Prime</h1>
+                        <p class="sub">Clean finance tracker with secure visual identity</p>
                     </div>
                 </div>
-                <button id="themeToggle" class="theme-btn" title="Toggle theme" aria-label="Toggle theme"><i class="fa-solid fa-moon"></i></button>
+                <button id="themeToggle" class="theme-btn" aria-label="Toggle theme"><i class="fa-solid fa-moon"></i></button>
             </div>
 
             <div class="stats">
                 <div class="stat income">
-                    <div class="label"><i class="fa-solid fa-arrow-trend-up"></i> Income</div>
+                    <div class="label"><i class="fa-solid fa-arrow-up"></i> Income</div>
                     <div class="value" id="income">0 BDT</div>
                 </div>
                 <div class="stat expense">
-                    <div class="label"><i class="fa-solid fa-arrow-trend-down"></i> Expense</div>
+                    <div class="label"><i class="fa-solid fa-arrow-down"></i> Expense</div>
                     <div class="value" id="expense">0 BDT</div>
                 </div>
                 <div class="stat balance">
@@ -315,41 +547,79 @@
                 </div>
             </div>
 
-            <div class="grid">
-                <div class="input-card">
-                    <h3><i class="fa-solid fa-plus"></i> Add Income</h3>
+            <div class="forms">
+                <div class="box">
+                    <h3><i class="fa-solid fa-circle-plus"></i> Add Income</h3>
                     <input type="number" id="incomeInput" placeholder="Income amount" />
-                    <button class="btn btn-income" onclick="addIncome()">Save Income</button>
+                    <button id="incomeBtn" class="btn income-btn" onclick="addIncome()">Save Income</button>
                 </div>
 
-                <div class="input-card">
-                    <h3><i class="fa-solid fa-receipt"></i> Add Expense</h3>
+                <div class="box">
+                    <h3><i class="fa-solid fa-file-invoice-dollar"></i> Add Expense</h3>
                     <input type="number" id="expenseInput" placeholder="Expense amount" />
                     <input type="text" id="categoryInput" placeholder="Category (Food, Travel...)" />
-                    <button class="btn btn-expense" onclick="addExpense()">Save Expense</button>
+                    <button id="expenseBtn" class="btn expense-btn" onclick="addExpense()">Save Expense</button>
                 </div>
+            </div>
+
+            <div class="history">
+                <div class="history-head">
+                    <h3><i class="fa-solid fa-clock-rotate-left"></i> Transaction History</h3>
+                    <span id="txnCount" class="history-count">0 records</span>
+                </div>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Time</th>
+                                <th>Type</th>
+                                <th>Category</th>
+                                <th>Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody id="txnTableBody"></tbody>
+                    </table>
+                </div>
+                <p id="txnEmpty" class="empty" hidden>No transactions yet.</p>
             </div>
         </section>
 
-        <aside class="card side">
-            <h3><i class="fa-solid fa-chart-pie"></i> Spending Categories</h3>
-            <ul class="list" id="list"></ul>
-            <p class="empty" id="emptyState" hidden>No expense category yet.</p>
-
-            <div class="hero-note">
-                <i class="fa-solid fa-lock"></i>
-                Data is saved locally in your browser storage for a private, secure feeling.
+        <aside class="panel side">
+            <div class="side-head">
+                <h3><i class="fa-solid fa-chart-pie"></i> Category Overview</h3>
+                <span class="pill">Live</span>
             </div>
+            <ul id="list" class="list"></ul>
+            <p id="emptyState" class="empty" hidden>No expense category yet.</p>
+            <div class="note"><i class="fa-solid fa-lock"></i> Data stays in your browser local storage.</div>
         </aside>
     </div>
+
+    <nav class="bottom-nav" aria-label="Bottom navigation">
+        <button class="nav-btn active" type="button"><i class="fa-solid fa-house"></i> Home</button>
+        <button class="nav-btn" type="button"><i class="fa-solid fa-chart-line"></i> Report</button>
+        <button class="nav-btn" type="button"><i class="fa-solid fa-wallet"></i> Wallet</button>
+        <button class="nav-btn" type="button"><i class="fa-solid fa-gear"></i> Settings</button>
+    </nav>
 
     <script>
         let income = 0;
         let expense = 0;
+        let canEdit = false;
         const breakdown = JSON.parse(localStorage.getItem("breakdown")) || {};
+        const transactions = JSON.parse(localStorage.getItem("transactions")) || [];
 
         const root = document.documentElement;
         const themeToggle = document.getElementById("themeToggle");
+        const authInfo = document.getElementById("authInfo");
+        const loginBtn = document.getElementById("loginBtn");
+        const logoutBtn = document.getElementById("logoutBtn");
+        const appShell = document.querySelector(".app");
+        const incomeInput = document.getElementById("incomeInput");
+        const expenseInput = document.getElementById("expenseInput");
+        const categoryInput = document.getElementById("categoryInput");
+        const incomeBtn = document.getElementById("incomeBtn");
+        const expenseBtn = document.getElementById("expenseBtn");
 
         function formatMoney(value) {
             return `${value.toLocaleString("en-BD")} BDT`;
@@ -359,6 +629,7 @@
             localStorage.setItem("income", income);
             localStorage.setItem("expense", expense);
             localStorage.setItem("breakdown", JSON.stringify(breakdown));
+            localStorage.setItem("transactions", JSON.stringify(transactions));
         }
 
         function load() {
@@ -375,8 +646,86 @@
         }
 
         function loadTheme() {
-            const savedTheme = localStorage.getItem("theme") || "light";
-            applyTheme(savedTheme);
+            applyTheme(localStorage.getItem("theme") || "light");
+        }
+
+        function setEditAccess(enabled) {
+            canEdit = enabled;
+            incomeInput.disabled = !enabled;
+            expenseInput.disabled = !enabled;
+            categoryInput.disabled = !enabled;
+            incomeBtn.disabled = !enabled;
+            expenseBtn.disabled = !enabled;
+            incomeBtn.style.opacity = enabled ? "1" : "0.55";
+            expenseBtn.style.opacity = enabled ? "1" : "0.55";
+        }
+
+        function checkRoles(user) {
+            const roles = user?.app_metadata?.roles || [];
+            return roles.includes("admin") || roles.includes("editor");
+        }
+
+        function applyAuthState(user) {
+            if (!user) {
+                authInfo.innerText = "Login required. Without login, nobody can access app data.";
+                loginBtn.classList.remove("hidden");
+                logoutBtn.classList.add("hidden");
+                appShell.classList.add("hidden");
+                document.querySelector(".bottom-nav").classList.add("hidden");
+                setEditAccess(false);
+                return;
+            }
+
+            loginBtn.classList.add("hidden");
+            logoutBtn.classList.remove("hidden");
+            appShell.classList.remove("hidden");
+            document.querySelector(".bottom-nav").classList.remove("hidden");
+
+            const editable = checkRoles(user);
+            setEditAccess(editable);
+            authInfo.innerText = editable
+                ? `Logged in as ${user.email} (editor access)`
+                : `Logged in as ${user.email} (view only)`;
+        }
+
+        function openGoogleLogin() {
+            netlifyIdentity.open("login", { provider: "google" });
+        }
+
+        function renderTransactions() {
+            const tbody = document.getElementById("txnTableBody");
+            const txnEmpty = document.getElementById("txnEmpty");
+            const txnCount = document.getElementById("txnCount");
+            tbody.innerHTML = "";
+
+            txnCount.innerText = `${transactions.length} records`;
+            txnEmpty.hidden = transactions.length > 0;
+
+            for (const txn of [...transactions].reverse()) {
+                const row = document.createElement("tr");
+                const time = document.createElement("td");
+                const type = document.createElement("td");
+                const category = document.createElement("td");
+                const amount = document.createElement("td");
+                const chip = document.createElement("span");
+
+                time.innerText = txn.time;
+                chip.className = `type-chip ${txn.type === "income" ? "type-income" : "type-expense"}`;
+                chip.innerHTML = txn.type === "income"
+                    ? '<i class="fa-solid fa-arrow-up"></i> Income'
+                    : '<i class="fa-solid fa-arrow-down"></i> Expense';
+                type.appendChild(chip);
+
+                category.innerText = txn.category;
+                amount.innerText = formatMoney(txn.amount);
+                amount.className = txn.type === "income" ? "amount-income" : "amount-expense";
+
+                row.appendChild(time);
+                row.appendChild(type);
+                row.appendChild(category);
+                row.appendChild(amount);
+                tbody.appendChild(row);
+            }
         }
 
         function updateUI() {
@@ -389,39 +738,67 @@
             list.innerHTML = "";
 
             const categories = Object.keys(breakdown);
+            const maxValue = Math.max(1, ...Object.values(breakdown));
             emptyState.hidden = categories.length > 0;
 
             for (const key of categories) {
                 const li = document.createElement("li");
+                const row = document.createElement("div");
                 const cat = document.createElement("span");
                 const amount = document.createElement("strong");
+                const bar = document.createElement("div");
+                const fill = document.createElement("span");
+
+                row.className = "row";
+                bar.className = "bar";
 
                 cat.innerText = key;
                 amount.innerText = formatMoney(breakdown[key]);
+                fill.style.width = `${(breakdown[key] / maxValue) * 100}%`;
 
-                li.appendChild(cat);
-                li.appendChild(amount);
+                row.appendChild(cat);
+                row.appendChild(amount);
+                bar.appendChild(fill);
+                li.appendChild(row);
+                li.appendChild(bar);
                 list.appendChild(li);
             }
 
+            renderTransactions();
             save();
         }
 
         function addIncome() {
+            if (!canEdit) return;
             const val = Number(document.getElementById("incomeInput").value);
             if (!val || val < 0) return;
+
             income += val;
+            transactions.push({
+                time: new Date().toLocaleString("en-BD"),
+                type: "income",
+                category: "General Income",
+                amount: val
+            });
+
             document.getElementById("incomeInput").value = "";
             updateUI();
         }
 
         function addExpense() {
+            if (!canEdit) return;
             const val = Number(document.getElementById("expenseInput").value);
             const cat = document.getElementById("categoryInput").value.trim();
             if (!val || val < 0 || cat === "") return;
 
             expense += val;
             breakdown[cat] = (breakdown[cat] || 0) + val;
+            transactions.push({
+                time: new Date().toLocaleString("en-BD"),
+                type: "expense",
+                category: cat,
+                amount: val
+            });
 
             document.getElementById("expenseInput").value = "";
             document.getElementById("categoryInput").value = "";
@@ -433,9 +810,34 @@
             applyTheme(current === "dark" ? "light" : "dark");
         });
 
+        loginBtn.addEventListener("click", () => {
+            openGoogleLogin();
+        });
+
+        logoutBtn.addEventListener("click", () => {
+            netlifyIdentity.logout();
+        });
+
+        netlifyIdentity.on("init", (user) => {
+            applyAuthState(user);
+            if (!user) {
+                openGoogleLogin();
+            }
+        });
+
+        netlifyIdentity.on("login", (user) => {
+            applyAuthState(user);
+            netlifyIdentity.close();
+        });
+
+        netlifyIdentity.on("logout", () => {
+            applyAuthState(null);
+        });
+
         loadTheme();
         load();
         updateUI();
+        netlifyIdentity.init();
     </script>
 </body>
 
