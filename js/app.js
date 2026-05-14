@@ -10,7 +10,6 @@
         const authInfo = document.getElementById("authInfo");
         const loginOverlay = document.getElementById("loginOverlay");
         const googleLoginBtn = document.getElementById("googleLoginBtn");
-        const loginError = document.getElementById("loginError");
         const clearDataBtn = document.getElementById("clearDataBtn");
         const incomeInput = document.getElementById("incomeInput");
         const incomeSourceInput = document.getElementById("incomeSourceInput");
@@ -379,21 +378,20 @@
 
         googleLoginBtn.addEventListener("click", async () => {
             if (!auth || !googleProvider) {
-                loginError.innerText = "Google login is not configured yet.";
+                window.alert("Google login is not configured yet.");
                 return;
             }
             try {
-                loginError.innerText = "";
                 await auth.signInWithPopup(googleProvider);
             } catch (error) {
                 if (error?.code === "auth/configuration-not-found") {
-                    loginError.innerText = "Google Sign-In Firebase এ Enable করা নেই বা domain authorize করা হয়নি.";
+                    window.alert("Google Sign-In Firebase এ Enable করা নেই বা domain authorize করা হয়নি.");
                 } else if (error?.code === "auth/unauthorized-domain") {
-                    loginError.innerText = "এই domain Firebase Authorized Domains এ add করা নেই.";
+                    window.alert("এই domain Firebase Authorized Domains এ add করা নেই.");
                 } else if (error?.code === "auth/popup-blocked") {
-                    loginError.innerText = "Popup block হয়েছে। browser popup allow করে আবার চেষ্টা করুন।";
+                    window.alert("Popup block হয়েছে। browser popup allow করে আবার চেষ্টা করুন।");
                 } else {
-                    loginError.innerText = error?.message || "Google login failed.";
+                    window.alert(error?.message || "Google login failed.");
                 }
             }
         });
@@ -420,13 +418,11 @@
             } else {
                 applyAuthState(null);
             }
-            loginError.innerText = "";
         });
 
         function initGoogleAuth() {
             const notConfigured = Object.values(firebaseConfig).some((v) => !v || v.startsWith("REPLACE_WITH"));
             if (notConfigured) {
-                loginError.innerText = "Firebase config দিন, তারপর Google login কাজ করবে।";
                 applyAuthState(null);
                 return;
             }
