@@ -123,16 +123,31 @@ function getCacheKey() {
 function saveFinanceCache() {
   const key = getCacheKey();
   if (!key) return;
-  localStorage.setItem(key, JSON.stringify({ income, expense, breakdown, transactions }));
+  localStorage.setItem(key, JSON.stringify({
+    income,
+    expense,
+    breakdown,
+    transactions,
+    updatedAtMs: Date.now()
+  }));
+}
+
+function readFinanceCache() {
+  const key = getCacheKey();
+  if (!key) return null;
+  const raw = localStorage.getItem(key);
+  if (!raw) return null;
+  try {
+    return JSON.parse(raw);
+  } catch {
+    return null;
+  }
 }
 
 function loadFinanceCache() {
-  const key = getCacheKey();
-  if (!key) return false;
-  const raw = localStorage.getItem(key);
-  if (!raw) return false;
+  const data = readFinanceCache();
+  if (!data) return false;
   try {
-    const data = JSON.parse(raw);
     income = Number(data?.income || 0);
     expense = Number(data?.expense || 0);
     Object.keys(breakdown).forEach((k) => delete breakdown[k]);
@@ -169,6 +184,16 @@ async function loadFinanceData() {
   dbOfflineWarned = false;
   const data = snap.exists ? snap.data() : null;
 
+  const cacheData = readFinanceCache();
+  const serverMs = Number(data?.updatedAtMs || 0);
+  const cacheMs = Number(cacheData?.updatedAtMs || 0);
+
+  if (cacheData && cacheMs > serverMs) {
+    loadFinanceCache();
+    await saveFinanceData();
+    return;
+  }
+
     income = Number(data?.income || 0);
     expense = Number(data?.expense || 0);
     Object.keys(breakdown).forEach((k) => delete breakdown[k]);
@@ -190,6 +215,7 @@ async function saveFinanceData() {
       expense,
       breakdown,
       transactions,
+      updatedAtMs: Date.now(),
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
     }, { merge: true });
     saveFinanceCache();
