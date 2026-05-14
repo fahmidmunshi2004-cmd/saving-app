@@ -167,6 +167,23 @@ async function loadFinanceData() {
     return;
   }
 
+  // First try Firestore local cache for faster first paint.
+  try {
+    const cacheSnap = await db.collection("finance_data").doc(scopeId).get({ source: "cache" });
+    if (cacheSnap.exists) {
+      const cData = cacheSnap.data() || {};
+      income = Number(cData?.income || 0);
+      expense = Number(cData?.expense || 0);
+      Object.keys(breakdown).forEach((k) => delete breakdown[k]);
+      Object.assign(breakdown, cData?.breakdown || {});
+      transactions.length = 0;
+      (cData?.transactions || []).forEach((t) => transactions.push(t));
+      updateUI();
+    }
+  } catch (_) {
+    // ignore cache read errors and continue
+  }
+
   let snap;
   try {
     snap = await db.collection("finance_data").doc(scopeId).get();
@@ -329,9 +346,12 @@ async function applyAuthState() {
     const editable = isCurrentAdmin() || !!currentSession.canEdit || (!currentSession.groupId && currentSession.type === "gmail");
     setEditAccess(editable);
 
-    await loadFinanceData();
-    updateUI();
-    await refreshSettingsPanels();
+  // Render instantly from local cache, then sync with Firestore.
+  loadFinanceCache();
+  updateUI();
+  await loadFinanceData();
+  updateUI();
+  await refreshSettingsPanels();
 }
 
 async function processInviteLinkAfterGmailLogin() {
