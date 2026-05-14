@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Easy Budget</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial;
+            background: #0b0f1a;
+            color: white;
+        }
+
+        .container {
+            max-width: 420px;
+            margin: auto;
+            padding: 15px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        /* TOP BOXES */
+        .top {
+            display: flex;
+            gap: 10px;
+        }
+
+        .box {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.06);
+            padding: 12px;
+            border-radius: 12px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .box h3 {
+            margin: 5px 0;
+            font-size: 14px;
+            color: #aaa;
+        }
+
+        .box p {
+            font-size: 18px;
+            margin: 0;
+        }
+
+        .incomeBox p {
+            color: #2DE2E6;
+        }
+
+        .expenseBox p {
+            color: #FF5C5C;
+        }
+
+        .balanceBox p {
+            color: #7CFF6B;
+        }
+
+        /* INPUT CARD */
+        .card {
+            margin-top: 15px;
+            background: rgba(255, 255, 255, 0.06);
+            padding: 12px;
+            border-radius: 12px;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin-top: 8px;
+            border: none;
+            border-radius: 8px;
+            outline: none;
+        }
+
+        button {
+            width: 100%;
+            margin-top: 10px;
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            background: #2DE2E6;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        /* LIST */
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        li {
+            padding: 6px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <div class="container">
+
+        <h1>💰 Easy Budget</h1>
+
+        <!-- TOP BOXES -->
+        <div class="top">
+
+            <div class="box incomeBox">
+                <h3>Income</h3>
+                <p id="income">0</p>
+            </div>
+
+            <div class="box expenseBox">
+                <h3>Expense</h3>
+                <p id="expense">0</p>
+            </div>
+
+            <div class="box balanceBox">
+                <h3>Balance</h3>
+                <p id="balance">0</p>
+            </div>
+
+        </div>
+
+        <!-- ADD INCOME -->
+        <div class="card">
+            <h3>Add Income</h3>
+            <input type="number" id="incomeInput" placeholder="Enter income" />
+            <button onclick="addIncome()">Add Income</button>
+        </div>
+
+        <!-- ADD EXPENSE -->
+        <div class="card">
+            <h3>Add Expense</h3>
+
+            <input type="number" id="expenseInput" placeholder="Enter expense" />
+
+            <input type="text" id="categoryInput" placeholder="Category (Food/Travel/Hotel)" />
+
+            <button onclick="addExpense()">Add Expense</button>
+        </div>
+
+        <!-- BREAKDOWN -->
+        <div class="card">
+            <h3>📊 Where you spent</h3>
+            <ul id="list"></ul>
+        </div>
+
+    </div>
+
+    <script>
+        let income = 0;
+        let expense = 0;
+
+        let breakdown = JSON.parse(localStorage.getItem("breakdown")) || {};
+
+        function save() {
+            localStorage.setItem("income", income);
+            localStorage.setItem("expense", expense);
+            localStorage.setItem("breakdown", JSON.stringify(breakdown));
+        }
+
+        function load() {
+            income = Number(localStorage.getItem("income")) || 0;
+            expense = Number(localStorage.getItem("expense")) || 0;
+        }
+
+        function updateUI() {
+
+            document.getElementById("income").innerText = income;
+            document.getElementById("expense").innerText = expense;
+            document.getElementById("balance").innerText = income - expense;
+
+            let list = document.getElementById("list");
+            list.innerHTML = "";
+
+            for (let key in breakdown) {
+                let li = document.createElement("li");
+                li.innerText = `${key} → ${breakdown[key]} BDT`;
+                list.appendChild(li);
+            }
+
+            save();
+        }
+
+        function addIncome() {
+            let val = Number(document.getElementById("incomeInput").value);
+            if (!val) return;
+
+            income += val;
+            document.getElementById("incomeInput").value = "";
+            updateUI();
+        }
+
+        function addExpense() {
+            let val = Number(document.getElementById("expenseInput").value);
+            let cat = document.getElementById("categoryInput").value.trim();
+
+            if (!val || cat === "") return;
+
+            expense += val;
+
+            if (!breakdown[cat]) {
+                breakdown[cat] = 0;
+            }
+
+            breakdown[cat] += val;
+
+            document.getElementById("expenseInput").value = "";
+            document.getElementById("categoryInput").value = "";
+
+            updateUI();
+        }
+
+        load();
+        updateUI();
+    </script>
+
+</body>
+
+</html>
