@@ -9,9 +9,7 @@
         const themeToggle = document.getElementById("themeToggle");
         const authInfo = document.getElementById("authInfo");
         const loginOverlay = document.getElementById("loginOverlay");
-        const loginUsername = document.getElementById("loginUsername");
-        const loginPassword = document.getElementById("loginPassword");
-        const loginSubmit = document.getElementById("loginSubmit");
+        const googleLoginBtn = document.getElementById("googleLoginBtn");
         const loginError = document.getElementById("loginError");
         const clearDataBtn = document.getElementById("clearDataBtn");
         const incomeInput = document.getElementById("incomeInput");
@@ -27,8 +25,19 @@
         const topCategory = document.getElementById("topCategory");
         const topExpense = document.getElementById("topExpense");
         const totalCategory = document.getElementById("totalCategory");
-        const LOGIN_USER = "Saving By Fahmid";
-        const LOGIN_PASS = "Fahmid 1234";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDDGb1bNysz2Vszt116K2a3GGL9Rzsx9II",
+            authDomain: "saving-app-da3b7.firebaseapp.com",
+            projectId: "saving-app-da3b7",
+            storageBucket: "saving-app-da3b7.firebasestorage.app",
+            messagingSenderId: "989914118071",
+            appId: "1:989914118071:web:6ee7e72b5eda7c7f311a32",
+            measurementId: "G-8T0TCWSVCM"
+        };
+
+        let auth = null;
+        let googleProvider = null;
 
         function formatMoney(value) {
             return `${value.toLocaleString("en-BD")} BDT`;
@@ -73,8 +82,8 @@
             navButtons.forEach((btn) => btn.classList.toggle("active", btn.dataset.view === viewId));
         }
 
-        function applyAuthState(isLoggedIn) {
-            if (!isLoggedIn) {
+        function applyAuthState(user) {
+            if (!user) {
                 authInfo.innerText = "Private mode is enabled. Login first.";
                 views.forEach((view) => view.classList.remove("active"));
                 document.querySelector(".bottom-nav").classList.add("hidden");
@@ -82,7 +91,7 @@
                 setEditAccess(false);
                 return;
             }
-            authInfo.innerText = "Logged in as Saving By Fahmid.";
+            authInfo.innerText = `Logged in as ${user.email}`;
             showView("homeView");
             document.querySelector(".bottom-nav").classList.remove("hidden");
             loginOverlay.classList.add("hidden");
@@ -368,16 +377,24 @@
 
         downloadPdfBtn.addEventListener("click", downloadReportPdf);
 
-        loginSubmit.addEventListener("click", () => {
-            const user = loginUsername.value.trim();
-            const pass = loginPassword.value;
-            if (user === LOGIN_USER && pass === LOGIN_PASS) {
-                sessionStorage.setItem("sbf_logged_in", "1");
+        googleLoginBtn.addEventListener("click", async () => {
+            if (!auth || !googleProvider) {
+                loginError.innerText = "Google login is not configured yet.";
+                return;
+            }
+            try {
                 loginError.innerText = "";
-                applyAuthState(true);
-                loginPassword.value = "";
-            } else {
-                loginError.innerText = "Username or password incorrect.";
+                await auth.signInWithPopup(googleProvider);
+            } catch (error) {
+                if (error?.code === "auth/configuration-not-found") {
+                    loginError.innerText = "Google Sign-In Firebase এ Enable করা নেই বা domain authorize করা হয়নি.";
+                } else if (error?.code === "auth/unauthorized-domain") {
+                    loginError.innerText = "এই domain Firebase Authorized Domains এ add করা নেই.";
+                } else if (error?.code === "auth/popup-blocked") {
+                    loginError.innerText = "Popup block হয়েছে। browser popup allow করে আবার চেষ্টা করুন।";
+                } else {
+                    loginError.innerText = error?.message || "Google login failed.";
+                }
             }
         });
 
@@ -395,18 +412,32 @@
             localStorage.removeItem("breakdown");
             localStorage.removeItem("transactions");
             localStorage.removeItem("theme");
-            sessionStorage.removeItem("sbf_logged_in");
 
             applyTheme("light");
             updateUI();
-            applyAuthState(false);
-            loginUsername.value = "";
-            loginPassword.value = "";
+            applyAuthState(auth ? auth.currentUser : null);
             loginError.innerText = "";
         });
+
+        function initGoogleAuth() {
+            const notConfigured = Object.values(firebaseConfig).some((v) => !v || v.startsWith("REPLACE_WITH"));
+            if (notConfigured) {
+                loginError.innerText = "Firebase config দিন, তারপর Google login কাজ করবে।";
+                applyAuthState(null);
+                return;
+            }
+
+            firebase.initializeApp(firebaseConfig);
+            auth = firebase.auth();
+            googleProvider = new firebase.auth.GoogleAuthProvider();
+
+            auth.onAuthStateChanged((user) => {
+                applyAuthState(user);
+            });
+        }
 
         loadTheme();
         load();
         updateUI();
-        applyAuthState(sessionStorage.getItem("sbf_logged_in") === "1");
+        initGoogleAuth();
 
