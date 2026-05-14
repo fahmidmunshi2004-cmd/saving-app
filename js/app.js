@@ -90,11 +90,68 @@ function saveData() {
   localStorage.setItem("expense", expense);
   localStorage.setItem("breakdown", JSON.stringify(breakdown));
   localStorage.setItem("transactions", JSON.stringify(transactions));
+
+  // For group accounts, keep a shared copy in Firestore so all members see same data.
+  if (currentSession?.groupId && db) {
+    db.collection("groupFinance").doc(currentSession.groupId).set({
+      income,
+      expense,
+      breakdown,
+      transactions,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    }, { merge: true }).catch(() => { });
+  }
 }
 
 function loadData() {
   income = Number(localStorage.getItem("income")) || 0;
   expense = Number(localStorage.getItem("expense")) || 0;
+
+  const localBreakdown = JSON.parse(localStorage.getItem("breakdown")) || {};
+  Object.keys(breakdown).forEach((k) => delete breakdown[k]);
+  Object.entries(localBreakdown).forEach(([k, v]) => {
+    breakdown[k] = Number(v) || 0;
+  });
+
+  const localTransactions = JSON.parse(localStorage.getItem("transactions")) || [];
+  transactions.length = 0;
+  for (const t of localTransactions) {
+    transactions.push(t);
+  }
+}
+
+async function loadGroupSharedData() {
+  if (!currentSession?.groupId || !db) {
+    loadData();
+    return;
+  }
+
+  const ref = db.collection("groupFinance").doc(currentSession.groupId);
+  const snap = await ref.get();
+
+  if (!snap.exists) {
+    await ref.set({
+      income: 0,
+      expense: 0,
+      breakdown: {},
+      transactions: [],
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    }, { merge: true });
+  }
+
+  const data = snap.exists ? snap.data() : { income: 0, expense: 0, breakdown: {}, transactions: [] };
+  income = Number(data.income) || 0;
+  expense = Number(data.expense) || 0;
+
+  Object.keys(breakdown).forEach((k) => delete breakdown[k]);
+  Object.entries(data.breakdown || {}).forEach(([k, v]) => {
+    breakdown[k] = Number(v) || 0;
+  });
+
+  transactions.length = 0;
+  for (const t of (data.transactions || [])) {
+    transactions.push(t);
+  }
 }
 
 function applyTheme(theme) {
@@ -363,6 +420,8 @@ async function handleGoogleAuthUser(user) {
   }
 
   saveSession();
+  await loadGroupSharedData();
+  updateUI();
   applyAuthState();
 }
 
@@ -433,6 +492,8 @@ async function loginOrCreateGroupAccount() {
   }
 
   saveSession();
+  await loadGroupSharedData();
+  updateUI();
   applyAuthState();
 }
 
