@@ -2,16 +2,9 @@
 let expense = 0;
 let canEdit = false;
 let expenseChart = null;
-let auth = null;
-let db = null;
-let googleProvider = null;
-let firebaseUser = null;
-let currentSession = null;
-let pendingInviteInfo = null;
-let dbOfflineWarned = false;
 
-const breakdown = {};
-const transactions = [];
+const breakdown = JSON.parse(localStorage.getItem("breakdown")) || {};
+const transactions = JSON.parse(localStorage.getItem("transactions")) || [];
 const SESSION_KEY = "vault_session";
 
 const root = document.documentElement;
@@ -24,6 +17,7 @@ const groupLoginFields = document.getElementById("groupLoginFields");
 const groupUsername = document.getElementById("groupUsername");
 const groupPassword = document.getElementById("groupPassword");
 const groupLoginBtn = document.getElementById("groupLoginBtn");
+
 const clearDataBtn = document.getElementById("clearDataBtn");
 const incomeInput = document.getElementById("incomeInput");
 const incomeSourceInput = document.getElementById("incomeSourceInput");
@@ -31,6 +25,7 @@ const expenseInput = document.getElementById("expenseInput");
 const categoryInput = document.getElementById("categoryInput");
 const incomeBtn = document.getElementById("incomeBtn");
 const expenseBtn = document.getElementById("expenseBtn");
+
 const navButtons = document.querySelectorAll(".nav-btn");
 const views = document.querySelectorAll(".view");
 const downloadPdfBtn = document.getElementById("downloadPdfBtn");
@@ -38,6 +33,7 @@ const expenseChartCanvas = document.getElementById("expenseColumnChart");
 const topCategory = document.getElementById("topCategory");
 const topExpense = document.getElementById("topExpense");
 const totalCategory = document.getElementById("totalCategory");
+
 const accountTypeText = document.getElementById("accountTypeText");
 const accountRoleText = document.getElementById("accountRoleText");
 const groupMembersCard = document.getElementById("groupMembersCard");
@@ -52,768 +48,653 @@ const pendingRequestsCard = document.getElementById("pendingRequestsCard");
 const pendingRequestsList = document.getElementById("pendingRequestsList");
 
 const firebaseConfig = {
-    apiKey: "AIzaSyDDGb1bNysz2Vszt116K2a3GGL9Rzsx9II",
-    authDomain: "saving-app-da3b7.firebaseapp.com",
-    projectId: "saving-app-da3b7",
-    storageBucket: "saving-app-da3b7.firebasestorage.app",
-    messagingSenderId: "989914118071",
-    appId: "1:989914118071:web:6ee7e72b5eda7c7f311a32",
-    measurementId: "G-8T0TCWSVCM"
+  apiKey: "AIzaSyDDGb1bNysz2Vszt116K2a3GGL9Rzsx9II",
+  authDomain: "saving-app-da3b7.firebaseapp.com",
+  projectId: "saving-app-da3b7",
+  storageBucket: "saving-app-da3b7.firebasestorage.app",
+  messagingSenderId: "989914118071",
+  appId: "1:989914118071:web:6ee7e72b5eda7c7f311a32",
+  measurementId: "G-8T0TCWSVCM"
 };
 
-function formatMoney(value) {
-    return `${Number(value || 0).toLocaleString("en-BD")} BDT`;
-}
+let auth = null;
+let db = null;
+let googleProvider = null;
+let firebaseUser = null;
+let currentSession = null;
 
-function showView(viewId) {
-    views.forEach((view) => view.classList.toggle("active", view.id === viewId));
-    navButtons.forEach((btn) => btn.classList.toggle("active", btn.dataset.view === viewId));
-}
-
-function setEditAccess(enabled) {
-    canEdit = enabled;
-    incomeInput.disabled = !enabled;
-    incomeSourceInput.disabled = !enabled;
-    expenseInput.disabled = !enabled;
-    categoryInput.disabled = !enabled;
-    incomeBtn.disabled = !enabled;
-    expenseBtn.disabled = !enabled;
-    incomeBtn.style.opacity = enabled ? "1" : "0.55";
-    expenseBtn.style.opacity = enabled ? "1" : "0.55";
-}
-
-function applyTheme(theme) {
-    root.setAttribute("data-theme", theme);
-    localStorage.setItem("theme", theme);
-    themeToggle.innerHTML = theme === "dark"
-        ? '<i class="fa-solid fa-sun"></i>'
-        : '<i class="fa-solid fa-moon"></i>';
-}
-
-function loadTheme() {
-    applyTheme(localStorage.getItem("theme") || "light");
+function normalizeUsername(value) {
+  return value.trim().toLowerCase();
 }
 
 function saveSession() {
   if (currentSession) {
-    localStorage.setItem(SESSION_KEY, JSON.stringify(currentSession));
+    sessionStorage.setItem(SESSION_KEY, JSON.stringify(currentSession));
   } else {
-    localStorage.removeItem(SESSION_KEY);
     sessionStorage.removeItem(SESSION_KEY);
   }
 }
 
 function loadSession() {
-  const raw = localStorage.getItem(SESSION_KEY) || sessionStorage.getItem(SESSION_KEY);
+  const raw = sessionStorage.getItem(SESSION_KEY);
   currentSession = raw ? JSON.parse(raw) : null;
 }
 
-function getDataScopeId() {
-    if (!currentSession) return null;
-    if (currentSession.groupId) return `group_${currentSession.groupId}`;
-    if (currentSession.uid) return `user_${currentSession.uid}`;
-    return null;
+function formatMoney(value) {
+  return `${value.toLocaleString("en-BD")} BDT`;
 }
 
-function getCacheKey() {
-  const scopeId = getDataScopeId();
-  return scopeId ? `vault_cache_${scopeId}` : null;
+function saveData() {
+  localStorage.setItem("income", income);
+  localStorage.setItem("expense", expense);
+  localStorage.setItem("breakdown", JSON.stringify(breakdown));
+  localStorage.setItem("transactions", JSON.stringify(transactions));
 }
 
-function saveFinanceCache() {
-  const key = getCacheKey();
-  if (!key) return;
-  localStorage.setItem(key, JSON.stringify({
-    income,
-    expense,
-    breakdown,
-    transactions,
-    updatedAtMs: Date.now()
-  }));
+function loadData() {
+  income = Number(localStorage.getItem("income")) || 0;
+  expense = Number(localStorage.getItem("expense")) || 0;
 }
 
-function readFinanceCache() {
-  const key = getCacheKey();
-  if (!key) return null;
-  const raw = localStorage.getItem(key);
-  if (!raw) return null;
-  try {
-    return JSON.parse(raw);
-  } catch {
-    return null;
-  }
+function applyTheme(theme) {
+  root.setAttribute("data-theme", theme);
+  localStorage.setItem("theme", theme);
+  themeToggle.innerHTML = theme === "dark"
+    ? '<i class="fa-solid fa-sun"></i>'
+    : '<i class="fa-solid fa-moon"></i>';
 }
 
-function loadFinanceCache() {
-  const data = readFinanceCache();
-  if (!data) return false;
-  try {
-    income = Number(data?.income || 0);
-    expense = Number(data?.expense || 0);
-    Object.keys(breakdown).forEach((k) => delete breakdown[k]);
-    Object.assign(breakdown, data?.breakdown || {});
-    transactions.length = 0;
-    (data?.transactions || []).forEach((t) => transactions.push(t));
-    return true;
-  } catch {
-    return false;
-  }
+function loadTheme() {
+  applyTheme(localStorage.getItem("theme") || "light");
 }
 
-async function loadFinanceData() {
-  const scopeId = getDataScopeId();
-  if (!scopeId || !db) {
-    // Keep current in-memory/cache state until auth/session is ready.
-    return;
-  }
-
-  // First try Firestore local cache for faster first paint.
-  try {
-    const cacheSnap = await db.collection("finance_data").doc(scopeId).get({ source: "cache" });
-    if (cacheSnap.exists) {
-      const cData = cacheSnap.data() || {};
-      income = Number(cData?.income || 0);
-      expense = Number(cData?.expense || 0);
-      Object.keys(breakdown).forEach((k) => delete breakdown[k]);
-      Object.assign(breakdown, cData?.breakdown || {});
-      transactions.length = 0;
-      (cData?.transactions || []).forEach((t) => transactions.push(t));
-      updateUI();
-    }
-  } catch (_) {
-    // ignore cache read errors and continue
-  }
-
-  let snap;
-  try {
-    snap = await db.collection("finance_data").doc(scopeId).get();
-  } catch (error) {
-    const loaded = loadFinanceCache();
-    const isOfflineErr = String(error?.message || "").toLowerCase().includes("offline");
-    if (!loaded && !isOfflineErr) {
-      window.alert(`Data load fail: ${error?.message || "unknown error"}`);
-    } else if (isOfflineErr && !dbOfflineWarned) {
-      dbOfflineWarned = true;
-      window.alert("Internet/Firestore offline. Cached data দেখানো হচ্ছে।");
-    }
-    return;
-  }
-  dbOfflineWarned = false;
-  const data = snap.exists ? snap.data() : null;
-
-  const cacheData = readFinanceCache();
-  const serverMs = Number(data?.updatedAtMs || 0);
-  const cacheMs = Number(cacheData?.updatedAtMs || 0);
-
-  if (cacheData && cacheMs > serverMs) {
-    loadFinanceCache();
-    await saveFinanceData();
-    return;
-  }
-
-    income = Number(data?.income || 0);
-    expense = Number(data?.expense || 0);
-    Object.keys(breakdown).forEach((k) => delete breakdown[k]);
-    Object.assign(breakdown, data?.breakdown || {});
-  transactions.length = 0;
-  (data?.transactions || []).forEach((t) => transactions.push(t));
-  saveFinanceCache();
+function setEditAccess(enabled) {
+  canEdit = enabled;
+  incomeInput.disabled = !enabled;
+  incomeSourceInput.disabled = !enabled;
+  expenseInput.disabled = !enabled;
+  categoryInput.disabled = !enabled;
+  incomeBtn.disabled = !enabled;
+  expenseBtn.disabled = !enabled;
+  incomeBtn.style.opacity = enabled ? "1" : "0.55";
+  expenseBtn.style.opacity = enabled ? "1" : "0.55";
 }
 
-async function saveFinanceData() {
-  const scopeId = getDataScopeId();
-  if (!scopeId || !db) return;
-  // Save immediate cache first so quick reload won't lose data.
-  saveFinanceCache();
-
-  try {
-    await db.collection("finance_data").doc(scopeId).set({
-      income,
-      expense,
-      breakdown,
-      transactions,
-      updatedAtMs: Date.now(),
-      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-    }, { merge: true });
-    saveFinanceCache();
-  } catch (error) {
-    window.alert(`Data save fail: ${error?.message || "unknown error"}`);
-    saveFinanceCache();
-  }
-}
-
-async function getGroupDoc(groupId) {
-    const snap = await db.collection("groups").doc(groupId).get();
-    if (!snap.exists) return null;
-    return { id: snap.id, ...snap.data() };
-}
-
-async function saveGroupDoc(groupId, payload) {
-    await db.collection("groups").doc(groupId).set(payload, { merge: true });
+function showView(viewId) {
+  views.forEach((view) => view.classList.toggle("active", view.id === viewId));
+  navButtons.forEach((btn) => btn.classList.toggle("active", btn.dataset.view === viewId));
 }
 
 function isCurrentAdmin() {
-    return currentSession?.role === "admin";
+  return currentSession?.role === "admin";
+}
+
+async function getCurrentMemberDoc() {
+  if (!currentSession?.groupId || !currentSession?.memberId || !db) return null;
+  const snap = await db
+    .collection("groupMembers")
+    .where("groupId", "==", currentSession.groupId)
+    .where("memberId", "==", currentSession.memberId)
+    .limit(1)
+    .get();
+  if (snap.empty) return null;
+  return { id: snap.docs[0].id, ...snap.docs[0].data() };
 }
 
 async function refreshSettingsPanels() {
-    if (!currentSession) {
-        accountTypeText.innerText = "-";
-        accountRoleText.innerText = "-";
-        groupMembersCard.classList.add("hidden");
-        inviteCard.classList.add("hidden");
-        requestAccessCard.classList.add("hidden");
-        pendingRequestsCard.classList.add("hidden");
-        return;
-    }
+  if (!currentSession) {
+    accountTypeText.innerText = "-";
+    accountRoleText.innerText = "-";
+    groupMembersCard.classList.add("hidden");
+    inviteCard.classList.add("hidden");
+    requestAccessCard.classList.add("hidden");
+    pendingRequestsCard.classList.add("hidden");
+    return;
+  }
 
-    accountTypeText.innerText = currentSession.type === "group" ? "Group Account" : "Gmail Account";
-    accountRoleText.innerText = currentSession.role || "viewer";
+  accountTypeText.innerText = currentSession.type === "group" ? "Group Account" : "Gmail Account";
+  accountRoleText.innerText = currentSession.role || "viewer";
 
-    if (!currentSession.groupId) {
-        groupMembersCard.classList.add("hidden");
-        inviteCard.classList.add("hidden");
-        requestAccessCard.classList.add("hidden");
-        pendingRequestsCard.classList.add("hidden");
-        return;
-    }
+  if (!currentSession.groupId || !db) {
+    groupMembersCard.classList.add("hidden");
+    inviteCard.classList.add("hidden");
+    requestAccessCard.classList.add("hidden");
+    pendingRequestsCard.classList.add("hidden");
+    return;
+  }
 
-    const group = await getGroupDoc(currentSession.groupId);
-    if (!group) return;
+  const memberSnap = await db.collection("groupMembers").where("groupId", "==", currentSession.groupId).get();
+  groupMembersCard.classList.remove("hidden");
+  groupMemberCount.innerText = String(memberSnap.size || 0);
 
-    groupMembersCard.classList.remove("hidden");
-    groupMemberCount.innerText = String((group.members || []).length || 1);
-    inviteCard.classList.toggle("hidden", !isCurrentAdmin());
-    pendingRequestsCard.classList.toggle("hidden", !isCurrentAdmin());
-    requestAccessCard.classList.toggle("hidden", isCurrentAdmin());
+  inviteCard.classList.toggle("hidden", !isCurrentAdmin());
+  pendingRequestsCard.classList.toggle("hidden", !isCurrentAdmin());
+  requestAccessCard.classList.toggle("hidden", isCurrentAdmin());
 
-    pendingRequestsList.innerHTML = "";
-    const pending = (group.accessRequests || []).filter((r) => r.status === "pending");
-    if (!pending.length) {
-        const li = document.createElement("li");
-        li.innerText = "No pending request";
-        pendingRequestsList.appendChild(li);
-        return;
-    }
-
-    for (const req of pending) {
-        const li = document.createElement("li");
-        const info = document.createElement("div");
-        const btn = document.createElement("button");
-        info.innerText = `${req.fromLabel} চাইছে edit access`;
-        btn.className = "btn income-btn";
-        btn.style.marginTop = "8px";
-        btn.innerText = "Approve";
-        btn.onclick = async () => {
-            const g = await getGroupDoc(currentSession.groupId);
-            if (!g) return;
-            const reqItem = (g.accessRequests || []).find((r) => r.id === req.id);
-            if (!reqItem) return;
-            const member = (g.members || []).find((m) => m.memberId === reqItem.fromId);
-            if (member) {
-                member.role = "editor";
-                member.canEdit = true;
-            }
-            reqItem.status = "approved";
-            await saveGroupDoc(g.id, { members: g.members || [], accessRequests: g.accessRequests || [] });
-            await refreshSettingsPanels();
-        };
-        li.appendChild(info);
-        li.appendChild(btn);
-        pendingRequestsList.appendChild(li);
-    }
+  await renderPendingRequests();
 }
 
-async function applyAuthState() {
-    if (!currentSession) {
-        authInfo.innerText = "Private mode is enabled. Login first.";
-        views.forEach((v) => v.classList.remove("active"));
-        document.querySelector(".bottom-nav").classList.add("hidden");
-        loginOverlay.classList.remove("hidden");
-        setEditAccess(false);
-        await refreshSettingsPanels();
-        return;
-    }
+async function renderPendingRequests() {
+  if (!isCurrentAdmin() || !currentSession?.groupId) return;
+  pendingRequestsList.innerHTML = "";
 
-    authInfo.innerText = currentSession.type === "gmail"
-        ? `Logged in as ${currentSession.email}`
-        : `Logged in as group user: ${currentSession.username}`;
+  const snap = await db
+    .collection("accessRequests")
+    .where("groupId", "==", currentSession.groupId)
+    .where("status", "==", "pending")
+    .get();
 
-    showView("homeView");
-    document.querySelector(".bottom-nav").classList.remove("hidden");
-    loginOverlay.classList.add("hidden");
+  if (snap.empty) {
+    const li = document.createElement("li");
+    li.innerText = "No pending request";
+    pendingRequestsList.appendChild(li);
+    return;
+  }
 
-    const editable = isCurrentAdmin() || !!currentSession.canEdit || (!currentSession.groupId && currentSession.type === "gmail");
-    setEditAccess(editable);
+  snap.forEach((doc) => {
+    const req = doc.data();
+    const li = document.createElement("li");
+    const info = document.createElement("div");
+    const btn = document.createElement("button");
+    info.innerText = `${req.fromLabel} চাইছে edit access`;
+    btn.className = "btn income-btn";
+    btn.style.marginTop = "8px";
+    btn.innerText = "Approve";
+    btn.onclick = () => approveAccessRequest(doc.id, req.fromMemberId);
+    li.appendChild(info);
+    li.appendChild(btn);
+    pendingRequestsList.appendChild(li);
+  });
+}
 
-  // Render instantly from local cache, then sync with Firestore.
-  loadFinanceCache();
-  updateUI();
-  await loadFinanceData();
-  updateUI();
+async function approveAccessRequest(requestId, fromMemberId) {
+  const memberSnap = await db
+    .collection("groupMembers")
+    .where("groupId", "==", currentSession.groupId)
+    .where("memberId", "==", fromMemberId)
+    .limit(1)
+    .get();
+
+  if (!memberSnap.empty) {
+    await db.collection("groupMembers").doc(memberSnap.docs[0].id).update({ role: "editor", canEdit: true });
+  }
+
+  await db.collection("accessRequests").doc(requestId).update({ status: "approved" });
   await refreshSettingsPanels();
 }
 
-async function processInviteLinkAfterGmailLogin() {
-    if (!firebaseUser) return;
-    const params = new URLSearchParams(window.location.search);
-    const token = params.get("inviteToken");
-    const groupId = params.get("groupId");
-    const invitedEmail = params.get("email");
+async function requestEditAccess() {
+  if (!currentSession?.groupId) return;
+  const adminEmail = requestAccessEmailInput.value.trim().toLowerCase();
+  if (!adminEmail) {
+    window.alert("Admin Gmail দিন");
+    return;
+  }
 
-    if (!token || !groupId || !invitedEmail) return;
-    if (firebaseUser.email?.toLowerCase() !== invitedEmail.toLowerCase()) return;
+  await db.collection("accessRequests").add({
+    groupId: currentSession.groupId,
+    fromMemberId: currentSession.memberId,
+    fromLabel: currentSession.type === "gmail" ? currentSession.email : currentSession.username,
+    toEmail: adminEmail,
+    status: "pending",
+    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+  });
 
-    const group = await getGroupDoc(groupId);
-    if (!group) return;
+  requestAccessEmailInput.value = "";
+  window.alert("Access request admin queue-তে গেছে।");
+}
 
-    const invites = group.invites || [];
-    const invite = invites.find((i) => i.token === token && i.status === "pending");
-    if (!invite) return;
+function applyAuthState() {
+  if (!currentSession) {
+    authInfo.innerText = "Private mode is enabled. Login first.";
+    views.forEach((view) => view.classList.remove("active"));
+    document.querySelector(".bottom-nav").classList.add("hidden");
+    loginOverlay.classList.remove("hidden");
+    setEditAccess(false);
+    refreshSettingsPanels();
+    return;
+  }
 
-    const memberId = `gmail_${firebaseUser.uid}`;
-    const members = group.members || [];
-    if (!members.some((m) => m.memberId === memberId)) {
-        members.push({ memberId, type: "gmail", label: firebaseUser.email, role: "viewer", canEdit: false });
-    }
-    invite.status = "accepted";
+  authInfo.innerText = currentSession.type === "gmail"
+    ? `Logged in as ${currentSession.email}`
+    : `Logged in as group user: ${currentSession.username}`;
 
-    await saveGroupDoc(groupId, { members, invites });
+  showView("homeView");
+  document.querySelector(".bottom-nav").classList.remove("hidden");
+  loginOverlay.classList.add("hidden");
 
-    currentSession = {
-        type: "gmail",
-        uid: firebaseUser.uid,
-        email: firebaseUser.email,
-        groupId,
-        memberId,
-        role: "viewer",
-        canEdit: false
-    };
-    saveSession();
+  const editable = isCurrentAdmin() || !!currentSession.canEdit || (!currentSession.groupId && currentSession.type === "gmail");
+  setEditAccess(editable);
+  refreshSettingsPanels();
+}
 
-    params.delete("inviteToken");
-    params.delete("groupId");
-    params.delete("email");
-    history.replaceState({}, "", `${location.pathname}${params.toString() ? `?${params.toString()}` : ""}`);
+async function processInviteLink() {
+  if (!firebaseUser || !db) return;
+  const params = new URLSearchParams(window.location.search);
+  const token = params.get("inviteToken");
+  const groupId = params.get("groupId");
+  const invitedEmail = params.get("email");
+  if (!token || !groupId || !invitedEmail) return;
+  if (firebaseUser.email?.toLowerCase() !== invitedEmail.toLowerCase()) return;
+
+  const invRef = db.collection("invitations").doc(token);
+  const invSnap = await invRef.get();
+  if (!invSnap.exists) return;
+  const inv = invSnap.data();
+  if (inv.status !== "pending" || inv.groupId !== groupId) return;
+
+  const memberId = `gmail_${firebaseUser.uid}`;
+  const memberDocId = `${groupId}__${memberId}`;
+
+  await db.collection("groupMembers").doc(memberDocId).set({
+    groupId,
+    memberId,
+    type: "gmail",
+    label: firebaseUser.email,
+    role: "viewer",
+    canEdit: false,
+    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+  }, { merge: true });
+
+  await invRef.update({ status: "accepted", acceptedAt: firebase.firestore.FieldValue.serverTimestamp() });
+
+  currentSession = {
+    type: "gmail",
+    uid: firebaseUser.uid,
+    email: firebaseUser.email,
+    groupId,
+    memberId,
+    role: "viewer",
+    canEdit: false
+  };
+  saveSession();
+
+  params.delete("inviteToken");
+  params.delete("groupId");
+  params.delete("email");
+  history.replaceState({}, "", `${location.pathname}${params.toString() ? `?${params.toString()}` : ""}`);
 }
 
 async function handleGoogleAuthUser(user) {
-    firebaseUser = user || null;
-
-    if (!firebaseUser) {
-        if (currentSession?.type === "gmail") {
-            currentSession = null;
-            saveSession();
-        }
-        await applyAuthState();
-        return;
+  firebaseUser = user || null;
+  if (!firebaseUser) {
+    if (currentSession?.type === "gmail") {
+      currentSession = null;
+      saveSession();
     }
+    applyAuthState();
+    return;
+  }
 
-    const memberId = `gmail_${firebaseUser.uid}`;
+  await processInviteLink();
 
-    const groupsSnap = await db.collection("groups").get();
-    let matchedGroup = null;
-    let matchedMember = null;
+  if (currentSession?.type === "gmail" && currentSession.uid === firebaseUser.uid) {
+    applyAuthState();
+    return;
+  }
 
-    groupsSnap.forEach((doc) => {
-        if (matchedGroup) return;
-        const g = { id: doc.id, ...doc.data() };
-        const m = (g.members || []).find((it) => it.memberId === memberId);
-        if (m) {
-            matchedGroup = g;
-            matchedMember = m;
-        }
-    });
+  const memberId = `gmail_${firebaseUser.uid}`;
+  const snap = await db
+    .collection("groupMembers")
+    .where("memberId", "==", memberId)
+    .limit(1)
+    .get();
 
-    if (matchedGroup && matchedMember) {
-        currentSession = {
-            type: "gmail",
-            uid: firebaseUser.uid,
-            email: firebaseUser.email,
-            groupId: matchedGroup.id,
-            memberId,
-            role: matchedMember.role || "viewer",
-            canEdit: !!matchedMember.canEdit
-        };
-    } else {
-        currentSession = {
-            type: "gmail",
-            uid: firebaseUser.uid,
-            email: firebaseUser.email,
-            role: "owner",
-            canEdit: true
-        };
-    }
+  if (!snap.empty) {
+    const m = snap.docs[0].data();
+    currentSession = {
+      type: "gmail",
+      uid: firebaseUser.uid,
+      email: firebaseUser.email,
+      groupId: m.groupId,
+      memberId,
+      role: m.role || "viewer",
+      canEdit: !!m.canEdit
+    };
+  } else {
+    currentSession = {
+      type: "gmail",
+      uid: firebaseUser.uid,
+      email: firebaseUser.email,
+      role: "owner",
+      canEdit: true
+    };
+  }
 
-    saveSession();
-    await processInviteLinkAfterGmailLogin();
-    await applyAuthState();
+  saveSession();
+  applyAuthState();
 }
 
 async function loginOrCreateGroupAccount() {
-    if (!db) {
-        window.alert("Database ready না। 2-3 সেকেন্ড wait করে আবার চেষ্টা করুন।");
-        return;
-    }
-    const username = groupUsername.value.trim();
-    const password = groupPassword.value;
-    if (!username || !password) {
-        window.alert("Username and password দিন।");
-        return;
-    }
+  if (!db) {
+    window.alert("Firebase not ready");
+    return;
+  }
 
-    const usernameKey = username.toLowerCase();
-    let ref;
-    let snap;
-    try {
-        ref = db.collection("group_accounts").doc(usernameKey);
-        snap = await ref.get();
-    } catch (error) {
-        window.alert(`Group account load fail: ${error?.message || "unknown error"}`);
-        return;
-    }
+  const username = groupUsername.value.trim();
+  const password = groupPassword.value;
+  if (!username || !password) {
+    window.alert("Username and password দিন।");
+    return;
+  }
 
-    let account = snap.exists ? snap.data() : null;
+  const unameKey = normalizeUsername(username);
+  const userRef = db.collection("groupUsers").doc(unameKey);
+  const userSnap = await userRef.get();
 
-    if (!account) {
-        const groupId = pendingInviteInfo?.groupId || `grp_${Date.now()}`;
-        const memberId = `group_${usernameKey}`;
-        account = {
-            username,
-            password,
-            groupId,
-            memberId,
-            role: pendingInviteInfo ? "viewer" : "admin",
-            canEdit: !pendingInviteInfo,
-            createdAt: firebase.firestore.FieldValue.serverTimestamp()
-        };
-        try {
-            await ref.set(account);
-        } catch (error) {
-            window.alert(`Group account create fail: ${error?.message || "unknown error"}`);
-            return;
-        }
+  if (!userSnap.exists) {
+    const groupRef = db.collection("groups").doc();
+    const groupId = groupRef.id;
+    const memberId = `group_${unameKey}`;
 
-        const g = await getGroupDoc(groupId);
-        if (!g) {
-            try {
-                await saveGroupDoc(groupId, {
-                    adminUsername: pendingInviteInfo ? "" : username,
-                    members: [{ memberId, type: "group", label: username, role: account.role, canEdit: account.canEdit }],
-                    invites: [],
-                    accessRequests: []
-                });
-            } catch (error) {
-                window.alert(`Group তৈরি করা যায়নি: ${error?.message || "unknown error"}`);
-                return;
-            }
-        } else {
-            const members = g.members || [];
-            if (!members.some((m) => m.memberId === memberId)) {
-                members.push({ memberId, type: "group", label: username, role: "viewer", canEdit: false });
-                try {
-                    await saveGroupDoc(groupId, { members });
-                } catch (error) {
-                    window.alert(`Group member add fail: ${error?.message || "unknown error"}`);
-                    return;
-                }
-            }
-        }
-    } else {
-        if (account.password !== password) {
-            window.alert("Password ভুল।");
-            return;
-        }
-        if (pendingInviteInfo && account.groupId !== pendingInviteInfo.groupId) {
-            window.alert("এই username অন্য group-এর। নতুন username দিন।");
-            return;
-        }
-    }
+    await groupRef.set({
+      id: groupId,
+      adminUsername: username,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
 
-    if (pendingInviteInfo) {
-        const g = await getGroupDoc(pendingInviteInfo.groupId);
-        if (!g) {
-            window.alert("Invite group পাওয়া যায়নি।");
-            return;
-        }
-        const invites = g.invites || [];
-        const inv = invites.find((i) => i.token === pendingInviteInfo.token && i.status === "pending");
-        if (!inv) {
-            window.alert("Invite expired বা invalid.");
-            return;
-        }
-        inv.status = "accepted";
-        try {
-            await saveGroupDoc(g.id, { invites });
-        } catch (error) {
-            window.alert(`Invite accept update fail: ${error?.message || "unknown error"}`);
-            return;
-        }
-        account.role = "viewer";
-        account.canEdit = false;
-        try {
-            await ref.set({ role: "viewer", canEdit: false }, { merge: true });
-        } catch (error) {
-            window.alert(`Role update fail: ${error?.message || "unknown error"}`);
-            return;
-        }
+    await userRef.set({
+      username,
+      password,
+      groupId,
+      role: "admin",
+      canEdit: true,
+      memberId,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+
+    await db.collection("groupMembers").doc(`${groupId}__${memberId}`).set({
+      groupId,
+      memberId,
+      type: "group",
+      label: username,
+      role: "admin",
+      canEdit: true,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+
+    currentSession = { type: "group", username, groupId, memberId, role: "admin", canEdit: true };
+  } else {
+    const d = userSnap.data();
+    if (d.password !== password) {
+      window.alert("Password ভুল।");
+      return;
     }
 
     currentSession = {
-        type: "group",
-        username: account.username,
-        groupId: account.groupId,
-        memberId: account.memberId,
-        role: account.role || "viewer",
-        canEdit: !!account.canEdit
+      type: "group",
+      username: d.username,
+      groupId: d.groupId,
+      memberId: d.memberId,
+      role: d.role || "admin",
+      canEdit: d.canEdit !== false
     };
-    pendingInviteInfo = null;
-    groupLoginBtn.innerText = "Create/Login Group";
-    saveSession();
-    await applyAuthState();
-    window.alert("Group login successful.");
+  }
+
+  saveSession();
+  applyAuthState();
 }
 
 async function sendInviteToGmail() {
-    if (!isCurrentAdmin()) return;
-    const email = inviteEmailInput.value.trim().toLowerCase();
-    if (!email) {
-        window.alert("Friend Gmail দিন");
-        return;
-    }
+  if (!isCurrentAdmin() || !currentSession?.groupId) return;
+  const email = inviteEmailInput.value.trim().toLowerCase();
+  if (!email) {
+    window.alert("Friend Gmail দিন");
+    return;
+  }
 
-    const g = await getGroupDoc(currentSession.groupId);
-    if (!g) return;
+  const token = `inv_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+  await db.collection("invitations").doc(token).set({
+    token,
+    groupId: currentSession.groupId,
+    email,
+    status: "pending",
+    createdBy: currentSession.memberId,
+    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+  });
 
-    const invites = g.invites || [];
-    const token = `inv_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
-    invites.push({ email, token, status: "pending" });
-    await saveGroupDoc(g.id, { invites });
+  const link = `${location.origin}${location.pathname}?groupId=${encodeURIComponent(currentSession.groupId)}&inviteToken=${encodeURIComponent(token)}&email=${encodeURIComponent(email)}`;
+  const subject = encodeURIComponent("VaultBudget Group Invite");
+  const body = encodeURIComponent(`Please join my group account. Click this link: ${link}`);
 
-    const link = `${location.origin}${location.pathname}?groupId=${encodeURIComponent(g.id)}&inviteToken=${encodeURIComponent(token)}&email=${encodeURIComponent(email)}`;
-    window.open(`mailto:${email}?subject=${encodeURIComponent("VaultBudget Group Invite")}&body=${encodeURIComponent(`Please join my group: ${link}`)}`, "_blank");
-    inviteEmailInput.value = "";
-}
-
-async function requestEditAccess() {
-    if (!currentSession?.groupId) return;
-    const adminEmail = requestAccessEmailInput.value.trim();
-    if (!adminEmail) {
-        window.alert("Admin Gmail দিন");
-        return;
-    }
-
-    const g = await getGroupDoc(currentSession.groupId);
-    if (!g) return;
-
-    const requests = g.accessRequests || [];
-    requests.push({
-        id: `req_${Date.now()}`,
-        fromId: currentSession.memberId,
-        fromLabel: currentSession.type === "gmail" ? currentSession.email : currentSession.username,
-        toEmail: adminEmail,
-        status: "pending"
-    });
-
-    await saveGroupDoc(g.id, { accessRequests: requests });
-    requestAccessEmailInput.value = "";
-    window.alert("Access request admin queue-তে গেছে।");
+  window.open(`mailto:${email}?subject=${subject}&body=${body}`, "_blank");
+  inviteEmailInput.value = "";
+  window.alert("Invite compose window খুলেছে। Send করলে invite যাবে।");
 }
 
 function renderTransactions() {
-    const tbody = document.getElementById("txnTableBody");
-    const txnEmpty = document.getElementById("txnEmpty");
-    const txnCount = document.getElementById("txnCount");
-    tbody.innerHTML = "";
-    txnCount.innerText = `${transactions.length} records`;
-    txnEmpty.hidden = transactions.length > 0;
+  const tbody = document.getElementById("txnTableBody");
+  const txnEmpty = document.getElementById("txnEmpty");
+  const txnCount = document.getElementById("txnCount");
+  tbody.innerHTML = "";
 
-    for (const txn of [...transactions].reverse()) {
-        const row = document.createElement("tr");
-        row.innerHTML = `<td>${txn.time}</td><td><span class="type-chip ${txn.type === "income" ? "type-income" : "type-expense"}">${txn.type}</span></td><td>${txn.category}</td><td>${formatMoney(txn.amount)}</td>`;
-        tbody.appendChild(row);
-    }
+  txnCount.innerText = `${transactions.length} records`;
+  txnEmpty.hidden = transactions.length > 0;
+
+  for (const txn of [...transactions].reverse()) {
+    const row = document.createElement("tr");
+    const time = document.createElement("td");
+    const type = document.createElement("td");
+    const category = document.createElement("td");
+    const amount = document.createElement("td");
+    const chip = document.createElement("span");
+
+    time.innerText = txn.time;
+    chip.className = `type-chip ${txn.type === "income" ? "type-income" : "type-expense"}`;
+    chip.innerHTML = txn.type === "income" ? '<i class="fa-solid fa-arrow-up"></i> Income' : '<i class="fa-solid fa-arrow-down"></i> Expense';
+    type.appendChild(chip);
+
+    category.innerText = txn.category;
+    amount.innerText = formatMoney(txn.amount);
+    amount.className = txn.type === "income" ? "amount-income" : "amount-expense";
+
+    row.appendChild(time);
+    row.appendChild(type);
+    row.appendChild(category);
+    row.appendChild(amount);
+    tbody.appendChild(row);
+  }
 }
 
 function renderExpenseChart() {
-    const categories = Object.keys(breakdown);
-    const values = categories.map((cat) => breakdown[cat]);
-    totalCategory.innerText = String(categories.length);
+  const categories = Object.keys(breakdown);
+  const values = categories.map((cat) => breakdown[cat]);
+  totalCategory.innerText = String(categories.length);
 
-    if (!categories.length) {
-        topCategory.innerText = "-";
-        topExpense.innerText = "0 BDT";
-    } else {
-        const maxIndex = values.indexOf(Math.max(...values));
-        topCategory.innerText = categories[maxIndex];
-        topExpense.innerText = formatMoney(values[maxIndex]);
+  if (!categories.length) {
+    topCategory.innerText = "-";
+    topExpense.innerText = "0 BDT";
+  } else {
+    const maxIndex = values.indexOf(Math.max(...values));
+    topCategory.innerText = categories[maxIndex];
+    topExpense.innerText = formatMoney(values[maxIndex]);
+  }
+
+  const ctx = expenseChartCanvas.getContext("2d");
+  if (expenseChart) expenseChart.destroy();
+
+  const gradient = ctx.createLinearGradient(0, 0, 0, 260);
+  gradient.addColorStop(0, "#ff014f");
+  gradient.addColorStop(0.5, "#f9004d");
+  gradient.addColorStop(1, "#d11414");
+
+  expenseChart = new Chart(ctx, {
+    type: "bar",
+    data: {
+      labels: categories.length ? categories : ["No Data"],
+      datasets: [{
+        label: "Expense (BDT)",
+        data: categories.length ? values : [0],
+        borderRadius: 12,
+        borderSkipped: false,
+        maxBarThickness: 38,
+        backgroundColor: gradient,
+        hoverBackgroundColor: "#ff014f"
+      }]
+    },
+    options: {
+      animation: { duration: 900, easing: "easeOutQuart" },
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } }
     }
-
-    const ctx = expenseChartCanvas.getContext("2d");
-    if (expenseChart) expenseChart.destroy();
-    const gradient = ctx.createLinearGradient(0, 0, 0, 260);
-    gradient.addColorStop(0, "#ff014f");
-    gradient.addColorStop(0.5, "#f9004d");
-    gradient.addColorStop(1, "#d11414");
-
-    expenseChart = new Chart(ctx, {
-        type: "bar",
-        data: {
-            labels: categories.length ? categories : ["No Data"],
-            datasets: [{ data: categories.length ? values : [0], borderRadius: 12, maxBarThickness: 38, backgroundColor: gradient }]
-        },
-        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
-    });
+  });
 }
 
 function updateUI() {
-    document.getElementById("income").innerText = formatMoney(income);
-    document.getElementById("expense").innerText = formatMoney(expense);
-    document.getElementById("balance").innerText = formatMoney(income - expense);
-    document.getElementById("walletIncome").innerText = formatMoney(income);
-    document.getElementById("walletExpense").innerText = formatMoney(expense);
-    document.getElementById("walletBalance").innerText = formatMoney(income - expense);
-    document.getElementById("walletRate").innerText = income > 0 ? `${Math.max(0, Math.round(((income - expense) / income) * 100))}%` : "0%";
+  document.getElementById("income").innerText = formatMoney(income);
+  document.getElementById("expense").innerText = formatMoney(expense);
+  document.getElementById("balance").innerText = formatMoney(income - expense);
+  document.getElementById("walletIncome").innerText = formatMoney(income);
+  document.getElementById("walletExpense").innerText = formatMoney(expense);
+  document.getElementById("walletBalance").innerText = formatMoney(income - expense);
+  document.getElementById("walletRate").innerText = income > 0 ? `${Math.max(0, Math.round(((income - expense) / income) * 100))}%` : "0%";
 
-    const list = document.getElementById("list");
-    const emptyState = document.getElementById("emptyState");
-    list.innerHTML = "";
-    const cats = Object.keys(breakdown);
-    const maxValue = Math.max(1, ...Object.values(breakdown));
-    emptyState.hidden = cats.length > 0;
+  const list = document.getElementById("list");
+  const emptyState = document.getElementById("emptyState");
+  list.innerHTML = "";
 
-    for (const key of cats) {
-        const li = document.createElement("li");
-        li.innerHTML = `<div class="row"><span>${key}</span><strong>${formatMoney(breakdown[key])}</strong></div><div class="bar"><span style="width:${(breakdown[key] / maxValue) * 100}%"></span></div>`;
-        list.appendChild(li);
-    }
+  const categories = Object.keys(breakdown);
+  const maxValue = Math.max(1, ...Object.values(breakdown));
+  emptyState.hidden = categories.length > 0;
+
+  for (const key of categories) {
+    const li = document.createElement("li");
+    const row = document.createElement("div");
+    const cat = document.createElement("span");
+    const amount = document.createElement("strong");
+    const bar = document.createElement("div");
+    const fill = document.createElement("span");
+
+    row.className = "row";
+    bar.className = "bar";
+    cat.innerText = key;
+    amount.innerText = formatMoney(breakdown[key]);
+    fill.style.width = `${(breakdown[key] / maxValue) * 100}%`;
+
+    row.appendChild(cat);
+    row.appendChild(amount);
+    bar.appendChild(fill);
+    li.appendChild(row);
+    li.appendChild(bar);
+    list.appendChild(li);
+  }
 
   renderTransactions();
   renderExpenseChart();
-  saveFinanceCache();
+  saveData();
 }
 
-async function addIncome() {
-    if (!canEdit) return;
-    const val = Number(incomeInput.value);
-    const source = incomeSourceInput.value.trim();
-    if (!val || val < 0) return;
-    income += val;
-    transactions.push({ time: new Date().toLocaleString("en-BD"), type: "income", category: source || "General Income", amount: val });
-    incomeInput.value = "";
-    incomeSourceInput.value = "";
-    updateUI();
-    await saveFinanceData();
+function addIncome() {
+  if (!canEdit) return;
+  const val = Number(incomeInput.value);
+  const source = incomeSourceInput.value.trim();
+  if (!val || val < 0) return;
+  income += val;
+  transactions.push({ time: new Date().toLocaleString("en-BD"), type: "income", category: source || "General Income", amount: val });
+  incomeInput.value = "";
+  incomeSourceInput.value = "";
+  updateUI();
 }
 
-async function addExpense() {
-    if (!canEdit) return;
-    const val = Number(expenseInput.value);
-    const cat = categoryInput.value.trim();
-    if (!val || val < 0 || cat === "") return;
-    expense += val;
-    breakdown[cat] = (breakdown[cat] || 0) + val;
-    transactions.push({ time: new Date().toLocaleString("en-BD"), type: "expense", category: cat, amount: val });
-    expenseInput.value = "";
-    categoryInput.value = "";
-    updateUI();
-    await saveFinanceData();
+function addExpense() {
+  if (!canEdit) return;
+  const val = Number(expenseInput.value);
+  const cat = categoryInput.value.trim();
+  if (!val || val < 0 || cat === "") return;
+  expense += val;
+  breakdown[cat] = (breakdown[cat] || 0) + val;
+  transactions.push({ time: new Date().toLocaleString("en-BD"), type: "expense", category: cat, amount: val });
+  expenseInput.value = "";
+  categoryInput.value = "";
+  updateUI();
 }
 
 function downloadReportPdf() {
-    if (!window.jspdf || !window.jspdf.jsPDF) return;
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
-    doc.text("VaultBudget Report", 14, 16);
-    doc.text(`Total Income: ${formatMoney(income)}`, 14, 30);
-    doc.text(`Total Expense: ${formatMoney(expense)}`, 14, 36);
-    doc.text(`Balance: ${formatMoney(income - expense)}`, 14, 42);
-    doc.save(`vaultbudget-report-${new Date().toISOString().slice(0, 10)}.pdf`);
-}
-
-function initFirebaseCore() {
-  if (!firebase.apps.length) {
-    firebase.initializeApp(firebaseConfig);
+  if (!window.jspdf || !window.jspdf.jsPDF) {
+    window.alert("PDF library load hoyni. Please refresh and try again.");
+    return;
   }
-  db = firebase.firestore();
-  db.enablePersistence({ synchronizeTabs: true }).catch(() => {
-    // Ignore persistence init errors (private mode / multiple tabs with restrictions).
-  });
-  auth = firebase.auth();
-  googleProvider = new firebase.auth.GoogleAuthProvider();
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  doc.text("VaultBudget Report", 14, 16);
+  doc.text(`Total Income: ${formatMoney(income)}`, 14, 30);
+  doc.text(`Total Expense: ${formatMoney(expense)}`, 14, 36);
+  doc.text(`Balance: ${formatMoney(income - expense)}`, 14, 42);
+  doc.save(`vaultbudget-report-${new Date().toISOString().slice(0, 10)}.pdf`);
 }
 
-function initGoogleAuthListener() {
-  auth.onAuthStateChanged(async (user) => {
-    await handleGoogleAuthUser(user);
+function initFirebase() {
+  firebase.initializeApp(firebaseConfig);
+  auth = firebase.auth();
+  db = firebase.firestore();
+  googleProvider = new firebase.auth.GoogleAuthProvider();
+  auth.onAuthStateChanged((user) => {
+    handleGoogleAuthUser(user).catch((e) => window.alert(e.message || "Auth error"));
   });
 }
 
 themeToggle.addEventListener("click", () => {
-    const current = root.getAttribute("data-theme") === "dark" ? "dark" : "light";
-    applyTheme(current === "dark" ? "light" : "dark");
+  const current = root.getAttribute("data-theme") === "dark" ? "dark" : "light";
+  applyTheme(current === "dark" ? "light" : "dark");
 });
 
 navButtons.forEach((btn) => btn.addEventListener("click", () => showView(btn.dataset.view)));
 downloadPdfBtn.addEventListener("click", downloadReportPdf);
 
 groupModeBtn.addEventListener("click", () => groupLoginFields.classList.toggle("hidden"));
-groupLoginBtn.addEventListener("click", async () => {
-    try {
-        await loginOrCreateGroupAccount();
-    } catch (error) {
-        window.alert(`Group login failed: ${error?.message || "unknown error"}`);
-    }
+groupLoginBtn.addEventListener("click", () => {
+  loginOrCreateGroupAccount().catch((e) => window.alert(e.message || "Group login error"));
 });
-sendInviteBtn.addEventListener("click", () => { sendInviteToGmail(); });
-requestAccessBtn.addEventListener("click", () => { requestEditAccess(); });
+
+sendInviteBtn.addEventListener("click", () => {
+  sendInviteToGmail().catch((e) => window.alert(e.message || "Invite failed"));
+});
+
+requestAccessBtn.addEventListener("click", () => {
+  requestEditAccess().catch((e) => window.alert(e.message || "Request failed"));
+});
 
 googleLoginBtn.addEventListener("click", async () => {
-    try {
-        await auth.signInWithPopup(googleProvider);
-    } catch (error) {
-        window.alert(error?.message || "Google login failed.");
-    }
+  try {
+    await auth.signInWithPopup(googleProvider);
+  } catch (error) {
+    window.alert(error?.message || "Google login failed.");
+  }
 });
 
 clearDataBtn.addEventListener("click", async () => {
-    const ok = window.confirm("Are you sure? This will clear all app data for this account/group.");
-    if (!ok) return;
+  const ok = window.confirm("Are you sure? This will clear all app data.");
+  if (!ok) return;
 
-    income = 0;
-    expense = 0;
-    Object.keys(breakdown).forEach((k) => delete breakdown[k]);
-    transactions.length = 0;
-    await saveFinanceData();
+  income = 0;
+  expense = 0;
+  Object.keys(breakdown).forEach((key) => delete breakdown[key]);
+  transactions.length = 0;
 
-    if (auth && auth.currentUser) await auth.signOut();
-    currentSession = null;
-    saveSession();
-    applyTheme("light");
-    updateUI();
-    await applyAuthState();
+  localStorage.removeItem("income");
+  localStorage.removeItem("expense");
+  localStorage.removeItem("breakdown");
+  localStorage.removeItem("transactions");
+  localStorage.removeItem("theme");
+
+  if (auth && auth.currentUser) {
+    await auth.signOut();
+  }
+
+  currentSession = null;
+  saveSession();
+  applyTheme("light");
+  updateUI();
+  applyAuthState();
 });
 
-async function bootApp() {
-  loadTheme();
-  loadSession();
-  initFirebaseCore();
-  await applyAuthState();
-  initGoogleAuthListener();
-  updateUI();
-}
-
-bootApp();
-
-const params = new URLSearchParams(window.location.search);
-const token = params.get("inviteToken");
-const groupId = params.get("groupId");
-const invitedEmail = params.get("email");
-if (token && groupId) {
-    pendingInviteInfo = { token, groupId, invitedEmail: invitedEmail || "" };
-    groupLoginFields.classList.remove("hidden");
-    groupLoginBtn.innerText = "Join Group";
-}
+loadTheme();
+loadData();
+updateUI();
+loadSession();
+applyAuthState();
+initFirebase();
 
 window.addIncome = addIncome;
 window.addExpense = addExpense;
