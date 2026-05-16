@@ -63,6 +63,7 @@ let db = null;
 let googleProvider = null;
 let firebaseUser = null;
 let currentSession = null;
+let pendingInviteInfo = null;
 
 function normalizeUsername(value) {
   return value.trim().toLowerCase();
@@ -441,24 +442,29 @@ async function loginOrCreateGroupAccount() {
   const unameKey = normalizeUsername(username);
   const userRef = db.collection("groupUsers").doc(unameKey);
   const userSnap = await userRef.get();
+  const invitedGroupId = pendingInviteInfo?.groupId || null;
+  const invitedToken = pendingInviteInfo?.token || null;
 
   if (!userSnap.exists) {
-    const groupRef = db.collection("groups").doc();
-    const groupId = groupRef.id;
+    const groupId = invitedGroupId || db.collection("groups").doc().id;
+    const groupRef = db.collection("groups").doc(groupId);
     const memberId = `group_${unameKey}`;
 
-    await groupRef.set({
-      id: groupId,
-      adminUsername: username,
-      createdAt: firebase.firestore.FieldValue.serverTimestamp()
-    });
+    const existingGroup = await groupRef.get();
+    if (!existingGroup.exists) {
+      await groupRef.set({
+        id: groupId,
+        adminUsername: invitedGroupId ? "" : username,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+    }
 
     await userRef.set({
       username,
       password,
       groupId,
-      role: "admin",
-      canEdit: true,
+      role: invitedGroupId ? "viewer" : "admin",
+      canEdit: invitedGroupId ? false : true,
       memberId,
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
     });
@@ -468,16 +474,38 @@ async function loginOrCreateGroupAccount() {
       memberId,
       type: "group",
       label: username,
-      role: "admin",
-      canEdit: true,
+      role: invitedGroupId ? "viewer" : "admin",
+      canEdit: invitedGroupId ? false : true,
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
     });
 
-    currentSession = { type: "group", username, groupId, memberId, role: "admin", canEdit: true };
+    if (invitedGroupId && invitedToken) {
+      const invRef = db.collection("invitations").doc(invitedToken);
+      const invSnap = await invRef.get();
+      if (invSnap.exists) {
+        const inv = invSnap.data();
+        if (inv.status === "pending" && inv.groupId === invitedGroupId) {
+          await invRef.update({ status: "accepted", acceptedAt: firebase.firestore.FieldValue.serverTimestamp() });
+        }
+      }
+    }
+
+    currentSession = {
+      type: "group",
+      username,
+      groupId,
+      memberId,
+      role: invitedGroupId ? "viewer" : "admin",
+      canEdit: invitedGroupId ? false : true
+    };
   } else {
     const d = userSnap.data();
     if (d.password !== password) {
       window.alert("Password ভুল।");
+      return;
+    }
+    if (invitedGroupId && d.groupId !== invitedGroupId) {
+      window.alert("এই username অন্য group-এর। নতুন username দিন।");
       return;
     }
 
@@ -491,6 +519,7 @@ async function loginOrCreateGroupAccount() {
     };
   }
 
+  pendingInviteInfo = null;
   saveSession();
   await loadGroupSharedData();
   updateUI();
@@ -717,6 +746,18 @@ function initFirebase() {
   });
 }
 
+function captureInviteInfoFromUrl() {
+  const params = new URLSearchParams(window.location.search);
+  const groupId = params.get("groupId");
+  const token = params.get("inviteToken");
+  const email = params.get("email");
+  if (groupId && token) {
+    pendingInviteInfo = { groupId, token, email: email || "" };
+    groupLoginFields.classList.remove("hidden");
+    groupLoginBtn.innerText = "Join Group";
+  }
+}
+
 themeToggle.addEventListener("click", () => {
   const current = root.getAttribute("data-theme") === "dark" ? "dark" : "light";
   applyTheme(current === "dark" ? "light" : "dark");
@@ -777,6 +818,7 @@ loadData();
 updateUI();
 loadSession();
 applyAuthState();
+captureInviteInfoFromUrl();
 initFirebase();
 
 window.addIncome = addIncome;
