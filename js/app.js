@@ -341,7 +341,9 @@ async function createGroupFromGmail() {
   await groupRef.set({
     id: groupId,
     adminUsername: username,
+    adminUsernameLower: unameKey,
     createdByEmail: (firebaseUser.email || "").toLowerCase(),
+    createdByUid: firebaseUser.uid,
     createdAt: firebase.firestore.FieldValue.serverTimestamp()
   });
 
@@ -973,6 +975,5 @@ initPasswordToggles();
 
 window.addIncome = addIncome;
 window.addExpense = addExpense;
-
 
 
