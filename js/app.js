@@ -262,6 +262,10 @@ async function loginOrCreateGroupAccount() {
     window.alert("Firebase not ready");
     return;
   }
+  if (!firebaseUser) {
+    window.alert("Group account create/join করার আগে Gmail দিয়ে login করুন।");
+    return;
+  }
 
   const username = groupUsername.value.trim();
   const password = groupPassword.value;
@@ -340,14 +344,50 @@ async function loginOrCreateGroupAccount() {
       return;
     }
 
-    currentSession = {
-      type: "group",
-      username: d.username,
-      groupId: d.groupId,
-      memberId: d.memberId,
-      role: d.role || "admin",
-      canEdit: d.canEdit !== false
-    };
+    // Invite flow: invited user can enter admin's group credentials,
+    // but still joins as viewer unless admin approves edit access later.
+    if (invitedGroupId && d.groupId === invitedGroupId) {
+      const memberId = `gmail_${firebaseUser.uid}`;
+      await db.collection("groupMembers").doc(`${invitedGroupId}__${memberId}`).set({
+        groupId: invitedGroupId,
+        memberId,
+        type: "gmail",
+        label: firebaseUser.email,
+        role: "viewer",
+        canEdit: false,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      }, { merge: true });
+
+      if (invitedToken) {
+        const invRef = db.collection("invitations").doc(invitedToken);
+        const invSnap = await invRef.get();
+        if (invSnap.exists) {
+          const inv = invSnap.data();
+          if (inv.status === "pending" && inv.groupId === invitedGroupId) {
+            await invRef.update({ status: "accepted", acceptedAt: firebase.firestore.FieldValue.serverTimestamp() });
+          }
+        }
+      }
+
+      currentSession = {
+        type: "gmail",
+        uid: firebaseUser.uid,
+        email: firebaseUser.email,
+        groupId: invitedGroupId,
+        memberId,
+        role: "viewer",
+        canEdit: false
+      };
+    } else {
+      currentSession = {
+        type: "group",
+        username: d.username,
+        groupId: d.groupId,
+        memberId: d.memberId,
+        role: d.role || "viewer",
+        canEdit: d.canEdit === true
+      };
+    }
   }
 
   pendingInviteInfo = null;
