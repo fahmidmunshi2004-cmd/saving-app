@@ -824,18 +824,50 @@ googleLoginBtn.addEventListener("click", async () => {
 clearDataBtn.addEventListener("click", async () => {
   const ok = window.confirm("Are you sure? This will clear all app data.");
   if (!ok) return;
+  let remoteClearError = "";
 
-  // Clear remote shared data first (if exists)
+  // Clear remote shared/group data first (if exists)
   try {
     if (db) {
       if (currentSession?.groupId) {
+        const groupId = currentSession.groupId;
+
+        // group finance
         await db.collection("groupFinance").doc(currentSession.groupId).delete();
+
+        // group meta doc
+        await db.collection("groups").doc(groupId).delete().catch(() => { });
+
+        // group members
+        const membersSnap = await db.collection("groupMembers").where("groupId", "==", groupId).get();
+        for (const d of membersSnap.docs) {
+          await d.ref.delete().catch(() => { });
+        }
+
+        // invitations
+        const inviteSnap = await db.collection("invitations").where("groupId", "==", groupId).get();
+        for (const d of inviteSnap.docs) {
+          await d.ref.delete().catch(() => { });
+        }
+
+        // access requests
+        const reqSnap = await db.collection("accessRequests").where("groupId", "==", groupId).get();
+        for (const d of reqSnap.docs) {
+          await d.ref.delete().catch(() => { });
+        }
+
+        // group user credential docs linked with this group
+        const groupUsersSnap = await db.collection("groupUsers").where("groupId", "==", groupId).get();
+        for (const d of groupUsersSnap.docs) {
+          await d.ref.delete().catch(() => { });
+        }
       } else if (firebaseUser?.uid) {
         await db.collection("userFinance").doc(firebaseUser.uid).delete();
       }
     }
-  } catch (_) {
+  } catch (err) {
     // If remote delete fails, continue local cleanup + logout.
+    remoteClearError = err?.message || "Remote clear failed";
   }
 
   income = 0;
@@ -843,12 +875,9 @@ clearDataBtn.addEventListener("click", async () => {
   Object.keys(breakdown).forEach((key) => delete breakdown[key]);
   transactions.length = 0;
 
-  localStorage.removeItem("income");
-  localStorage.removeItem("expense");
-  localStorage.removeItem("breakdown");
-  localStorage.removeItem("transactions");
-  localStorage.removeItem("theme");
-  sessionStorage.removeItem("vault_session");
+  // full local reset
+  localStorage.clear();
+  sessionStorage.clear();
 
   if (auth && auth.currentUser) {
     await auth.signOut();
@@ -861,6 +890,11 @@ clearDataBtn.addEventListener("click", async () => {
   applyAuthState();
   if (groupActionFormCard) groupActionFormCard.classList.add("hidden");
   if (inviteStatusText) inviteStatusText.innerText = "";
+  if (remoteClearError) {
+    window.alert(`Local reset complete, but cloud data delete failed: ${remoteClearError}`);
+  } else {
+    window.alert("Full reset complete. Logged out successfully.");
+  }
 });
 
 loadTheme();
