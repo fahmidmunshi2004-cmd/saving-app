@@ -747,17 +747,38 @@ tbody tr:last-child td {
     align-items: center;
     justify-content: center;
     padding: 16px;
-    background: rgba(18, 24, 38, 0.36);
-    backdrop-filter: blur(4px);
+    background:
+        radial-gradient(500px 220px at 10% 10%, rgba(255, 1, 79, 0.18), transparent 68%),
+        radial-gradient(420px 200px at 88% 88%, rgba(26, 162, 219, 0.14), transparent 70%),
+        rgba(16, 22, 34, 0.42);
+    backdrop-filter: blur(8px);
 }
 
 .loader-card,
 .modal-card {
     width: min(380px, 100%);
-    border-radius: 16px;
-    background: #ffffff;
-    padding: 16px;
-    box-shadow: 0 16px 38px rgba(0, 0, 0, 0.22);
+    border-radius: 18px;
+    background:
+        linear-gradient(160deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 255, 0.96));
+    padding: 0;
+    box-shadow:
+        0 20px 44px rgba(0, 0, 0, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.7);
+    overflow: hidden;
+}
+
+.modal-card::before {
+    content: "";
+    display: block;
+    height: 6px;
+    background: linear-gradient(90deg, var(--brand), #ff5f73, #1BA2DB);
+}
+
+.modal-card h3,
+.modal-card p,
+.modal-actions {
+    padding-left: 14px;
+    padding-right: 14px;
 }
 
 .loader-card {
@@ -781,23 +802,38 @@ tbody tr:last-child td {
 }
 
 .modal-card h3 {
-    margin: 0 0 8px;
+    margin: 12px 0 8px;
+    font-family: var(--font-display);
+    font-size: 1.02rem;
+    letter-spacing: 0.2px;
 }
 
 .modal-card p {
     margin: 0 0 14px;
-    color: var(--muted);
+    color: color-mix(in srgb, var(--muted) 88%, #1e2125 12%);
     white-space: pre-line;
+    line-height: 1.5;
 }
 
 .modal-actions {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
+    grid-template-columns: 1fr;
+    gap: 8px;
+    padding-bottom: 14px;
 }
 
 .modal-actions .btn {
     margin-top: 0;
+    width: 100%;
+    padding: 11px 12px;
+    border-radius: 12px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+    transition: transform 0.18s ease, filter 0.2s ease;
+}
+
+.modal-actions .btn:hover {
+    transform: translateY(-1px);
+    filter: saturate(1.05);
 }
 
 @keyframes spin {
