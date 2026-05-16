@@ -19,6 +19,8 @@ async function refreshSettingsPanels() {
     requestAccessCard.classList.add("hidden");
     pendingRequestsCard.classList.add("hidden");
     groupMembersList.innerHTML = "";
+    groupActionsCard.classList.add("hidden");
+    groupActionFormCard.classList.add("hidden");
     return;
   }
 
@@ -31,6 +33,8 @@ async function refreshSettingsPanels() {
     requestAccessCard.classList.add("hidden");
     pendingRequestsCard.classList.add("hidden");
     groupMembersList.innerHTML = "";
+    groupActionsCard.classList.toggle("hidden", currentSession.type !== "gmail");
+    groupActionFormCard.classList.add("hidden");
     return;
   }
 
@@ -60,6 +64,8 @@ async function refreshSettingsPanels() {
   inviteCard.classList.toggle("hidden", !isCurrentAdmin());
   pendingRequestsCard.classList.toggle("hidden", !isCurrentAdmin());
   requestAccessCard.classList.toggle("hidden", isCurrentAdmin());
+  groupActionsCard.classList.add("hidden");
+  groupActionFormCard.classList.add("hidden");
 
   await renderPendingRequests();
 }
@@ -395,6 +401,138 @@ async function loginOrCreateGroupAccount() {
   await loadGroupSharedData();
   updateUI();
   applyAuthState();
+}
+
+function openGroupActionForm(mode) {
+  groupActionMode = mode;
+  groupActionFormCard.classList.remove("hidden");
+  groupActionTitle.innerText = mode === "create" ? "Create Group Account" : "Join Other Group";
+  groupActionSubmitBtn.innerText = mode === "create" ? "Create Group" : "Join Group";
+}
+
+async function createGroupFromGmail() {
+  if (!firebaseUser || !db) {
+    window.alert("আগে Gmail login করুন।");
+    return;
+  }
+  const username = groupActionUsername.value.trim();
+  const password = groupActionPassword.value;
+  if (!username || !password) {
+    window.alert("Username এবং password দিন।");
+    return;
+  }
+
+  const unameKey = normalizeUsername(username);
+  const userRef = db.collection("groupUsers").doc(unameKey);
+  const userSnap = await userRef.get();
+  if (userSnap.exists) {
+    window.alert("এই group username already আছে।");
+    return;
+  }
+
+  const groupRef = db.collection("groups").doc();
+  const groupId = groupRef.id;
+  const memberId = `gmail_${firebaseUser.uid}`;
+
+  await groupRef.set({
+    id: groupId,
+    adminUsername: username,
+    createdByEmail: firebaseUser.email || "",
+    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+  });
+
+  await userRef.set({
+    username,
+    password,
+    groupId,
+    role: "admin",
+    canEdit: true,
+    memberId,
+    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+  });
+
+  await db.collection("groupMembers").doc(`${groupId}__${memberId}`).set({
+    groupId,
+    memberId,
+    type: "gmail",
+    label: firebaseUser.email || username,
+    role: "admin",
+    canEdit: true,
+    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+  }, { merge: true });
+
+  currentSession = {
+    type: "gmail",
+    uid: firebaseUser.uid,
+    email: firebaseUser.email,
+    groupId,
+    memberId,
+    role: "admin",
+    canEdit: true
+  };
+  saveSession();
+  await loadGroupSharedData();
+  updateUI();
+  applyAuthState();
+  groupActionUsername.value = "";
+  groupActionPassword.value = "";
+  window.alert("Group account created.");
+}
+
+async function joinGroupFromGmail() {
+  if (!firebaseUser || !db) {
+    window.alert("আগে Gmail login করুন।");
+    return;
+  }
+  const username = groupActionUsername.value.trim();
+  const password = groupActionPassword.value;
+  if (!username || !password) {
+    window.alert("Username এবং password দিন।");
+    return;
+  }
+
+  const unameKey = normalizeUsername(username);
+  const userSnap = await db.collection("groupUsers").doc(unameKey).get();
+  if (!userSnap.exists) {
+    window.alert("Group username পাওয়া যায়নি।");
+    return;
+  }
+
+  const userData = userSnap.data();
+  if (userData.password !== password) {
+    window.alert("Password ভুল।");
+    return;
+  }
+
+  const groupId = userData.groupId;
+  const memberId = `gmail_${firebaseUser.uid}`;
+
+  await db.collection("groupMembers").doc(`${groupId}__${memberId}`).set({
+    groupId,
+    memberId,
+    type: "gmail",
+    label: firebaseUser.email || "",
+    role: "viewer",
+    canEdit: false,
+    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+  }, { merge: true });
+
+  currentSession = {
+    type: "gmail",
+    uid: firebaseUser.uid,
+    email: firebaseUser.email,
+    groupId,
+    memberId,
+    role: "viewer",
+    canEdit: false
+  };
+  saveSession();
+  await loadGroupSharedData();
+  updateUI();
+  applyAuthState();
+  groupActionUsername.value = "";
+  groupActionPassword.value = "";
+  window.alert("Joined group successfully.");
 }
 
 async function sendInviteToGmail() {
@@ -811,6 +949,22 @@ sendInviteBtn.addEventListener("click", () => {
 
 requestAccessBtn.addEventListener("click", () => {
   requestEditAccess().catch((e) => window.alert(e.message || "Request failed"));
+});
+
+createGroupBtn.addEventListener("click", () => openGroupActionForm("create"));
+joinOtherGroupBtn.addEventListener("click", () => openGroupActionForm("join"));
+groupActionSubmitBtn.addEventListener("click", async () => {
+  try {
+    if (groupActionMode === "create") {
+      await createGroupFromGmail();
+    } else if (groupActionMode === "join") {
+      await joinGroupFromGmail();
+    } else {
+      window.alert("Action select করুন।");
+    }
+  } catch (e) {
+    window.alert(e.message || "Group action failed");
+  }
 });
 
 googleLoginBtn.addEventListener("click", async () => {
