@@ -263,151 +263,11 @@ async function handleGoogleAuthUser(user) {
   applyAuthState();
 }
 
-async function loginOrCreateGroupAccount() {
-  if (!db) {
-    window.alert("Firebase not ready");
-    return;
-  }
-  if (!firebaseUser) {
-    window.alert("Group account create/join করার আগে Gmail দিয়ে login করুন।");
-    return;
-  }
-
-  const username = groupUsername.value.trim();
-  const password = groupPassword.value;
-  if (!username || !password) {
-    window.alert("Username and password দিন।");
-    return;
-  }
-
-  const unameKey = normalizeUsername(username);
-  const userRef = db.collection("groupUsers").doc(unameKey);
-  const userSnap = await userRef.get();
-  const invitedGroupId = pendingInviteInfo?.groupId || null;
-  const invitedToken = pendingInviteInfo?.token || null;
-
-  if (!userSnap.exists) {
-    const groupId = invitedGroupId || db.collection("groups").doc().id;
-    const groupRef = db.collection("groups").doc(groupId);
-    const memberId = `group_${unameKey}`;
-
-    const existingGroup = await groupRef.get();
-    if (!existingGroup.exists) {
-      await groupRef.set({
-        id: groupId,
-        adminUsername: invitedGroupId ? "" : username,
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-      });
-    }
-
-    await userRef.set({
-      username,
-      password,
-      groupId,
-      role: invitedGroupId ? "viewer" : "admin",
-      canEdit: invitedGroupId ? false : true,
-      memberId,
-      createdAt: firebase.firestore.FieldValue.serverTimestamp()
-    });
-
-    await db.collection("groupMembers").doc(`${groupId}__${memberId}`).set({
-      groupId,
-      memberId,
-      type: "group",
-      label: username,
-      role: invitedGroupId ? "viewer" : "admin",
-      canEdit: invitedGroupId ? false : true,
-      createdAt: firebase.firestore.FieldValue.serverTimestamp()
-    });
-
-    if (invitedGroupId && invitedToken) {
-      const invRef = db.collection("invitations").doc(invitedToken);
-      const invSnap = await invRef.get();
-      if (invSnap.exists) {
-        const inv = invSnap.data();
-        if (inv.status === "pending" && inv.groupId === invitedGroupId) {
-          await invRef.update({ status: "accepted", acceptedAt: firebase.firestore.FieldValue.serverTimestamp() });
-        }
-      }
-    }
-
-    currentSession = {
-      type: "group",
-      username,
-      groupId,
-      memberId,
-      role: invitedGroupId ? "viewer" : "admin",
-      canEdit: invitedGroupId ? false : true
-    };
-  } else {
-    const d = userSnap.data();
-    if (d.password !== password) {
-      window.alert("Password ভুল।");
-      return;
-    }
-    if (invitedGroupId && d.groupId !== invitedGroupId) {
-      window.alert("এই username অন্য group-এর। নতুন username দিন।");
-      return;
-    }
-
-    // Invite flow: invited user can enter admin's group credentials,
-    // but still joins as viewer unless admin approves edit access later.
-    if (invitedGroupId && d.groupId === invitedGroupId) {
-      const memberId = `gmail_${firebaseUser.uid}`;
-      await db.collection("groupMembers").doc(`${invitedGroupId}__${memberId}`).set({
-        groupId: invitedGroupId,
-        memberId,
-        type: "gmail",
-        label: firebaseUser.email,
-        role: "viewer",
-        canEdit: false,
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-      }, { merge: true });
-
-      if (invitedToken) {
-        const invRef = db.collection("invitations").doc(invitedToken);
-        const invSnap = await invRef.get();
-        if (invSnap.exists) {
-          const inv = invSnap.data();
-          if (inv.status === "pending" && inv.groupId === invitedGroupId) {
-            await invRef.update({ status: "accepted", acceptedAt: firebase.firestore.FieldValue.serverTimestamp() });
-          }
-        }
-      }
-
-      currentSession = {
-        type: "gmail",
-        uid: firebaseUser.uid,
-        email: firebaseUser.email,
-        groupId: invitedGroupId,
-        memberId,
-        role: "viewer",
-        canEdit: false
-      };
-    } else {
-      currentSession = {
-        type: "group",
-        username: d.username,
-        groupId: d.groupId,
-        memberId: d.memberId,
-        role: d.role || "viewer",
-        canEdit: d.canEdit === true
-      };
-    }
-  }
-
-  pendingInviteInfo = null;
-  saveSession();
-  await loadGroupSharedData();
-  updateUI();
-  applyAuthState();
-}
-
-function openGroupActionForm(mode) {
-  groupActionMode = mode;
+function openGroupActionForm() {
+  groupActionMode = "create";
   groupActionFormCard.classList.remove("hidden");
-  groupActionTitle.innerText = mode === "create" ? "Create Group Account" : "Join Other Group";
-  groupActionSubmitBtn.innerText = mode === "create" ? "Create Group" : "Join Group";
+  groupActionTitle.innerText = "Create Group Account";
+  groupActionSubmitBtn.innerText = "Create Group";
 }
 
 async function createGroupFromGmail() {
@@ -430,6 +290,16 @@ async function createGroupFromGmail() {
     return;
   }
 
+  const ownedGroupSnap = await db
+    .collection("groups")
+    .where("createdByEmail", "==", (firebaseUser.email || "").toLowerCase())
+    .limit(1)
+    .get();
+  if (!ownedGroupSnap.empty) {
+    window.alert("আপনার Gmail দিয়ে already group account তৈরি আছে।");
+    return;
+  }
+
   const groupRef = db.collection("groups").doc();
   const groupId = groupRef.id;
   const memberId = `gmail_${firebaseUser.uid}`;
@@ -437,7 +307,7 @@ async function createGroupFromGmail() {
   await groupRef.set({
     id: groupId,
     adminUsername: username,
-    createdByEmail: firebaseUser.email || "",
+    createdByEmail: (firebaseUser.email || "").toLowerCase(),
     createdAt: firebase.firestore.FieldValue.serverTimestamp()
   });
 
@@ -913,18 +783,6 @@ function initFirebase() {
   });
 }
 
-function captureInviteInfoFromUrl() {
-  const params = new URLSearchParams(window.location.search);
-  const groupId = params.get("groupId");
-  const token = params.get("inviteToken");
-  const email = params.get("email");
-  if (groupId && token) {
-    pendingInviteInfo = { groupId, token, email: email || "" };
-    groupLoginFields.classList.remove("hidden");
-    groupLoginBtn.innerText = "Join Group";
-  }
-}
-
 themeToggle.addEventListener("click", () => {
   const current = root.getAttribute("data-theme") === "dark" ? "dark" : "light";
   applyTheme(current === "dark" ? "light" : "dark");
@@ -938,11 +796,6 @@ navButtons.forEach((btn) => btn.addEventListener("click", async () => {
 }));
 downloadPdfBtn.addEventListener("click", downloadReportPdf);
 
-groupModeBtn.addEventListener("click", () => groupLoginFields.classList.toggle("hidden"));
-groupLoginBtn.addEventListener("click", () => {
-  loginOrCreateGroupAccount().catch((e) => window.alert(e.message || "Group login error"));
-});
-
 sendInviteBtn.addEventListener("click", () => {
   sendInviteToGmail().catch((e) => window.alert(e.message || "Invite failed"));
 });
@@ -951,17 +804,10 @@ requestAccessBtn.addEventListener("click", () => {
   requestEditAccess().catch((e) => window.alert(e.message || "Request failed"));
 });
 
-createGroupBtn.addEventListener("click", () => openGroupActionForm("create"));
-joinOtherGroupBtn.addEventListener("click", () => openGroupActionForm("join"));
+createGroupBtn.addEventListener("click", () => openGroupActionForm());
 groupActionSubmitBtn.addEventListener("click", async () => {
   try {
-    if (groupActionMode === "create") {
-      await createGroupFromGmail();
-    } else if (groupActionMode === "join") {
-      await joinGroupFromGmail();
-    } else {
-      window.alert("Action select করুন।");
-    }
+    await createGroupFromGmail();
   } catch (e) {
     window.alert(e.message || "Group action failed");
   }
@@ -1006,7 +852,6 @@ loadData();
 updateUI();
 loadSession();
 applyAuthState();
-captureInviteInfoFromUrl();
 initFirebase();
 
 window.addIncome = addIncome;
