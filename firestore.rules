@@ -36,8 +36,8 @@ service cloud.firestore {
     match /groups/{groupId} {
       allow read: if isGroupMember(groupId);
       allow create: if signedIn()
-        && request.resource.data.createdByEmail == request.auth.token.email
-        && request.resource.data.id == groupId;
+        && request.resource.data.id == groupId
+        && request.resource.data.createdByUid == request.auth.uid;
       allow update: if isGroupAdmin(groupId);
       allow delete: if isGroupAdmin(groupId);
     }
