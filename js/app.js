@@ -825,6 +825,19 @@ clearDataBtn.addEventListener("click", async () => {
   const ok = window.confirm("Are you sure? This will clear all app data.");
   if (!ok) return;
 
+  // Clear remote shared data first (if exists)
+  try {
+    if (db) {
+      if (currentSession?.groupId) {
+        await db.collection("groupFinance").doc(currentSession.groupId).delete();
+      } else if (firebaseUser?.uid) {
+        await db.collection("userFinance").doc(firebaseUser.uid).delete();
+      }
+    }
+  } catch (_) {
+    // If remote delete fails, continue local cleanup + logout.
+  }
+
   income = 0;
   expense = 0;
   Object.keys(breakdown).forEach((key) => delete breakdown[key]);
@@ -835,6 +848,7 @@ clearDataBtn.addEventListener("click", async () => {
   localStorage.removeItem("breakdown");
   localStorage.removeItem("transactions");
   localStorage.removeItem("theme");
+  sessionStorage.removeItem("vault_session");
 
   if (auth && auth.currentUser) {
     await auth.signOut();
@@ -845,6 +859,8 @@ clearDataBtn.addEventListener("click", async () => {
   applyTheme("light");
   updateUI();
   applyAuthState();
+  if (groupActionFormCard) groupActionFormCard.classList.add("hidden");
+  if (inviteStatusText) inviteStatusText.innerText = "";
 });
 
 loadTheme();
