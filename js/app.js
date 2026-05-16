@@ -310,16 +310,18 @@ async function createGroupFromGmail() {
     return;
   }
   const username = groupActionUsername.value.trim();
-  const password = groupActionPassword.value;
-  if (!username || !password) {
-    appAlert("Username এবং password দিন।");
+  if (!username) {
+    appAlert("Group username দিন।");
     return;
   }
 
   const unameKey = normalizeUsername(username);
-  const userRef = db.collection("groupUsers").doc(unameKey);
-  const userSnap = await userRef.get();
-  if (userSnap.exists) {
+  const existingNameSnap = await db
+    .collection("groups")
+    .where("adminUsernameLower", "==", unameKey)
+    .limit(1)
+    .get();
+  if (!existingNameSnap.empty) {
     appAlert("এই group username already আছে।");
     return;
   }
@@ -341,17 +343,9 @@ async function createGroupFromGmail() {
   await groupRef.set({
     id: groupId,
     adminUsername: username,
+    adminUsernameLower: unameKey,
     createdByEmail: (firebaseUser.email || "").toLowerCase(),
-    createdAt: firebase.firestore.FieldValue.serverTimestamp()
-  });
-
-  await userRef.set({
-    username,
-    password,
-    groupId,
-    role: "admin",
-    canEdit: true,
-    memberId,
+    createdByUid: firebaseUser.uid,
     createdAt: firebase.firestore.FieldValue.serverTimestamp()
   });
 
@@ -379,64 +373,7 @@ async function createGroupFromGmail() {
   updateUI();
   applyAuthState();
   groupActionUsername.value = "";
-  groupActionPassword.value = "";
   appAlert("Group account created.");
-}
-
-async function joinGroupFromGmail() {
-  if (!firebaseUser || !db) {
-    appAlert("আগে Gmail login করুন।");
-    return;
-  }
-  const username = groupActionUsername.value.trim();
-  const password = groupActionPassword.value;
-  if (!username || !password) {
-    appAlert("Username এবং password দিন।");
-    return;
-  }
-
-  const unameKey = normalizeUsername(username);
-  const userSnap = await db.collection("groupUsers").doc(unameKey).get();
-  if (!userSnap.exists) {
-    appAlert("Group username পাওয়া যায়নি।");
-    return;
-  }
-
-  const userData = userSnap.data();
-  if (userData.password !== password) {
-    appAlert("Password ভুল।");
-    return;
-  }
-
-  const groupId = userData.groupId;
-  const memberId = `gmail_${firebaseUser.uid}`;
-
-  await db.collection("groupMembers").doc(`${groupId}__${memberId}`).set({
-    groupId,
-    memberId,
-    type: "gmail",
-    label: firebaseUser.email || "",
-    role: "viewer",
-    canEdit: false,
-    createdAt: firebase.firestore.FieldValue.serverTimestamp()
-  }, { merge: true });
-
-  currentSession = {
-    type: "gmail",
-    uid: firebaseUser.uid,
-    email: firebaseUser.email,
-    groupId,
-    memberId,
-    role: "viewer",
-    canEdit: false
-  };
-  saveSession();
-  await loadGroupSharedData();
-  updateUI();
-  applyAuthState();
-  groupActionUsername.value = "";
-  groupActionPassword.value = "";
-  appAlert("Joined group successfully.");
 }
 
 async function sendInviteToGmail() {
@@ -817,22 +754,6 @@ function initFirebase() {
   });
 }
 
-function initPasswordToggles() {
-  document.querySelectorAll(".toggle-pass").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const targetId = btn.getAttribute("data-target");
-      const input = targetId ? document.getElementById(targetId) : null;
-      if (!input) return;
-      const isHidden = input.type === "password";
-      input.type = isHidden ? "text" : "password";
-      const icon = btn.querySelector("i");
-      if (icon) {
-        icon.className = isHidden ? "fa-regular fa-eye-slash" : "fa-regular fa-eye";
-      }
-    });
-  });
-}
-
 navButtons.forEach((btn) => btn.addEventListener("click", async () => {
   showView(btn.dataset.view);
   if (btn.dataset.view === "settingsView") {
@@ -911,11 +832,6 @@ clearDataBtn.addEventListener("click", async () => {
             await d.ref.delete().catch(() => { });
           }
 
-          // group user credential docs linked with this group
-          const groupUsersSnap = await db.collection("groupUsers").where("groupId", "==", groupId).get();
-          for (const d of groupUsersSnap.docs) {
-            await d.ref.delete().catch(() => { });
-          }
         } else if (!isGroupMember && firebaseUser?.uid) {
           await db.collection("userFinance").doc(firebaseUser.uid).delete();
         }
@@ -965,7 +881,6 @@ updateUI();
 loadSession();
 applyAuthState();
 initFirebase();
-initPasswordToggles();
 
 window.addIncome = addIncome;
 window.addExpense = addExpense;

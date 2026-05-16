@@ -97,18 +97,6 @@ service cloud.firestore {
         );
     }
 
-    match /groupUsers/{username} {
-      allow read: if false;
-      allow create: if signedIn()
-        && request.resource.data.memberId == myMemberId();
-      allow update: if signedIn()
-        && (
-          request.resource.data.memberId == myMemberId()
-          || resource.data.memberId == myMemberId()
-        );
-      allow delete: if signedIn() && resource.data.memberId == myMemberId();
-    }
-
     match /userFinance/{uid} {
       allow read, write: if signedIn() && request.auth.uid == uid;
     }

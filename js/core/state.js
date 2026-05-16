@@ -56,7 +56,6 @@ const createGroupBtn = document.getElementById("createGroupBtn");
 const groupActionFormCard = document.getElementById("groupActionFormCard");
 const groupActionTitle = document.getElementById("groupActionTitle");
 const groupActionUsername = document.getElementById("groupActionUsername");
-const groupActionPassword = document.getElementById("groupActionPassword");
 const groupActionSubmitBtn = document.getElementById("groupActionSubmitBtn");
 
 const firebaseConfig = {

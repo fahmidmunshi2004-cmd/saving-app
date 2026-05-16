@@ -370,9 +370,6 @@ input.with-icon {
     padding-left: 34px;
 }
 
-input.with-toggle {
-    padding-right: 42px;
-}
 
 input:hover {
     border-color: color-mix(in srgb, var(--brand) 36%, var(--stroke));
@@ -396,27 +393,6 @@ input:focus {
     transition: top 0.18s ease, font-size 0.18s ease, color 0.18s ease;
 }
 
-.toggle-pass {
-    position: absolute;
-    right: 8px;
-    top: 50%;
-    transform: translateY(-50%);
-    border: 0;
-    background: transparent;
-    width: 30px;
-    height: 30px;
-    border-radius: 8px;
-    color: var(--muted);
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.toggle-pass:hover {
-    background: color-mix(in srgb, var(--brand) 10%, transparent);
-    color: var(--brand);
-}
 
 input:focus+.floating-label,
 input:not(:placeholder-shown)+.floating-label {
