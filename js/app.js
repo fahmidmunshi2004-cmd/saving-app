@@ -817,6 +817,22 @@ function initFirebase() {
   });
 }
 
+function initPasswordToggles() {
+  document.querySelectorAll(".toggle-pass").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const targetId = btn.getAttribute("data-target");
+      const input = targetId ? document.getElementById(targetId) : null;
+      if (!input) return;
+      const isHidden = input.type === "password";
+      input.type = isHidden ? "text" : "password";
+      const icon = btn.querySelector("i");
+      if (icon) {
+        icon.className = isHidden ? "fa-regular fa-eye-slash" : "fa-regular fa-eye";
+      }
+    });
+  });
+}
+
 navButtons.forEach((btn) => btn.addEventListener("click", async () => {
   showView(btn.dataset.view);
   if (btn.dataset.view === "settingsView") {
@@ -953,6 +969,7 @@ updateUI();
 loadSession();
 applyAuthState();
 initFirebase();
+initPasswordToggles();
 
 window.addIncome = addIncome;
 window.addExpense = addExpense;
