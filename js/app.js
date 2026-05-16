@@ -2,6 +2,7 @@
 let expense = 0;
 let canEdit = false;
 let expenseChart = null;
+let incomePieChart = null;
 
 const breakdown = JSON.parse(localStorage.getItem("breakdown")) || {};
 const transactions = JSON.parse(localStorage.getItem("transactions")) || [];
@@ -30,6 +31,7 @@ const navButtons = document.querySelectorAll(".nav-btn");
 const views = document.querySelectorAll(".view");
 const downloadPdfBtn = document.getElementById("downloadPdfBtn");
 const expenseChartCanvas = document.getElementById("expenseColumnChart");
+const incomePieChartCanvas = document.getElementById("incomePieChart");
 const topCategory = document.getElementById("topCategory");
 const topExpense = document.getElementById("topExpense");
 const totalCategory = document.getElementById("totalCategory");
@@ -38,6 +40,7 @@ const accountTypeText = document.getElementById("accountTypeText");
 const accountRoleText = document.getElementById("accountRoleText");
 const groupMembersCard = document.getElementById("groupMembersCard");
 const groupMemberCount = document.getElementById("groupMemberCount");
+const groupMembersList = document.getElementById("groupMembersList");
 const inviteCard = document.getElementById("inviteCard");
 const inviteEmailInput = document.getElementById("inviteEmailInput");
 const sendInviteBtn = document.getElementById("sendInviteBtn");
@@ -208,6 +211,7 @@ async function refreshSettingsPanels() {
     inviteCard.classList.add("hidden");
     requestAccessCard.classList.add("hidden");
     pendingRequestsCard.classList.add("hidden");
+    groupMembersList.innerHTML = "";
     return;
   }
 
@@ -219,12 +223,32 @@ async function refreshSettingsPanels() {
     inviteCard.classList.add("hidden");
     requestAccessCard.classList.add("hidden");
     pendingRequestsCard.classList.add("hidden");
+    groupMembersList.innerHTML = "";
+    return;
+  }
+
+  // Skip heavy Firestore reads unless Settings view is currently open.
+  const isSettingsOpen = document.getElementById("settingsView")?.classList.contains("active");
+  if (!isSettingsOpen) {
+    groupMembersCard.classList.remove("hidden");
+    inviteCard.classList.toggle("hidden", !isCurrentAdmin());
+    pendingRequestsCard.classList.toggle("hidden", !isCurrentAdmin());
+    requestAccessCard.classList.toggle("hidden", isCurrentAdmin());
     return;
   }
 
   const memberSnap = await db.collection("groupMembers").where("groupId", "==", currentSession.groupId).get();
   groupMembersCard.classList.remove("hidden");
   groupMemberCount.innerText = String(memberSnap.size || 0);
+  groupMembersList.innerHTML = "";
+  memberSnap.forEach((doc) => {
+    const m = doc.data();
+    const li = document.createElement("li");
+    const label = m.label || m.email || m.memberId || "Member";
+    const role = m.role || "viewer";
+    li.innerText = `${label} (${role})`;
+    groupMembersList.appendChild(li);
+  });
 
   inviteCard.classList.toggle("hidden", !isCurrentAdmin());
   pendingRequestsCard.classList.toggle("hidden", !isCurrentAdmin());
@@ -622,35 +646,80 @@ function renderExpenseChart() {
     topExpense.innerText = formatMoney(values[maxIndex]);
   }
 
-  const ctx = expenseChartCanvas.getContext("2d");
-  if (expenseChart) expenseChart.destroy();
+  if (!expenseChart) {
+    const ctx = expenseChartCanvas.getContext("2d");
+    const gradient = ctx.createLinearGradient(0, 0, 0, 260);
+    gradient.addColorStop(0, "#ff014f");
+    gradient.addColorStop(0.5, "#f9004d");
+    gradient.addColorStop(1, "#d11414");
 
-  const gradient = ctx.createLinearGradient(0, 0, 0, 260);
-  gradient.addColorStop(0, "#ff014f");
-  gradient.addColorStop(0.5, "#f9004d");
-  gradient.addColorStop(1, "#d11414");
+    expenseChart = new Chart(ctx, {
+      type: "bar",
+      data: {
+        labels: [],
+        datasets: [{
+          label: "Expense (BDT)",
+          data: [],
+          borderRadius: 12,
+          borderSkipped: false,
+          maxBarThickness: 38,
+          backgroundColor: gradient,
+          hoverBackgroundColor: "#ff014f"
+        }]
+      },
+      options: {
+        animation: { duration: 500, easing: "easeOutQuart" },
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } }
+      }
+    });
+  }
 
-  expenseChart = new Chart(ctx, {
-    type: "bar",
-    data: {
-      labels: categories.length ? categories : ["No Data"],
-      datasets: [{
-        label: "Expense (BDT)",
-        data: categories.length ? values : [0],
-        borderRadius: 12,
-        borderSkipped: false,
-        maxBarThickness: 38,
-        backgroundColor: gradient,
-        hoverBackgroundColor: "#ff014f"
-      }]
-    },
-    options: {
-      animation: { duration: 900, easing: "easeOutQuart" },
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: { legend: { display: false } }
+  expenseChart.data.labels = categories.length ? categories : ["No Data"];
+  expenseChart.data.datasets[0].data = categories.length ? values : [0];
+  expenseChart.update("none");
+}
+
+function renderIncomePieChart() {
+  const incomeBySource = {};
+  for (const txn of transactions) {
+    if (txn.type === "income") {
+      const src = txn.category || "General Income";
+      incomeBySource[src] = (incomeBySource[src] || 0) + Number(txn.amount || 0);
     }
-  });
+  }
+
+  const labels = Object.keys(incomeBySource);
+  const values = labels.map((k) => incomeBySource[k]);
+  const colors = ["#ff014f", "#d11414", "#f9004d", "#3EB75E", "#1BA2DB", "#FF8F3C", "#7289da", "#C231A1"];
+
+  if (!incomePieChart) {
+    const ctx = incomePieChartCanvas.getContext("2d");
+    incomePieChart = new Chart(ctx, {
+      type: "pie",
+      data: {
+        labels: [],
+        datasets: [{
+          data: [],
+          backgroundColor: colors,
+          borderColor: "#ffffff",
+          borderWidth: 2
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { position: "bottom" }
+        }
+      }
+    });
+  }
+
+  incomePieChart.data.labels = labels.length ? labels : ["No Income Data"];
+  incomePieChart.data.datasets[0].data = labels.length ? values : [1];
+  incomePieChart.update("none");
 }
 
 function updateUI() {
@@ -694,6 +763,7 @@ function updateUI() {
 
   renderTransactions();
   renderExpenseChart();
+  renderIncomePieChart();
   saveData();
 }
 
@@ -729,10 +799,122 @@ function downloadReportPdf() {
   }
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF();
-  doc.text("VaultBudget Report", 14, 16);
-  doc.text(`Total Income: ${formatMoney(income)}`, 14, 30);
-  doc.text(`Total Expense: ${formatMoney(expense)}`, 14, 36);
-  doc.text(`Balance: ${formatMoney(income - expense)}`, 14, 42);
+  let y = 16;
+
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const margin = 14;
+  const tableWidth = pageWidth - margin * 2;
+  const headerColor = [255, 1, 79];
+  const softGray = [245, 245, 245];
+  const lineGray = [220, 220, 220];
+
+  // Header strip
+  doc.setFillColor(headerColor[0], headerColor[1], headerColor[2]);
+  doc.rect(0, 0, pageWidth, 26, "F");
+  doc.setTextColor(255, 255, 255);
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(16);
+  doc.text("VaultBudget Report", margin, 16);
+
+  y = 34;
+  doc.setTextColor(33, 33, 33);
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(10);
+  doc.text(`Generated: ${new Date().toLocaleString("en-BD")}`, margin, y);
+  y += 10;
+
+  // Summary cards
+  const cardW = (tableWidth - 8) / 3;
+  const cardH = 16;
+  const summary = [
+    ["Income", formatMoney(income)],
+    ["Expense", formatMoney(expense)],
+    ["Balance", formatMoney(income - expense)]
+  ];
+  for (let i = 0; i < summary.length; i += 1) {
+    const x = margin + i * (cardW + 4);
+    doc.setFillColor(250, 250, 250);
+    doc.setDrawColor(232, 232, 232);
+    doc.roundedRect(x, y, cardW, cardH, 2, 2, "FD");
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(9);
+    doc.text(summary[i][0], x + 3, y + 6);
+    doc.setFont("helvetica", "normal");
+    doc.text(summary[i][1], x + 3, y + 12);
+  }
+  y += cardH + 10;
+
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(12);
+  doc.text("Transaction History", margin, y);
+  y += 6;
+
+  const rowH = 8;
+  const col = {
+    time: 58,
+    type: 24,
+    category: 62,
+    amount: tableWidth - (58 + 24 + 62)
+  };
+
+  const drawTableHeader = () => {
+    doc.setFillColor(headerColor[0], headerColor[1], headerColor[2]);
+    doc.rect(margin, y, tableWidth, rowH, "F");
+    doc.setTextColor(255, 255, 255);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(9);
+    let x = margin + 2;
+    doc.text("Time", x, y + 5.5);
+    x += col.time;
+    doc.text("Type", x, y + 5.5);
+    x += col.type;
+    doc.text("Category", x, y + 5.5);
+    x += col.category;
+    doc.text("Amount", x, y + 5.5);
+    y += rowH;
+  };
+
+  const ensurePage = (needHeight) => {
+    if (y + needHeight > 280) {
+      doc.addPage();
+      y = 18;
+      drawTableHeader();
+    }
+  };
+
+  drawTableHeader();
+  doc.setTextColor(33, 33, 33);
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(8.5);
+
+  if (!transactions.length) {
+    ensurePage(rowH);
+    doc.setFillColor(softGray[0], softGray[1], softGray[2]);
+    doc.rect(margin, y, tableWidth, rowH, "F");
+    doc.text("No transactions yet", margin + 2, y + 5.5);
+    y += rowH;
+  } else {
+    const rows = [...transactions].reverse();
+    rows.forEach((txn, idx) => {
+      ensurePage(rowH);
+      const zebra = idx % 2 === 0;
+      doc.setFillColor(zebra ? 252 : 247, zebra ? 252 : 247, zebra ? 252 : 247);
+      doc.rect(margin, y, tableWidth, rowH, "F");
+      doc.setDrawColor(lineGray[0], lineGray[1], lineGray[2]);
+      doc.line(margin, y + rowH, margin + tableWidth, y + rowH);
+
+      let x = margin + 2;
+      doc.text(String(txn.time || "-"), x, y + 5.5);
+      x += col.time;
+      doc.text(String((txn.type || "-").toUpperCase()), x, y + 5.5);
+      x += col.type;
+      doc.text(String(txn.category || "-"), x, y + 5.5);
+      x += col.category;
+      doc.text(formatMoney(Number(txn.amount || 0)), x, y + 5.5);
+      y += rowH;
+    });
+  }
+
   doc.save(`vaultbudget-report-${new Date().toISOString().slice(0, 10)}.pdf`);
 }
 
@@ -763,7 +945,12 @@ themeToggle.addEventListener("click", () => {
   applyTheme(current === "dark" ? "light" : "dark");
 });
 
-navButtons.forEach((btn) => btn.addEventListener("click", () => showView(btn.dataset.view)));
+navButtons.forEach((btn) => btn.addEventListener("click", async () => {
+  showView(btn.dataset.view);
+  if (btn.dataset.view === "settingsView") {
+    await refreshSettingsPanels();
+  }
+}));
 downloadPdfBtn.addEventListener("click", downloadReportPdf);
 
 groupModeBtn.addEventListener("click", () => groupLoginFields.classList.toggle("hidden"));
@@ -823,3 +1010,4 @@ initFirebase();
 
 window.addIncome = addIncome;
 window.addExpense = addExpense;
+

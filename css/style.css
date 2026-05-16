@@ -98,7 +98,7 @@ body {
         radial-gradient(600px 220px at 0% 0%, #d8e7ff 0%, transparent 60%),
         radial-gradient(600px 260px at 100% 0%, #d9f2ff 0%, transparent 62%),
         linear-gradient(160deg, var(--bg), var(--bg-2));
-    padding: 16px;
+    padding: 16px 16px 120px;
 }
 
 .auth-shell,
@@ -507,14 +507,19 @@ input:not(:placeholder-shown)+.floating-label {
 
 .mini-btn {
     border: 0;
-    border-radius: 10px;
-    padding: 7px 10px;
+    border-radius: 12px;
+    padding: 11px 14px;
     font: inherit;
-    font-size: 0.78rem;
+    font-size: 0.9rem;
     font-weight: 700;
-    color: var(--text);
+    color: #ffffff;
     cursor: pointer;
     background: var(--gradient-red-hover);
+    line-height: 1;
+}
+
+.mini-btn i {
+    color: #ffffff;
 }
 
 .table-wrap {
@@ -659,10 +664,13 @@ tbody tr:last-child td {
 }
 
 .bottom-nav {
-    position: sticky;
+    position: fixed;
+    left: 50%;
+    transform: translateX(-50%);
     bottom: 10px;
-    margin: 12px auto 0;
+    margin: 0;
     max-width: 1060px;
+    width: calc(100% - 24px);
     background: #ffffff;
     backdrop-filter: blur(10px);
     border: none;
@@ -726,6 +734,8 @@ tbody tr:last-child td {
     padding: 8px;
     border-radius: 10px;
     background: #f7f7f7;
+    color: var(--text);
+    font-size: 0.84rem;
 }
 
 @media (max-width: 620px) {
@@ -738,6 +748,6 @@ tbody tr:last-child td {
     }
 
     body {
-        padding-bottom: 74px;
+        padding-bottom: 128px;
     }
 }
