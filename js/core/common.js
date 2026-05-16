@@ -119,3 +119,77 @@ function showView(viewId) {
 function isCurrentAdmin() {
   return currentSession?.role === "admin";
 }
+
+let loaderCount = 0;
+
+function showLoader(text = "Please wait...") {
+  if (!appLoader) return;
+  loaderCount += 1;
+  if (loaderText) loaderText.innerText = text;
+  appLoader.classList.remove("hidden");
+}
+
+function hideLoader() {
+  if (!appLoader) return;
+  loaderCount = Math.max(0, loaderCount - 1);
+  if (loaderCount === 0) {
+    appLoader.classList.add("hidden");
+  }
+}
+
+function appAlert(message, title = "Notice") {
+  return new Promise((resolve) => {
+    if (!appModal || !modalOkBtn || !modalMessage || !modalTitle || !modalCancelBtn) {
+      window.alert(message);
+      resolve(true);
+      return;
+    }
+
+    modalTitle.innerText = title;
+    modalMessage.innerText = String(message || "");
+    modalCancelBtn.classList.add("hidden");
+    appModal.classList.remove("hidden");
+
+    const close = () => {
+      appModal.classList.add("hidden");
+      modalOkBtn.removeEventListener("click", onOk);
+      resolve(true);
+    };
+    const onOk = () => close();
+    modalOkBtn.addEventListener("click", onOk);
+  });
+}
+
+function appConfirm(message, title = "Confirm") {
+  return new Promise((resolve) => {
+    if (!appModal || !modalOkBtn || !modalMessage || !modalTitle || !modalCancelBtn) {
+      resolve(window.confirm(message));
+      return;
+    }
+
+    modalTitle.innerText = title;
+    modalMessage.innerText = String(message || "");
+    modalCancelBtn.classList.remove("hidden");
+    appModal.classList.remove("hidden");
+
+    const close = (result) => {
+      appModal.classList.add("hidden");
+      modalOkBtn.removeEventListener("click", onOk);
+      modalCancelBtn.removeEventListener("click", onCancel);
+      resolve(result);
+    };
+    const onOk = () => close(true);
+    const onCancel = () => close(false);
+    modalOkBtn.addEventListener("click", onOk);
+    modalCancelBtn.addEventListener("click", onCancel);
+  });
+}
+
+async function withLoader(text, task) {
+  showLoader(text);
+  try {
+    return await task();
+  } finally {
+    hideLoader();
+  }
+}

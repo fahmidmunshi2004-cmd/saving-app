@@ -145,7 +145,7 @@ async function requestEditAccess() {
   });
 
   requestAccessEmailInput.value = "";
-  window.alert("Access request admin queue-তে গেছে। Admin approve করতে পারবে।");
+  appAlert("Access request admin queue-তে গেছে। Admin approve করতে পারবে।");
 }
 
 function applyAuthState() {
@@ -306,13 +306,13 @@ function openGroupActionForm() {
 
 async function createGroupFromGmail() {
   if (!firebaseUser || !db) {
-    window.alert("আগে Gmail login করুন।");
+    appAlert("আগে Gmail login করুন।");
     return;
   }
   const username = groupActionUsername.value.trim();
   const password = groupActionPassword.value;
   if (!username || !password) {
-    window.alert("Username এবং password দিন।");
+    appAlert("Username এবং password দিন।");
     return;
   }
 
@@ -320,7 +320,7 @@ async function createGroupFromGmail() {
   const userRef = db.collection("groupUsers").doc(unameKey);
   const userSnap = await userRef.get();
   if (userSnap.exists) {
-    window.alert("এই group username already আছে।");
+    appAlert("এই group username already আছে।");
     return;
   }
 
@@ -330,7 +330,7 @@ async function createGroupFromGmail() {
     .limit(1)
     .get();
   if (!ownedGroupSnap.empty) {
-    window.alert("আপনার Gmail দিয়ে already group account তৈরি আছে।");
+    appAlert("আপনার Gmail দিয়ে already group account তৈরি আছে।");
     return;
   }
 
@@ -380,31 +380,31 @@ async function createGroupFromGmail() {
   applyAuthState();
   groupActionUsername.value = "";
   groupActionPassword.value = "";
-  window.alert("Group account created.");
+  appAlert("Group account created.");
 }
 
 async function joinGroupFromGmail() {
   if (!firebaseUser || !db) {
-    window.alert("আগে Gmail login করুন।");
+    appAlert("আগে Gmail login করুন।");
     return;
   }
   const username = groupActionUsername.value.trim();
   const password = groupActionPassword.value;
   if (!username || !password) {
-    window.alert("Username এবং password দিন।");
+    appAlert("Username এবং password দিন।");
     return;
   }
 
   const unameKey = normalizeUsername(username);
   const userSnap = await db.collection("groupUsers").doc(unameKey).get();
   if (!userSnap.exists) {
-    window.alert("Group username পাওয়া যায়নি।");
+    appAlert("Group username পাওয়া যায়নি।");
     return;
   }
 
   const userData = userSnap.data();
   if (userData.password !== password) {
-    window.alert("Password ভুল।");
+    appAlert("Password ভুল।");
     return;
   }
 
@@ -436,14 +436,14 @@ async function joinGroupFromGmail() {
   applyAuthState();
   groupActionUsername.value = "";
   groupActionPassword.value = "";
-  window.alert("Joined group successfully.");
+  appAlert("Joined group successfully.");
 }
 
 async function sendInviteToGmail() {
   if (!isCurrentAdmin() || !currentSession?.groupId) return;
   const email = inviteEmailInput.value.trim().toLowerCase();
   if (!email) {
-    window.alert("Friend Gmail দিন");
+    appAlert("Friend Gmail দিন");
     return;
   }
 
@@ -478,12 +478,12 @@ async function sendInviteToGmail() {
     : `Invite created for ${email}.`;
 
   if (popupBlocked) {
-    window.alert(`Popup blocked. এই invite link manually share করুন:\n\n${link}`);
+    appAlert(`Popup blocked. এই invite link manually share করুন:\n\n${link}`);
     return;
   }
 
   if (!copied) {
-    window.alert(`Invite compose opened. প্রয়োজনে এই link manually share করুন:\n\n${link}`);
+    appAlert(`Invite compose opened. প্রয়োজনে এই link manually share করুন:\n\n${link}`);
   }
 }
 
@@ -683,7 +683,7 @@ function addExpense() {
 
 function downloadReportPdf() {
   if (!window.jspdf || !window.jspdf.jsPDF) {
-    window.alert("PDF library load hoyni. Please refresh and try again.");
+    appAlert("PDF library load hoyni. Please refresh and try again.");
     return;
   }
   const { jsPDF } = window.jspdf;
@@ -813,7 +813,7 @@ function initFirebase() {
   db = firebase.firestore();
   googleProvider = new firebase.auth.GoogleAuthProvider();
   auth.onAuthStateChanged((user) => {
-    handleGoogleAuthUser(user).catch((e) => window.alert(e.message || "Auth error"));
+    handleGoogleAuthUser(user).catch((e) => appAlert(e.message || "Auth error"));
   });
 }
 
@@ -831,27 +831,35 @@ navButtons.forEach((btn) => btn.addEventListener("click", async () => {
 downloadPdfBtn.addEventListener("click", downloadReportPdf);
 
 sendInviteBtn.addEventListener("click", () => {
-  sendInviteToGmail().catch((e) => window.alert(e.message || "Invite failed"));
+  withLoader("Sending invite...", async () => {
+    await sendInviteToGmail();
+  }).catch((e) => appAlert(e.message || "Invite failed"));
 });
 
 requestAccessBtn.addEventListener("click", () => {
-  requestEditAccess().catch((e) => window.alert(e.message || "Request failed"));
+  withLoader("Submitting request...", async () => {
+    await requestEditAccess();
+  }).catch((e) => appAlert(e.message || "Request failed"));
 });
 
 createGroupBtn.addEventListener("click", () => openGroupActionForm());
 groupActionSubmitBtn.addEventListener("click", async () => {
   try {
-    await createGroupFromGmail();
+    await withLoader("Creating group...", async () => {
+      await createGroupFromGmail();
+    });
   } catch (e) {
-    window.alert(e.message || "Group action failed");
+    appAlert(e.message || "Group action failed");
   }
 });
 
 googleLoginBtn.addEventListener("click", async () => {
   try {
-    await auth.signInWithPopup(googleProvider);
+    await withLoader("Signing in with Google...", async () => {
+      await auth.signInWithPopup(googleProvider);
+    });
   } catch (error) {
-    window.alert(error?.message || "Google login failed.");
+    appAlert(error?.message || "Google login failed.");
   }
 });
 
@@ -861,82 +869,86 @@ clearDataBtn.addEventListener("click", async () => {
   const promptText = adminMode
     ? "Admin reset: This will delete FULL group data for everyone. Continue?"
     : "This will clear only your app data/session on this device. Continue?";
-  const ok = window.confirm(promptText);
+  const ok = await appConfirm(promptText, "Clear Data");
   if (!ok) return;
   let remoteClearError = "";
-
-  // Clear remote data based on role
+  showLoader("Resetting data...");
   try {
-    if (db) {
+    // Clear remote data based on role
+    try {
+      if (db) {
+        if (adminMode) {
+          const groupId = currentSession.groupId;
+
+          // group finance
+          await db.collection("groupFinance").doc(currentSession.groupId).delete();
+
+          // group meta doc
+          await db.collection("groups").doc(groupId).delete().catch(() => { });
+
+          // group members
+          const membersSnap = await db.collection("groupMembers").where("groupId", "==", groupId).get();
+          for (const d of membersSnap.docs) {
+            await d.ref.delete().catch(() => { });
+          }
+
+          // invitations
+          const inviteSnap = await db.collection("invitations").where("groupId", "==", groupId).get();
+          for (const d of inviteSnap.docs) {
+            await d.ref.delete().catch(() => { });
+          }
+
+          // access requests
+          const reqSnap = await db.collection("accessRequests").where("groupId", "==", groupId).get();
+          for (const d of reqSnap.docs) {
+            await d.ref.delete().catch(() => { });
+          }
+
+          // group user credential docs linked with this group
+          const groupUsersSnap = await db.collection("groupUsers").where("groupId", "==", groupId).get();
+          for (const d of groupUsersSnap.docs) {
+            await d.ref.delete().catch(() => { });
+          }
+        } else if (!isGroupMember && firebaseUser?.uid) {
+          await db.collection("userFinance").doc(firebaseUser.uid).delete();
+        }
+      }
+    } catch (err) {
+      // If remote delete fails, continue local cleanup + logout.
+      remoteClearError = err?.message || "Remote clear failed";
+    }
+
+    income = 0;
+    expense = 0;
+    Object.keys(breakdown).forEach((key) => delete breakdown[key]);
+    transactions.length = 0;
+
+    // full local reset
+    localStorage.clear();
+    sessionStorage.clear();
+
+    if (auth && auth.currentUser) {
+      await auth.signOut();
+    }
+
+    currentSession = null;
+    saveSession();
+    applyTheme("light");
+    updateUI();
+    applyAuthState();
+    if (groupActionFormCard) groupActionFormCard.classList.add("hidden");
+    if (inviteStatusText) inviteStatusText.innerText = "";
+    if (remoteClearError) {
+      appAlert(`Local reset complete, but cloud data delete failed: ${remoteClearError}`);
+    } else {
       if (adminMode) {
-        const groupId = currentSession.groupId;
-
-        // group finance
-        await db.collection("groupFinance").doc(currentSession.groupId).delete();
-
-        // group meta doc
-        await db.collection("groups").doc(groupId).delete().catch(() => { });
-
-        // group members
-        const membersSnap = await db.collection("groupMembers").where("groupId", "==", groupId).get();
-        for (const d of membersSnap.docs) {
-          await d.ref.delete().catch(() => { });
-        }
-
-        // invitations
-        const inviteSnap = await db.collection("invitations").where("groupId", "==", groupId).get();
-        for (const d of inviteSnap.docs) {
-          await d.ref.delete().catch(() => { });
-        }
-
-        // access requests
-        const reqSnap = await db.collection("accessRequests").where("groupId", "==", groupId).get();
-        for (const d of reqSnap.docs) {
-          await d.ref.delete().catch(() => { });
-        }
-
-        // group user credential docs linked with this group
-        const groupUsersSnap = await db.collection("groupUsers").where("groupId", "==", groupId).get();
-        for (const d of groupUsersSnap.docs) {
-          await d.ref.delete().catch(() => { });
-        }
-      } else if (!isGroupMember && firebaseUser?.uid) {
-        await db.collection("userFinance").doc(firebaseUser.uid).delete();
+        appAlert("Admin group reset complete. Logged out successfully.");
+      } else {
+        appAlert("Your app reset is complete. Group data was kept safe.");
       }
     }
-  } catch (err) {
-    // If remote delete fails, continue local cleanup + logout.
-    remoteClearError = err?.message || "Remote clear failed";
-  }
-
-  income = 0;
-  expense = 0;
-  Object.keys(breakdown).forEach((key) => delete breakdown[key]);
-  transactions.length = 0;
-
-  // full local reset
-  localStorage.clear();
-  sessionStorage.clear();
-
-  if (auth && auth.currentUser) {
-    await auth.signOut();
-  }
-
-  currentSession = null;
-  saveSession();
-  applyTheme("light");
-  updateUI();
-  applyAuthState();
-  if (groupActionFormCard) groupActionFormCard.classList.add("hidden");
-  if (inviteStatusText) inviteStatusText.innerText = "";
-  if (remoteClearError) {
-    window.alert(`Local reset complete, but cloud data delete failed: ${remoteClearError}`);
-  } else {
-    if (adminMode) {
-      window.alert("Admin group reset complete. Logged out successfully.");
-    } else {
-      window.alert("Your app reset is complete. Group data was kept safe.");
-    }
+  } finally {
+    hideLoader();
   }
 });
 
@@ -949,5 +961,6 @@ initFirebase();
 
 window.addIncome = addIncome;
 window.addExpense = addExpense;
+
 
 

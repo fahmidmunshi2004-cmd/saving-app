@@ -13,6 +13,13 @@ const themeToggle = document.getElementById("themeToggle");
 const authInfo = document.getElementById("authInfo");
 const loginOverlay = document.getElementById("loginOverlay");
 const googleLoginBtn = document.getElementById("googleLoginBtn");
+const appLoader = document.getElementById("appLoader");
+const loaderText = document.getElementById("loaderText");
+const appModal = document.getElementById("appModal");
+const modalTitle = document.getElementById("modalTitle");
+const modalMessage = document.getElementById("modalMessage");
+const modalOkBtn = document.getElementById("modalOkBtn");
+const modalCancelBtn = document.getElementById("modalCancelBtn");
 
 const clearDataBtn = document.getElementById("clearDataBtn");
 const incomeInput = document.getElementById("incomeInput");
