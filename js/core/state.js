@@ -9,7 +9,6 @@ const transactions = JSON.parse(localStorage.getItem("transactions")) || [];
 const SESSION_KEY = "vault_session";
 
 const root = document.documentElement;
-const themeToggle = document.getElementById("themeToggle");
 const authInfo = document.getElementById("authInfo");
 const loginOverlay = document.getElementById("loginOverlay");
 const googleLoginBtn = document.getElementById("googleLoginBtn");

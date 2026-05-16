@@ -228,16 +228,6 @@ h1 {
     opacity: 0.9;
 }
 
-.theme-btn {
-    border: none;
-    background: #ffffff;
-    color: var(--text);
-    width: 44px;
-    height: 44px;
-    border-radius: 13px;
-    cursor: pointer;
-}
-
 .stats,
 .forms,
 .wallet-grid,

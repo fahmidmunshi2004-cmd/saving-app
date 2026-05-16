@@ -817,11 +817,6 @@ function initFirebase() {
   });
 }
 
-themeToggle.addEventListener("click", () => {
-  const current = root.getAttribute("data-theme") === "dark" ? "dark" : "light";
-  applyTheme(current === "dark" ? "light" : "dark");
-});
-
 navButtons.forEach((btn) => btn.addEventListener("click", async () => {
   showView(btn.dataset.view);
   if (btn.dataset.view === "settingsView") {
@@ -933,7 +928,7 @@ clearDataBtn.addEventListener("click", async () => {
 
     currentSession = null;
     saveSession();
-    applyTheme("light");
+    applyTheme();
     updateUI();
     applyAuthState();
     if (groupActionFormCard) groupActionFormCard.classList.add("hidden");
@@ -952,7 +947,7 @@ clearDataBtn.addEventListener("click", async () => {
   }
 });
 
-loadTheme();
+applyTheme();
 loadData();
 updateUI();
 loadSession();

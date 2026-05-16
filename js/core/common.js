@@ -87,16 +87,8 @@ async function loadGroupSharedData() {
   }
 }
 
-function applyTheme(theme) {
-  root.setAttribute("data-theme", theme);
-  localStorage.setItem("theme", theme);
-  themeToggle.innerHTML = theme === "dark"
-    ? '<i class="fa-solid fa-sun"></i>'
-    : '<i class="fa-solid fa-moon"></i>';
-}
-
-function loadTheme() {
-  applyTheme(localStorage.getItem("theme") || "light");
+function applyTheme() {
+  root.setAttribute("data-theme", "light");
 }
 
 function setEditAccess(enabled) {
