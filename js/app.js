@@ -121,10 +121,18 @@ async function approveAccessRequest(requestId, fromMemberId) {
 
 async function requestEditAccess() {
   if (!currentSession?.groupId) return;
-  const adminEmail = requestAccessEmailInput.value.trim().toLowerCase();
+  let adminEmail = requestAccessEmailInput.value.trim().toLowerCase();
   if (!adminEmail) {
-    window.alert("Admin Gmail দিন");
-    return;
+    const adminSnap = await db
+      .collection("groupMembers")
+      .where("groupId", "==", currentSession.groupId)
+      .where("role", "==", "admin")
+      .limit(1)
+      .get();
+    if (!adminSnap.empty) {
+      const adminData = adminSnap.docs[0].data();
+      adminEmail = (adminData.label || "").toLowerCase();
+    }
   }
 
   await db.collection("accessRequests").add({
@@ -137,7 +145,7 @@ async function requestEditAccess() {
   });
 
   requestAccessEmailInput.value = "";
-  window.alert("Access request admin queue-তে গেছে।");
+  window.alert("Access request admin queue-তে গেছে। Admin approve করতে পারবে।");
 }
 
 function applyAuthState() {
@@ -204,11 +212,33 @@ async function processInviteLink() {
     canEdit: false
   };
   saveSession();
+  await loadGroupSharedData();
+  updateUI();
 
   params.delete("inviteToken");
   params.delete("groupId");
   params.delete("email");
   history.replaceState({}, "", `${location.pathname}${params.toString() ? `?${params.toString()}` : ""}`);
+}
+
+async function resolveMembershipForUser(memberId, preferredGroupId = "") {
+  if (!db || !memberId) return null;
+  const snap = await db
+    .collection("groupMembers")
+    .where("memberId", "==", memberId)
+    .get();
+
+  if (snap.empty) return null;
+  const memberships = snap.docs.map((d) => d.data());
+
+  if (preferredGroupId) {
+    const preferred = memberships.find((m) => m.groupId === preferredGroupId);
+    if (preferred) return preferred;
+  }
+
+  const adminMembership = memberships.find((m) => m.role === "admin");
+  if (adminMembership) return adminMembership;
+  return memberships[0];
 }
 
 async function handleGoogleAuthUser(user) {
@@ -225,19 +255,23 @@ async function handleGoogleAuthUser(user) {
   await processInviteLink();
 
   if (currentSession?.type === "gmail" && currentSession.uid === firebaseUser.uid) {
+    if (currentSession.groupId) {
+      const latestMember = await resolveMembershipForUser(`gmail_${firebaseUser.uid}`, currentSession.groupId);
+      if (latestMember) {
+        currentSession.role = latestMember.role || currentSession.role || "viewer";
+        currentSession.canEdit = !!latestMember.canEdit;
+        saveSession();
+      }
+      await loadGroupSharedData();
+      updateUI();
+    }
     applyAuthState();
     return;
   }
 
   const memberId = `gmail_${firebaseUser.uid}`;
-  const snap = await db
-    .collection("groupMembers")
-    .where("memberId", "==", memberId)
-    .limit(1)
-    .get();
-
-  if (!snap.empty) {
-    const m = snap.docs[0].data();
+  const m = await resolveMembershipForUser(memberId, currentSession?.groupId || "");
+  if (m) {
     currentSession = {
       type: "gmail",
       uid: firebaseUser.uid,
