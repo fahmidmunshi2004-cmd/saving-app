@@ -856,14 +856,19 @@ googleLoginBtn.addEventListener("click", async () => {
 });
 
 clearDataBtn.addEventListener("click", async () => {
-  const ok = window.confirm("Are you sure? This will clear all app data.");
+  const isGroupMember = !!currentSession?.groupId;
+  const adminMode = isGroupMember && isCurrentAdmin();
+  const promptText = adminMode
+    ? "Admin reset: This will delete FULL group data for everyone. Continue?"
+    : "This will clear only your app data/session on this device. Continue?";
+  const ok = window.confirm(promptText);
   if (!ok) return;
   let remoteClearError = "";
 
-  // Clear remote shared/group data first (if exists)
+  // Clear remote data based on role
   try {
     if (db) {
-      if (currentSession?.groupId) {
+      if (adminMode) {
         const groupId = currentSession.groupId;
 
         // group finance
@@ -895,7 +900,7 @@ clearDataBtn.addEventListener("click", async () => {
         for (const d of groupUsersSnap.docs) {
           await d.ref.delete().catch(() => { });
         }
-      } else if (firebaseUser?.uid) {
+      } else if (!isGroupMember && firebaseUser?.uid) {
         await db.collection("userFinance").doc(firebaseUser.uid).delete();
       }
     }
@@ -927,7 +932,11 @@ clearDataBtn.addEventListener("click", async () => {
   if (remoteClearError) {
     window.alert(`Local reset complete, but cloud data delete failed: ${remoteClearError}`);
   } else {
-    window.alert("Full reset complete. Logged out successfully.");
+    if (adminMode) {
+      window.alert("Admin group reset complete. Logged out successfully.");
+    } else {
+      window.alert("Your app reset is complete. Group data was kept safe.");
+    }
   }
 });
 
