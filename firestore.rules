@@ -34,7 +34,7 @@ service cloud.firestore {
     }
 
     match /groups/{groupId} {
-      allow read: if isGroupMember(groupId);
+      allow read: if signedIn();
       allow create: if signedIn()
         && request.resource.data.id == groupId
         && request.resource.data.createdByUid == request.auth.uid;
@@ -102,7 +102,7 @@ service cloud.firestore {
     }
 
     match /groupUsers/{username} {
-      allow read: if false;
+      allow read: if signedIn();
       allow create: if signedIn() && request.resource.data.memberId == myMemberId();
       allow update: if signedIn()
         && (
