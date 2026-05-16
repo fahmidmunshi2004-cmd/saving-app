@@ -52,6 +52,11 @@ service cloud.firestore {
       allow create: if signedIn()
         && request.resource.data.memberId == myMemberId()
         && (
+          (
+            request.resource.data.role == "admin"
+            && get(/databases/$(database)/documents/groups/$(request.resource.data.groupId)).data.createdByUid == request.auth.uid
+          )
+          ||
           isGroupAdmin(request.resource.data.groupId)
           || request.resource.data.role == "viewer"
         );
