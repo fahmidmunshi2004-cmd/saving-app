@@ -819,6 +819,13 @@ function initFirebase() {
   });
 }
 
+function registerServiceWorker() {
+  if (!("serviceWorker" in navigator)) return;
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./sw.js").catch(() => { });
+  });
+}
+
 function initPasswordToggles() {
   document.querySelectorAll(".toggle-pass").forEach((btn) => {
     btn.addEventListener("click", () => {
@@ -972,8 +979,8 @@ loadSession();
 applyAuthState();
 initFirebase();
 initPasswordToggles();
+registerServiceWorker();
 
 window.addIncome = addIncome;
 window.addExpense = addExpense;
-
 
