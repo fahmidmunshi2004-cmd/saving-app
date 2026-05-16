@@ -155,7 +155,7 @@ function applyAuthState() {
     document.querySelector(".bottom-nav").classList.add("hidden");
     loginOverlay.classList.remove("hidden");
     setEditAccess(false);
-    refreshSettingsPanels();
+    safeRun(() => refreshSettingsPanels(), "Settings load failed.");
     return;
   }
 
@@ -169,7 +169,7 @@ function applyAuthState() {
 
   const editable = isCurrentAdmin() || !!currentSession.canEdit || (!currentSession.groupId && currentSession.type === "gmail");
   setEditAccess(editable);
-  refreshSettingsPanels();
+  safeRun(() => refreshSettingsPanels(), "Settings load failed.");
 }
 
 async function processInviteLink() {
@@ -813,7 +813,7 @@ function initFirebase() {
   db = firebase.firestore();
   googleProvider = new firebase.auth.GoogleAuthProvider();
   auth.onAuthStateChanged((user) => {
-    handleGoogleAuthUser(user).catch((e) => appAlert(e.message || "Auth error"));
+    safeRun(() => handleGoogleAuthUser(user), "Authentication failed.");
   });
 }
 
@@ -836,42 +836,38 @@ function initPasswordToggles() {
 navButtons.forEach((btn) => btn.addEventListener("click", async () => {
   showView(btn.dataset.view);
   if (btn.dataset.view === "settingsView") {
-    await refreshSettingsPanels();
+    await safeRun(() => refreshSettingsPanels(), "Settings load failed.");
   }
 }));
 downloadPdfBtn.addEventListener("click", downloadReportPdf);
 
 sendInviteBtn.addEventListener("click", () => {
-  withLoader("Sending invite...", async () => {
+  safeRun(() => withLoader("Sending invite...", async () => {
     await sendInviteToGmail();
-  }).catch((e) => appAlert(e.message || "Invite failed"));
+  }), "Invite failed.");
 });
 
 requestAccessBtn.addEventListener("click", () => {
-  withLoader("Submitting request...", async () => {
+  safeRun(() => withLoader("Submitting request...", async () => {
     await requestEditAccess();
-  }).catch((e) => appAlert(e.message || "Request failed"));
+  }), "Request failed.");
 });
 
 createGroupBtn.addEventListener("click", () => openGroupActionForm());
 groupActionSubmitBtn.addEventListener("click", async () => {
-  try {
+  await safeRun(async () => {
     await withLoader("Creating group...", async () => {
       await createGroupFromGmail();
     });
-  } catch (e) {
-    appAlert(e.message || "Group action failed");
-  }
+  }, "Group action failed.");
 });
 
 googleLoginBtn.addEventListener("click", async () => {
-  try {
+  await safeRun(async () => {
     await withLoader("Signing in with Google...", async () => {
       await auth.signInWithPopup(googleProvider);
     });
-  } catch (error) {
-    appAlert(error?.message || "Google login failed.");
-  }
+  }, "Google login failed.");
 });
 
 clearDataBtn.addEventListener("click", async () => {
