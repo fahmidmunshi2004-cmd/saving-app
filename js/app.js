@@ -726,6 +726,8 @@ function downloadReportPdf() {
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
+    :root { color-scheme: light; }
+    * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
     body { font-family: "Noto Sans Bengali", sans-serif; margin: 24px; color: #101828; }
     h1 { margin: 0 0 8px; font-size: 22px; }
     .meta { margin: 0 0 14px; color: #475467; font-size: 13px; }
@@ -735,7 +737,8 @@ function downloadReportPdf() {
     .value { font-size: 15px; font-weight: 700; margin-top: 4px; }
     table { width: 100%; border-collapse: collapse; }
     th, td { border: 1px solid #eaecf0; padding: 8px; text-align: left; font-size: 12px; }
-    th { background: #ff014f; color: #fff; }
+    th { background: #ff014f !important; color: #fff !important; }
+    tr:nth-child(even) td { background: #fff4f8; }
     @media print { body { margin: 12mm; } }
   </style>
 </head>
