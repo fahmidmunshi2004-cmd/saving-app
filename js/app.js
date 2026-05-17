@@ -494,6 +494,7 @@ function renderTransactions() {
   const txnEmpty = document.getElementById("txnEmpty");
   const txnCount = document.getElementById("txnCount");
   tbody.innerHTML = "";
+  const fragment = document.createDocumentFragment();
 
   txnCount.innerText = `${transactions.length} records`;
   txnEmpty.hidden = transactions.length > 0;
@@ -519,8 +520,9 @@ function renderTransactions() {
     row.appendChild(type);
     row.appendChild(category);
     row.appendChild(amount);
-    tbody.appendChild(row);
+    fragment.appendChild(row);
   }
+  tbody.appendChild(fragment);
 }
 
 function renderExpenseChart() {
@@ -622,39 +624,44 @@ function updateUI() {
   document.getElementById("walletBalance").innerText = formatMoney(income - expense);
   document.getElementById("walletRate").innerText = income > 0 ? `${Math.max(0, Math.round(((income - expense) / income) * 100))}%` : "0%";
 
-  const list = document.getElementById("list");
-  const emptyState = document.getElementById("emptyState");
-  list.innerHTML = "";
+  const activeViewId = document.querySelector(".view.active")?.id;
+  if (activeViewId === "reportView") {
+    const list = document.getElementById("list");
+    const emptyState = document.getElementById("emptyState");
+    list.innerHTML = "";
 
-  const categories = Object.keys(breakdown);
-  const maxValue = Math.max(1, ...Object.values(breakdown));
-  emptyState.hidden = categories.length > 0;
+    const categories = Object.keys(breakdown);
+    const maxValue = Math.max(1, ...Object.values(breakdown));
+    emptyState.hidden = categories.length > 0;
 
-  for (const key of categories) {
-    const li = document.createElement("li");
-    const row = document.createElement("div");
-    const cat = document.createElement("span");
-    const amount = document.createElement("strong");
-    const bar = document.createElement("div");
-    const fill = document.createElement("span");
+    const fragment = document.createDocumentFragment();
+    for (const key of categories) {
+      const li = document.createElement("li");
+      const row = document.createElement("div");
+      const cat = document.createElement("span");
+      const amount = document.createElement("strong");
+      const bar = document.createElement("div");
+      const fill = document.createElement("span");
 
-    row.className = "row";
-    bar.className = "bar";
-    cat.innerText = key;
-    amount.innerText = formatMoney(breakdown[key]);
-    fill.style.width = `${(breakdown[key] / maxValue) * 100}%`;
+      row.className = "row";
+      bar.className = "bar";
+      cat.innerText = key;
+      amount.innerText = formatMoney(breakdown[key]);
+      fill.style.width = `${(breakdown[key] / maxValue) * 100}%`;
 
-    row.appendChild(cat);
-    row.appendChild(amount);
-    bar.appendChild(fill);
-    li.appendChild(row);
-    li.appendChild(bar);
-    list.appendChild(li);
+      row.appendChild(cat);
+      row.appendChild(amount);
+      bar.appendChild(fill);
+      li.appendChild(row);
+      li.appendChild(bar);
+      fragment.appendChild(li);
+    }
+    list.appendChild(fragment);
+
+    renderTransactions();
+    renderExpenseChart();
+    renderIncomePieChart();
   }
-
-  renderTransactions();
-  renderExpenseChart();
-  renderIncomePieChart();
   saveData();
 }
 
@@ -683,162 +690,75 @@ function addExpense() {
   updateUI();
 }
 
-let pdfBanglaFontReady = false;
-async function ensurePdfBanglaFont(doc) {
-  if (!doc || typeof doc.addFileToVFS !== "function" || typeof doc.addFont !== "function") {
-    return false;
-  }
-  if (pdfBanglaFontReady) return true;
-
-  const fontUrl = "https://cdn.jsdelivr.net/gh/googlefonts/noto-fonts@main/hinted/ttf/NotoSansBengali/NotoSansBengali-Regular.ttf";
-
-  try {
-    const res = await fetch(fontUrl);
-    if (!res.ok) throw new Error("Font download failed");
-    const buffer = await res.arrayBuffer();
-    const bytes = new Uint8Array(buffer);
-    let binary = "";
-    const chunkSize = 0x8000;
-    for (let i = 0; i < bytes.length; i += chunkSize) {
-      const chunk = bytes.subarray(i, i + chunkSize);
-      binary += String.fromCharCode(...chunk);
-    }
-    const base64 = btoa(binary);
-    doc.addFileToVFS("NotoSansBengali-Regular.ttf", base64);
-    doc.addFont("NotoSansBengali-Regular.ttf", "NotoSansBengali", "normal");
-    pdfBanglaFontReady = true;
-    return true;
-  } catch (e) {
-    return false;
-  }
+function escapeHtml(text) {
+  return String(text ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
 }
 
-async function downloadReportPdf() {
-  if (!window.jspdf || !window.jspdf.jsPDF) {
-    appAlert("PDF library load hoyni. Please refresh and try again.");
+function downloadReportPdf() {
+  const printWindow = window.open("", "_blank");
+  if (!printWindow) {
+    appAlert("Popup block hoyeche. Browser settings theke popup allow kore abar try korun.");
     return;
   }
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF();
-  const hasBanglaFont = await ensurePdfBanglaFont(doc);
-  const baseFont = hasBanglaFont ? "NotoSansBengali" : "helvetica";
-  let y = 16;
 
-  const pageWidth = doc.internal.pageSize.getWidth();
-  const margin = 14;
-  const tableWidth = pageWidth - margin * 2;
-  const headerColor = [255, 1, 79];
-  const softGray = [245, 245, 245];
-  const lineGray = [220, 220, 220];
+  const rows = [...transactions].reverse().map((txn) => `
+    <tr>
+      <td>${escapeHtml(txn.time || "-")}</td>
+      <td>${escapeHtml(String((txn.type || "-").toUpperCase()))}</td>
+      <td>${escapeHtml(txn.category || "-")}</td>
+      <td>${escapeHtml(formatMoney(Number(txn.amount || 0)))}</td>
+    </tr>
+  `).join("");
 
-  // Header strip
-  doc.setFillColor(headerColor[0], headerColor[1], headerColor[2]);
-  doc.rect(0, 0, pageWidth, 26, "F");
-  doc.setTextColor(255, 255, 255);
-  doc.setFont(baseFont, "normal");
-  doc.setFontSize(16);
-  doc.text("VaultBudget Report", margin, 16);
+  const html = `<!doctype html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VaultBudget Report</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: "Noto Sans Bengali", sans-serif; margin: 24px; color: #111827; }
+    h1 { margin: 0 0 8px; font-size: 22px; }
+    .meta { margin: 0 0 16px; color: #374151; font-size: 13px; }
+    .summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 16px; }
+    .card { border: 1px solid #e5e7eb; border-radius: 10px; padding: 10px; }
+    .label { font-size: 12px; color: #6b7280; }
+    .value { font-size: 15px; font-weight: 700; margin-top: 4px; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { border: 1px solid #e5e7eb; padding: 8px; text-align: left; font-size: 12px; }
+    th { background: #ff014f; color: #fff; }
+  </style>
+</head>
+<body>
+  <h1>VaultBudget Report</h1>
+  <p class="meta">Generated: ${escapeHtml(new Date().toLocaleString("en-BD"))}</p>
+  <div class="summary">
+    <div class="card"><div class="label">Income</div><div class="value">${escapeHtml(formatMoney(income))}</div></div>
+    <div class="card"><div class="label">Expense</div><div class="value">${escapeHtml(formatMoney(expense))}</div></div>
+    <div class="card"><div class="label">Balance</div><div class="value">${escapeHtml(formatMoney(income - expense))}</div></div>
+  </div>
+  <table>
+    <thead><tr><th>Time</th><th>Type</th><th>Category</th><th>Amount</th></tr></thead>
+    <tbody>${rows || "<tr><td colspan='4'>No transactions yet</td></tr>"}</tbody>
+  </table>
+</body>
+</html>`;
 
-  y = 34;
-  doc.setTextColor(33, 33, 33);
-  doc.setFont(baseFont, "normal");
-  doc.setFontSize(10);
-  doc.text(`Generated: ${new Date().toLocaleString("en-BD")}`, margin, y);
-  y += 10;
-
-  // Summary cards
-  const cardW = (tableWidth - 8) / 3;
-  const cardH = 16;
-  const summary = [
-    ["Income", formatMoney(income)],
-    ["Expense", formatMoney(expense)],
-    ["Balance", formatMoney(income - expense)]
-  ];
-  for (let i = 0; i < summary.length; i += 1) {
-    const x = margin + i * (cardW + 4);
-    doc.setFillColor(250, 250, 250);
-    doc.setDrawColor(232, 232, 232);
-    doc.roundedRect(x, y, cardW, cardH, 2, 2, "FD");
-    doc.setFont(baseFont, "normal");
-    doc.setFontSize(9);
-    doc.text(summary[i][0], x + 3, y + 6);
-    doc.setFont(baseFont, "normal");
-    doc.text(summary[i][1], x + 3, y + 12);
-  }
-  y += cardH + 10;
-
-  doc.setFont(baseFont, "normal");
-  doc.setFontSize(12);
-  doc.text("Transaction History", margin, y);
-  y += 6;
-
-  const rowH = 8;
-  const col = {
-    time: 58,
-    type: 24,
-    category: 62,
-    amount: tableWidth - (58 + 24 + 62)
-  };
-
-  const drawTableHeader = () => {
-    doc.setFillColor(headerColor[0], headerColor[1], headerColor[2]);
-    doc.rect(margin, y, tableWidth, rowH, "F");
-    doc.setTextColor(255, 255, 255);
-    doc.setFont(baseFont, "normal");
-    doc.setFontSize(9);
-    let x = margin + 2;
-    doc.text("Time", x, y + 5.5);
-    x += col.time;
-    doc.text("Type", x, y + 5.5);
-    x += col.type;
-    doc.text("Category", x, y + 5.5);
-    x += col.category;
-    doc.text("Amount", x, y + 5.5);
-    y += rowH;
-  };
-
-  const ensurePage = (needHeight) => {
-    if (y + needHeight > 280) {
-      doc.addPage();
-      y = 18;
-      drawTableHeader();
-    }
-  };
-
-  drawTableHeader();
-  doc.setTextColor(33, 33, 33);
-  doc.setFont(baseFont, "normal");
-  doc.setFontSize(8.5);
-
-  if (!transactions.length) {
-    ensurePage(rowH);
-    doc.setFillColor(softGray[0], softGray[1], softGray[2]);
-    doc.rect(margin, y, tableWidth, rowH, "F");
-    doc.text("No transactions yet", margin + 2, y + 5.5);
-    y += rowH;
-  } else {
-    const rows = [...transactions].reverse();
-    rows.forEach((txn, idx) => {
-      ensurePage(rowH);
-      const zebra = idx % 2 === 0;
-      doc.setFillColor(zebra ? 252 : 247, zebra ? 252 : 247, zebra ? 252 : 247);
-      doc.rect(margin, y, tableWidth, rowH, "F");
-      doc.setDrawColor(lineGray[0], lineGray[1], lineGray[2]);
-      doc.line(margin, y + rowH, margin + tableWidth, y + rowH);
-
-      let x = margin + 2;
-      doc.text(String(txn.time || "-"), x, y + 5.5);
-      x += col.time;
-      doc.text(String((txn.type || "-").toUpperCase()), x, y + 5.5);
-      x += col.type;
-      doc.text(String(txn.category || "-"), x, y + 5.5);
-      x += col.category;
-      doc.text(formatMoney(Number(txn.amount || 0)), x, y + 5.5);
-      y += rowH;
-    });
-  }
-
-  doc.save(`vaultbudget-report-${new Date().toISOString().slice(0, 10)}.pdf`);
+  printWindow.document.open();
+  printWindow.document.write(html);
+  printWindow.document.close();
+  printWindow.focus();
+  setTimeout(() => {
+    printWindow.print();
+  }, 300);
 }
 
 function initFirebase() {
@@ -876,6 +796,11 @@ function initPasswordToggles() {
 
 navButtons.forEach((btn) => btn.addEventListener("click", async () => {
   showView(btn.dataset.view);
+  if (btn.dataset.view === "reportView") {
+    renderTransactions();
+    renderExpenseChart();
+    renderIncomePieChart();
+  }
   if (btn.dataset.view === "settingsView") {
     await refreshSettingsPanels();
   }
