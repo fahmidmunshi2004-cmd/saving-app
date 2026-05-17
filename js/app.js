@@ -683,13 +683,45 @@ function addExpense() {
   updateUI();
 }
 
-function downloadReportPdf() {
+let pdfBanglaFontReady = false;
+async function ensurePdfBanglaFont(doc) {
+  if (!doc || typeof doc.addFileToVFS !== "function" || typeof doc.addFont !== "function") {
+    return false;
+  }
+  if (pdfBanglaFontReady) return true;
+
+  const fontUrl = "https://cdn.jsdelivr.net/gh/googlefonts/noto-fonts@main/hinted/ttf/NotoSansBengali/NotoSansBengali-Regular.ttf";
+
+  try {
+    const res = await fetch(fontUrl);
+    if (!res.ok) throw new Error("Font download failed");
+    const buffer = await res.arrayBuffer();
+    const bytes = new Uint8Array(buffer);
+    let binary = "";
+    const chunkSize = 0x8000;
+    for (let i = 0; i < bytes.length; i += chunkSize) {
+      const chunk = bytes.subarray(i, i + chunkSize);
+      binary += String.fromCharCode(...chunk);
+    }
+    const base64 = btoa(binary);
+    doc.addFileToVFS("NotoSansBengali-Regular.ttf", base64);
+    doc.addFont("NotoSansBengali-Regular.ttf", "NotoSansBengali", "normal");
+    pdfBanglaFontReady = true;
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
+async function downloadReportPdf() {
   if (!window.jspdf || !window.jspdf.jsPDF) {
     appAlert("PDF library load hoyni. Please refresh and try again.");
     return;
   }
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF();
+  const hasBanglaFont = await ensurePdfBanglaFont(doc);
+  const baseFont = hasBanglaFont ? "NotoSansBengali" : "helvetica";
   let y = 16;
 
   const pageWidth = doc.internal.pageSize.getWidth();
@@ -703,13 +735,13 @@ function downloadReportPdf() {
   doc.setFillColor(headerColor[0], headerColor[1], headerColor[2]);
   doc.rect(0, 0, pageWidth, 26, "F");
   doc.setTextColor(255, 255, 255);
-  doc.setFont("helvetica", "bold");
+  doc.setFont(baseFont, "normal");
   doc.setFontSize(16);
   doc.text("VaultBudget Report", margin, 16);
 
   y = 34;
   doc.setTextColor(33, 33, 33);
-  doc.setFont("helvetica", "normal");
+  doc.setFont(baseFont, "normal");
   doc.setFontSize(10);
   doc.text(`Generated: ${new Date().toLocaleString("en-BD")}`, margin, y);
   y += 10;
@@ -727,15 +759,15 @@ function downloadReportPdf() {
     doc.setFillColor(250, 250, 250);
     doc.setDrawColor(232, 232, 232);
     doc.roundedRect(x, y, cardW, cardH, 2, 2, "FD");
-    doc.setFont("helvetica", "bold");
+    doc.setFont(baseFont, "normal");
     doc.setFontSize(9);
     doc.text(summary[i][0], x + 3, y + 6);
-    doc.setFont("helvetica", "normal");
+    doc.setFont(baseFont, "normal");
     doc.text(summary[i][1], x + 3, y + 12);
   }
   y += cardH + 10;
 
-  doc.setFont("helvetica", "bold");
+  doc.setFont(baseFont, "normal");
   doc.setFontSize(12);
   doc.text("Transaction History", margin, y);
   y += 6;
@@ -752,7 +784,7 @@ function downloadReportPdf() {
     doc.setFillColor(headerColor[0], headerColor[1], headerColor[2]);
     doc.rect(margin, y, tableWidth, rowH, "F");
     doc.setTextColor(255, 255, 255);
-    doc.setFont("helvetica", "bold");
+    doc.setFont(baseFont, "normal");
     doc.setFontSize(9);
     let x = margin + 2;
     doc.text("Time", x, y + 5.5);
@@ -775,7 +807,7 @@ function downloadReportPdf() {
 
   drawTableHeader();
   doc.setTextColor(33, 33, 33);
-  doc.setFont("helvetica", "normal");
+  doc.setFont(baseFont, "normal");
   doc.setFontSize(8.5);
 
   if (!transactions.length) {
