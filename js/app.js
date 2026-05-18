@@ -52,20 +52,14 @@ async function refreshSettingsPanels() {
   groupMembersCard.classList.remove("hidden");
   groupMemberCount.innerText = String(memberSnap.size || 0);
   groupMembersList.innerHTML = "";
-  memberSnap.forEach((doc, index) => {
+  memberSnap.forEach((doc) => {
     const m = doc.data();
     const li = document.createElement("li");
-    li.className = "group-member-item";
-    const topRow = document.createElement("div");
-    topRow.className = "group-member-top";
-    const memberText = document.createElement("div");
-    memberText.className = "group-member-text";
     const row = document.createElement("div");
     const label = m.label || m.email || m.memberId || "Member";
     const role = m.role || "viewer";
-    row.innerText = `${index + 1}. ${label} (${role})`;
-    memberText.appendChild(row);
-    topRow.appendChild(memberText);
+    row.innerText = `${label} (${role})`;
+    li.appendChild(row);
 
     if (isCurrentAdmin()) {
       const isSelf = m.memberId === currentSession.memberId;
@@ -79,10 +73,9 @@ async function refreshSettingsPanels() {
             await removeGroupMember(doc.id, label);
           }).catch((e) => appAlert(e.message || "Kick failed"));
         };
-        topRow.appendChild(kickBtn);
+        li.appendChild(kickBtn);
       }
     }
-    li.appendChild(topRow);
 
     groupMembersList.appendChild(li);
   });
