@@ -141,7 +141,7 @@
                 </div>
             </div>
             <div class="table-wrap">
-                <table>
+                <table class="txn-table">
                     <thead>
                         <tr>
                             <th>Time</th>
@@ -152,6 +152,16 @@
                         </tr>
                     </thead>
                     <tbody id="txnTableBody"></tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="5">
+                                <div class="txn-footer-stats">
+                                    <span class="foot-income"><i class="fa-solid fa-arrow-trend-up"></i> মোট Income: <strong id="txnTotalIncome">0 BDT</strong></span>
+                                    <span class="foot-expense"><i class="fa-solid fa-arrow-trend-down"></i> মোট খরচ: <strong id="txnTotalExpense">0 BDT</strong></span>
+                                </div>
+                            </td>
+                        </tr>
+                    </tfoot>
                 </table>
             </div>
             <p id="txnEmpty" class="empty" hidden>No transactions yet.</p>

@@ -718,8 +718,12 @@ function renderTransactions() {
   const tbody = document.getElementById("txnTableBody");
   const txnEmpty = document.getElementById("txnEmpty");
   const txnCount = document.getElementById("txnCount");
+  const txnTotalIncome = document.getElementById("txnTotalIncome");
+  const txnTotalExpense = document.getElementById("txnTotalExpense");
   tbody.innerHTML = "";
   const fragment = document.createDocumentFragment();
+  let totalIncome = 0;
+  let totalExpense = 0;
 
   txnCount.innerText = `${transactions.length} records`;
   txnEmpty.hidden = transactions.length > 0;
@@ -741,6 +745,11 @@ function renderTransactions() {
     category.innerText = txn.category;
     amount.innerText = formatMoney(txn.amount);
     amount.className = txn.type === "income" ? "amount-income" : "amount-expense";
+    if (txn.type === "income") {
+      totalIncome += Number(txn.amount || 0);
+    } else {
+      totalExpense += Number(txn.amount || 0);
+    }
 
     if (canManageHistory()) {
       const deleteBtn = document.createElement("button");
@@ -766,6 +775,8 @@ function renderTransactions() {
     fragment.appendChild(row);
   }
   tbody.appendChild(fragment);
+  if (txnTotalIncome) txnTotalIncome.innerText = formatMoney(totalIncome);
+  if (txnTotalExpense) txnTotalExpense.innerText = formatMoney(totalExpense);
 }
 
 function renderExpenseChart() {
