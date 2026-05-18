@@ -10,6 +10,10 @@
   return { id: snap.docs[0].id, ...snap.docs[0].data() };
 }
 
+function canManageHistory() {
+  return isCurrentAdmin() || (!currentSession?.groupId && currentSession?.type === "gmail" && currentSession?.role === "owner");
+}
+
 async function refreshSettingsPanels() {
   if (!currentSession) {
     accountTypeText.innerText = "-";
@@ -18,9 +22,13 @@ async function refreshSettingsPanels() {
     inviteCard.classList.add("hidden");
     requestAccessCard.classList.add("hidden");
     pendingRequestsCard.classList.add("hidden");
-    deletedTransactionsCard.classList.add("hidden");
+    deletedTransactionsCard.classList.toggle("hidden", !canManageHistory());
     groupMembersList.innerHTML = "";
-    deletedTransactionsList.innerHTML = "";
+    if (canManageHistory()) {
+      renderDeletedTransactions();
+    } else {
+      deletedTransactionsList.innerHTML = "";
+    }
     groupActionsCard.classList.add("hidden");
     groupActionFormCard.classList.add("hidden");
     return;
@@ -34,9 +42,13 @@ async function refreshSettingsPanels() {
     inviteCard.classList.add("hidden");
     requestAccessCard.classList.add("hidden");
     pendingRequestsCard.classList.add("hidden");
-    deletedTransactionsCard.classList.add("hidden");
+    deletedTransactionsCard.classList.toggle("hidden", !canManageHistory());
     groupMembersList.innerHTML = "";
-    deletedTransactionsList.innerHTML = "";
+    if (canManageHistory()) {
+      renderDeletedTransactions();
+    } else {
+      deletedTransactionsList.innerHTML = "";
+    }
     groupActionsCard.classList.toggle("hidden", currentSession.type !== "gmail");
     groupActionFormCard.classList.add("hidden");
     return;
@@ -48,7 +60,7 @@ async function refreshSettingsPanels() {
     groupMembersCard.classList.remove("hidden");
     inviteCard.classList.toggle("hidden", !isCurrentAdmin());
     pendingRequestsCard.classList.toggle("hidden", !isCurrentAdmin());
-    deletedTransactionsCard.classList.toggle("hidden", !isCurrentAdmin());
+    deletedTransactionsCard.classList.toggle("hidden", !canManageHistory());
     requestAccessCard.classList.toggle("hidden", isCurrentAdmin());
     return;
   }
@@ -87,7 +99,7 @@ async function refreshSettingsPanels() {
 
   inviteCard.classList.toggle("hidden", !isCurrentAdmin());
   pendingRequestsCard.classList.toggle("hidden", !isCurrentAdmin());
-  deletedTransactionsCard.classList.toggle("hidden", !isCurrentAdmin());
+  deletedTransactionsCard.classList.toggle("hidden", !canManageHistory());
   requestAccessCard.classList.toggle("hidden", isCurrentAdmin());
   groupActionsCard.classList.add("hidden");
   groupActionFormCard.classList.add("hidden");
@@ -585,7 +597,7 @@ function syncTransactionState() {
 }
 
 async function deleteTransaction(txnId) {
-  if (!isCurrentAdmin()) {
+  if (!canManageHistory()) {
     appAlert("শুধু admin transaction delete করতে পারবে।");
     return;
   }
@@ -610,7 +622,7 @@ async function deleteTransaction(txnId) {
 
 function renderDeletedTransactions() {
   if (!deletedTransactionsList) return;
-  if (!isCurrentAdmin()) {
+  if (!canManageHistory()) {
     deletedTransactionsList.innerHTML = "";
     return;
   }
@@ -648,7 +660,7 @@ function renderDeletedTransactions() {
 }
 
 async function restoreDeletedTransaction(txnId) {
-  if (!isCurrentAdmin()) {
+  if (!canManageHistory()) {
     appAlert("শুধু admin restore করতে পারবে।");
     return;
   }
@@ -692,7 +704,7 @@ function renderTransactions() {
     amount.innerText = formatMoney(txn.amount);
     amount.className = txn.type === "income" ? "amount-income" : "amount-expense";
 
-    if (isCurrentAdmin()) {
+    if (canManageHistory()) {
       const deleteBtn = document.createElement("button");
       deleteBtn.type = "button";
       deleteBtn.className = "txn-delete-btn";
