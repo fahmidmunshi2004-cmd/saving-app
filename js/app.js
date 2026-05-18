@@ -248,12 +248,16 @@ function applyAuthState() {
     ? `Logged in as ${currentSession.email}`
     : `Logged in as group user: ${currentSession.username}`;
 
-  showView("homeView");
+  const lastView = sessionStorage.getItem("vault_active_view") || "homeView";
+  showView(lastView);
   document.querySelector(".bottom-nav").classList.remove("hidden");
   loginOverlay.classList.add("hidden");
 
   const editable = isCurrentAdmin() || !!currentSession.canEdit || (!currentSession.groupId && currentSession.type === "gmail");
   setEditAccess(editable);
+  if (lastView === "walletView") {
+    renderSavingsRateChart(true);
+  }
   refreshSettingsPanels();
 }
 

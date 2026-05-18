@@ -117,8 +117,15 @@ function setEditAccess(enabled) {
 }
 
 function showView(viewId) {
-  views.forEach((view) => view.classList.toggle("active", view.id === viewId));
-  navButtons.forEach((btn) => btn.classList.toggle("active", btn.dataset.view === viewId));
+  const exists = Array.from(views).some((view) => view.id === viewId);
+  const safeViewId = exists ? viewId : "homeView";
+  views.forEach((view) => view.classList.toggle("active", view.id === safeViewId));
+  navButtons.forEach((btn) => btn.classList.toggle("active", btn.dataset.view === safeViewId));
+  try {
+    sessionStorage.setItem("vault_active_view", safeViewId);
+  } catch (_) {
+    // ignore storage errors
+  }
 }
 
 function isCurrentAdmin() {
