@@ -160,7 +160,7 @@
                                 <div class="txn-footer-stats">
                                     <span class="foot-income"><i class="fa-solid fa-arrow-trend-up"></i> Total Income:
                                         <strong id="txnTotalIncome">0 BDT</strong></span>
-                                    <span class="foot-expense"><i class="fa-solid fa-arrow-trend-down"></i> Total খরচ:
+                                    <span class="foot-expense"><i class="fa-solid fa-arrow-trend-down"></i> Total Expense:
                                         <strong id="txnTotalExpense">0 BDT</strong></span>
                                 </div>
                             </td>
@@ -192,6 +192,15 @@
             <div class="wallet-item wallet-rate">
                 <div class="wallet-head"><i class="fa-solid fa-chart-line"></i><span>Savings Rate</span></div>
                 <strong id="walletRate">0%</strong>
+            </div>
+        </div>
+        <div class="wallet-rate-chart-card">
+            <div class="wallet-rate-head">
+                <h3><i class="fa-solid fa-gauge-high"></i> Savings Rate Live Chart</h3>
+                <span class="history-count">Animated</span>
+            </div>
+            <div class="wallet-rate-chart-wrap">
+                <canvas id="walletRateChart"></canvas>
             </div>
         </div>
     </section>

@@ -3,6 +3,7 @@ let expense = 0;
 let canEdit = false;
 let expenseChart = null;
 let incomePieChart = null;
+let walletRateChart = null;
 
 const breakdown = JSON.parse(localStorage.getItem("breakdown")) || {};
 const transactions = JSON.parse(localStorage.getItem("transactions")) || [];
@@ -34,6 +35,7 @@ const views = document.querySelectorAll(".view");
 const downloadPdfBtn = document.getElementById("downloadPdfBtn");
 const expenseChartCanvas = document.getElementById("expenseColumnChart");
 const incomePieChartCanvas = document.getElementById("incomePieChart");
+const walletRateChartCanvas = document.getElementById("walletRateChart");
 const topCategory = document.getElementById("topCategory");
 const topExpense = document.getElementById("topExpense");
 const totalCategory = document.getElementById("totalCategory");

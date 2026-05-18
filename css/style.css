@@ -575,6 +575,7 @@ input:not(:placeholder-shown)+.floating-label {
     width: 100%;
     border-collapse: collapse;
     min-width: 460px;
+    table-layout: fixed;
 }
 
 .txn-table th,
@@ -595,6 +596,32 @@ input:not(:placeholder-shown)+.floating-label {
     position: sticky;
     top: 0;
     z-index: 1;
+}
+
+.txn-table th:nth-child(1),
+.txn-table td:nth-child(1) {
+    width: 30%;
+}
+
+.txn-table th:nth-child(2),
+.txn-table td:nth-child(2) {
+    width: 17%;
+}
+
+.txn-table th:nth-child(3),
+.txn-table td:nth-child(3) {
+    width: 23%;
+}
+
+.txn-table th:nth-child(4),
+.txn-table td:nth-child(4) {
+    width: 20%;
+}
+
+.txn-table th:nth-child(5),
+.txn-table td:nth-child(5) {
+    width: 10%;
+    text-align: center;
 }
 
 .txn-table tbody tr:nth-child(odd) {
@@ -627,6 +654,10 @@ input:not(:placeholder-shown)+.floating-label {
 
 .txn-footer-stats strong {
     font-size: 0.92rem;
+}
+
+.txn-footer-stats span {
+    white-space: nowrap;
 }
 
 .foot-income {
@@ -939,6 +970,54 @@ input:not(:placeholder-shown)+.floating-label {
 
 .wallet-rate strong {
     color: #cc5d00;
+}
+
+.wallet-rate-chart-card {
+    margin-top: 18px;
+    border: 1px solid color-mix(in srgb, var(--brand) 16%, #ffffff 84%);
+    border-radius: 20px;
+    padding: 14px;
+    background:
+        radial-gradient(120% 100% at 0% 0%, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0) 56%),
+        linear-gradient(145deg, #ffffff, #f7fbff);
+    box-shadow:
+        0 10px 24px rgba(0, 0, 0, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.72);
+}
+
+.wallet-rate-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.wallet-rate-head h3 {
+    margin: 0;
+    font-size: 1rem;
+}
+
+.wallet-rate-head h3 i {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 6px;
+    color: #fff;
+    background: linear-gradient(130deg, #0fab72, #1ba2db);
+}
+
+.wallet-rate-chart-wrap {
+    height: 290px;
+    border-radius: 16px;
+    padding: 14px;
+    background:
+        radial-gradient(120% 120% at 0% 0%, rgba(27, 162, 219, 0.1) 0%, transparent 60%),
+        radial-gradient(120% 120% at 100% 0%, rgba(255, 1, 79, 0.08) 0%, transparent 58%),
+        #ffffff;
 }
 
 .bottom-nav {
@@ -1335,6 +1414,10 @@ input:not(:placeholder-shown)+.floating-label {
         gap: 6px;
     }
 
+    .txn-footer-stats span {
+        white-space: normal;
+    }
+
     .history-actions {
         width: 100%;
         justify-content: stretch;
@@ -1383,6 +1466,28 @@ input:not(:placeholder-shown)+.floating-label {
     .wallet-item {
         border-radius: 16px;
         padding: 14px 14px 12px;
+    }
+
+    .wallet-rate-chart-card {
+        margin-top: 14px;
+        border-radius: 16px;
+        padding: 12px;
+    }
+
+    .wallet-rate-head h3 {
+        font-size: 0.92rem;
+    }
+
+    .wallet-rate-head h3 i {
+        width: 30px;
+        height: 30px;
+        border-radius: 9px;
+    }
+
+    .wallet-rate-chart-wrap {
+        height: 230px;
+        border-radius: 12px;
+        padding: 10px;
     }
 
     .wallet-head {

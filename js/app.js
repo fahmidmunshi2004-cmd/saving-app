@@ -869,6 +869,82 @@ function renderIncomePieChart() {
   incomePieChart.update("none");
 }
 
+function renderSavingsRateChart(animate = true) {
+  if (!walletRateChartCanvas) return;
+  const rawRate = income > 0 ? Math.max(0, Math.round(((income - expense) / income) * 100)) : 0;
+  const rate = Math.min(100, rawRate);
+  const remain = 100 - rate;
+
+  const centerTextPlugin = {
+    id: "walletRateCenterText",
+    afterDraw(chart) {
+      const { ctx } = chart;
+      const meta = chart.getDatasetMeta(0);
+      if (!meta?.data?.length) return;
+      const x = meta.data[0].x;
+      const y = meta.data[0].y;
+
+      ctx.save();
+      ctx.textAlign = "center";
+      ctx.fillStyle = "#1e2125";
+      ctx.font = "700 28px Nunito, sans-serif";
+      ctx.fillText(`${rate}%`, x, y + 6);
+      ctx.fillStyle = "#667085";
+      ctx.font = "600 12px Nunito, sans-serif";
+      ctx.fillText("Savings", x, y + 24);
+      ctx.restore();
+    }
+  };
+
+  const ctx = walletRateChartCanvas.getContext("2d");
+  const grad = ctx.createLinearGradient(0, 0, 260, 0);
+  grad.addColorStop(0, "#0fab72");
+  grad.addColorStop(0.5, "#1ba2db");
+  grad.addColorStop(1, "#ff014f");
+
+  if (!walletRateChart) {
+    walletRateChart = new Chart(ctx, {
+      type: "doughnut",
+      data: {
+        labels: ["Savings", "Used"],
+        datasets: [{
+          data: [rate, remain],
+          backgroundColor: [grad, "#ecf0f6"],
+          borderWidth: 0,
+          hoverOffset: 2
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: "74%",
+        rotation: -100,
+        circumference: 340,
+        animation: {
+          duration: animate ? 1200 : 0,
+          easing: "easeOutExpo"
+        },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label(context) {
+                return `${context.label}: ${context.parsed}%`;
+              }
+            }
+          }
+        }
+      },
+      plugins: [centerTextPlugin]
+    });
+    return;
+  }
+
+  walletRateChart.options.animation.duration = animate ? 900 : 0;
+  walletRateChart.data.datasets[0].data = [rate, remain];
+  walletRateChart.update();
+}
+
 function updateUI() {
   document.getElementById("income").innerText = formatMoney(income);
   document.getElementById("expense").innerText = formatMoney(expense);
@@ -915,6 +991,9 @@ function updateUI() {
     renderTransactions();
     renderExpenseChart();
     renderIncomePieChart();
+  }
+  if (activeViewId === "walletView") {
+    renderSavingsRateChart(true);
   }
   saveData();
 }
@@ -1077,6 +1156,9 @@ navButtons.forEach((btn) => btn.addEventListener("click", async () => {
     renderTransactions();
     renderExpenseChart();
     renderIncomePieChart();
+  }
+  if (btn.dataset.view === "walletView") {
+    renderSavingsRateChart(true);
   }
   if (btn.dataset.view === "settingsView") {
     await refreshSettingsPanels();
