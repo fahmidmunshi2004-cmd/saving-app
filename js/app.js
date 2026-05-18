@@ -55,9 +55,29 @@ async function refreshSettingsPanels() {
   memberSnap.forEach((doc) => {
     const m = doc.data();
     const li = document.createElement("li");
+    const row = document.createElement("div");
     const label = m.label || m.email || m.memberId || "Member";
     const role = m.role || "viewer";
-    li.innerText = `${label} (${role})`;
+    row.innerText = `${label} (${role})`;
+    li.appendChild(row);
+
+    if (isCurrentAdmin()) {
+      const isSelf = m.memberId === currentSession.memberId;
+      const isAdminMember = role === "admin";
+      if (!isSelf && !isAdminMember) {
+        const kickBtn = document.createElement("button");
+        kickBtn.className = "btn danger-btn";
+        kickBtn.style.marginTop = "8px";
+        kickBtn.innerText = "Kick";
+        kickBtn.onclick = () => {
+          withLoader("Removing member...", async () => {
+            await removeGroupMember(doc.id, label);
+          }).catch((e) => appAlert(e.message || "Kick failed"));
+        };
+        li.appendChild(kickBtn);
+      }
+    }
+
     groupMembersList.appendChild(li);
   });
 
@@ -68,6 +88,15 @@ async function refreshSettingsPanels() {
   groupActionFormCard.classList.add("hidden");
 
   await renderPendingRequests();
+}
+
+async function removeGroupMember(memberDocId, label) {
+  if (!isCurrentAdmin() || !currentSession?.groupId || !memberDocId || !db) return;
+  const ok = await appConfirm(`${label} কে group থেকে remove করতে চান?`, "Kick Member");
+  if (!ok) return;
+
+  await db.collection("groupMembers").doc(memberDocId).delete();
+  await refreshSettingsPanels();
 }
 
 async function renderPendingRequests() {
@@ -260,6 +289,12 @@ async function handleGoogleAuthUser(user) {
       if (latestMember) {
         currentSession.role = latestMember.role || currentSession.role || "viewer";
         currentSession.canEdit = !!latestMember.canEdit;
+        saveSession();
+      } else {
+        currentSession.groupId = "";
+        currentSession.memberId = "";
+        currentSession.role = "owner";
+        currentSession.canEdit = true;
         saveSession();
       }
       await loadGroupSharedData();
