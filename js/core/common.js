@@ -121,6 +121,9 @@ function showView(viewId) {
   const safeViewId = exists ? viewId : "homeView";
   views.forEach((view) => view.classList.toggle("active", view.id === safeViewId));
   navButtons.forEach((btn) => btn.classList.toggle("active", btn.dataset.view === safeViewId));
+  if (safeViewId === "walletView" && typeof window.renderSavingsRateChart === "function") {
+    requestAnimationFrame(() => window.renderSavingsRateChart(true));
+  }
   try {
     sessionStorage.setItem("vault_active_view", safeViewId);
   } catch (_) {

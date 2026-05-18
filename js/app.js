@@ -1425,7 +1425,11 @@ applyAuthState();
 initFirebase();
 initPasswordToggles();
 registerServiceWorker();
+if (document.querySelector(".view.active")?.id === "walletView") {
+  renderSavingsRateChart(false);
+}
 
 window.addIncome = addIncome;
 window.addExpense = addExpense;
+window.renderSavingsRateChart = renderSavingsRateChart;
 
