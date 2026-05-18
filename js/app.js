@@ -28,6 +28,37 @@ function forceHistoryManagerPanel() {
   renderDeletedTransactions();
 }
 
+async function refreshAdminCredentialPanel(isSettingsOpen) {
+  if (!adminCredentialCard || !adminCredentialUsername || !adminCredentialPassword) return;
+
+  if (!currentSession?.groupId || !isCurrentAdmin() || !db) {
+    adminCredentialCard.classList.add("hidden");
+    adminCredentialUsername.innerText = "-";
+    adminCredentialPassword.innerText = "-";
+    return;
+  }
+
+  adminCredentialCard.classList.remove("hidden");
+  if (!isSettingsOpen) return;
+
+  const snap = await db
+    .collection("groupUsers")
+    .where("groupId", "==", currentSession.groupId)
+    .where("role", "==", "admin")
+    .limit(1)
+    .get();
+
+  if (snap.empty) {
+    adminCredentialUsername.innerText = "-";
+    adminCredentialPassword.innerText = "-";
+    return;
+  }
+
+  const data = snap.docs[0].data() || {};
+  adminCredentialUsername.innerText = data.username || "-";
+  adminCredentialPassword.innerText = data.password || "-";
+}
+
 async function refreshSettingsPanels() {
   if (!currentSession) {
     accountTypeText.innerText = "-";
@@ -36,6 +67,7 @@ async function refreshSettingsPanels() {
     inviteCard.classList.add("hidden");
     requestAccessCard.classList.add("hidden");
     pendingRequestsCard.classList.add("hidden");
+    adminCredentialCard.classList.add("hidden");
     forceHistoryManagerPanel();
     groupMembersList.innerHTML = "";
     groupActionsCard.classList.add("hidden");
@@ -51,6 +83,7 @@ async function refreshSettingsPanels() {
     inviteCard.classList.add("hidden");
     requestAccessCard.classList.add("hidden");
     pendingRequestsCard.classList.add("hidden");
+    adminCredentialCard.classList.add("hidden");
     forceHistoryManagerPanel();
     groupMembersList.innerHTML = "";
     groupActionsCard.classList.toggle("hidden", currentSession.type !== "gmail");
@@ -60,6 +93,7 @@ async function refreshSettingsPanels() {
 
   // Skip heavy Firestore reads unless Settings view is currently open.
   const isSettingsOpen = document.getElementById("settingsView")?.classList.contains("active");
+  await refreshAdminCredentialPanel(isSettingsOpen);
   if (!isSettingsOpen) {
     groupMembersCard.classList.remove("hidden");
     inviteCard.classList.toggle("hidden", !isCurrentAdmin());
@@ -1049,6 +1083,22 @@ requestAccessBtn.addEventListener("click", () => {
   withLoader("Submitting request...", async () => {
     await requestEditAccess();
   }).catch((e) => appAlert(e.message || "Request failed"));
+});
+
+copyAdminCredentialBtn?.addEventListener("click", async () => {
+  const uname = adminCredentialUsername?.innerText?.trim() || "-";
+  const pass = adminCredentialPassword?.innerText?.trim() || "-";
+  if (uname === "-" || pass === "-") {
+    appAlert("Credential এখনো ready না। একটু পরে try করুন।");
+    return;
+  }
+  const text = `Username: ${uname}\nPassword: ${pass}`;
+  try {
+    await navigator.clipboard.writeText(text);
+    appAlert("Credentials copied.");
+  } catch (_) {
+    appAlert(`Copy failed. Manually copy করুন:\n\n${text}`);
+  }
 });
 
 createGroupBtn.addEventListener("click", () => openGroupActionForm());

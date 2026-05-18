@@ -40,6 +40,10 @@ const totalCategory = document.getElementById("totalCategory");
 
 const accountTypeText = document.getElementById("accountTypeText");
 const accountRoleText = document.getElementById("accountRoleText");
+const adminCredentialCard = document.getElementById("adminCredentialCard");
+const adminCredentialUsername = document.getElementById("adminCredentialUsername");
+const adminCredentialPassword = document.getElementById("adminCredentialPassword");
+const copyAdminCredentialBtn = document.getElementById("copyAdminCredentialBtn");
 const groupMembersCard = document.getElementById("groupMembersCard");
 const groupMemberCount = document.getElementById("groupMemberCount");
 const groupMembersList = document.getElementById("groupMembersList");
