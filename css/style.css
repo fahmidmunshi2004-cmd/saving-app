@@ -438,6 +438,10 @@ input:not(:placeholder-shown)+.floating-label {
     font-weight: 700;
     color: var(--text);
     cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
 }
 
 .income-btn {
@@ -547,6 +551,10 @@ input:not(:placeholder-shown)+.floating-label {
     cursor: pointer;
     background: var(--gradient-red-hover);
     line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
 }
 
 .mini-btn i {

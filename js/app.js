@@ -88,7 +88,7 @@ async function refreshSettingsPanels() {
       if (!isSelf && !isAdminMember) {
         const kickBtn = document.createElement("button");
         kickBtn.className = "btn danger-btn";
-        kickBtn.innerText = "Kick";
+        kickBtn.innerHTML = '<i class="fa-solid fa-user-minus"></i> Kick';
         kickBtn.onclick = () => {
           withLoader("Removing member...", async () => {
             await removeGroupMember(doc.id, label);
@@ -146,7 +146,7 @@ async function renderPendingRequests() {
     info.innerText = `${req.fromLabel} চাইছে edit access`;
     btn.className = "btn income-btn";
     btn.style.marginTop = "8px";
-    btn.innerText = "Approve";
+    btn.innerHTML = '<i class="fa-solid fa-check"></i> Approve';
     btn.onclick = () => approveAccessRequest(doc.id, req.fromMemberId);
     li.appendChild(info);
     li.appendChild(btn);
@@ -361,7 +361,7 @@ function openGroupActionForm() {
   groupActionMode = "create";
   groupActionFormCard.classList.remove("hidden");
   groupActionTitle.innerText = "Create Group Account";
-  groupActionSubmitBtn.innerText = "Create Group";
+  groupActionSubmitBtn.innerHTML = '<i class="fa-solid fa-people-group"></i> Create Group';
 }
 
 async function createGroupFromGmail() {
@@ -651,7 +651,7 @@ function renderDeletedTransactions() {
     const restoreBtn = document.createElement("button");
     restoreBtn.className = "btn income-btn";
     restoreBtn.style.marginTop = "8px";
-    restoreBtn.innerText = "Restore";
+    restoreBtn.innerHTML = '<i class="fa-solid fa-rotate-left"></i> Restore';
     restoreBtn.onclick = () => {
       withLoader("Restoring transaction...", async () => {
         await restoreDeletedTransaction(txn.id);
