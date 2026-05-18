@@ -1040,6 +1040,7 @@ tbody tr:last-child td {
     font-family: var(--font-display);
     font-size: 1.02rem;
     letter-spacing: 0.2px;
+    text-align: center;
 }
 
 .modal-card p {
@@ -1048,6 +1049,7 @@ tbody tr:last-child td {
     color: color-mix(in srgb, var(--muted) 88%, #1e2125 12%);
     white-space: pre-line;
     line-height: 1.5;
+    text-align: center;
 }
 
 .modal-actions {
