@@ -81,7 +81,8 @@
                     <input type="text" id="incomeSourceInput" placeholder=" " />
                     <label class="floating-label" for="incomeSourceInput">Income source (Salary/Freelance...)</label>
                 </div>
-                <button id="incomeBtn" class="btn income-btn" onclick="addIncome()"><i class="fa-solid fa-circle-plus"></i> Save Income</button>
+                <button id="incomeBtn" class="btn income-btn" onclick="addIncome()"><i
+                        class="fa-solid fa-circle-plus"></i> Save Income</button>
             </div>
             <div class="box">
                 <h3><i class="fa-solid fa-credit-card"></i> Add Expense</h3>
@@ -93,7 +94,8 @@
                     <input type="text" id="categoryInput" placeholder=" " />
                     <label class="floating-label" for="categoryInput">Category (Food, Travel...)</label>
                 </div>
-                <button id="expenseBtn" class="btn expense-btn" onclick="addExpense()"><i class="fa-solid fa-circle-minus"></i> Save Expense</button>
+                <button id="expenseBtn" class="btn expense-btn" onclick="addExpense()"><i
+                        class="fa-solid fa-circle-minus"></i> Save Expense</button>
             </div>
         </div>
     </section>
@@ -156,8 +158,10 @@
                         <tr>
                             <td colspan="5">
                                 <div class="txn-footer-stats">
-                                    <span class="foot-income"><i class="fa-solid fa-arrow-trend-up"></i> মোট Income: <strong id="txnTotalIncome">0 BDT</strong></span>
-                                    <span class="foot-expense"><i class="fa-solid fa-arrow-trend-down"></i> মোট খরচ: <strong id="txnTotalExpense">0 BDT</strong></span>
+                                    <span class="foot-income"><i class="fa-solid fa-arrow-trend-up"></i> Total Income:
+                                        <strong id="txnTotalIncome">0 BDT</strong></span>
+                                    <span class="foot-expense"><i class="fa-solid fa-arrow-trend-down"></i> Total খরচ:
+                                        <strong id="txnTotalExpense">0 BDT</strong></span>
                                 </div>
                             </td>
                         </tr>
@@ -199,7 +203,8 @@
         <div class="settings-grid">
             <div id="groupActionsCard" class="settings-item hidden">
                 <strong>Group Actions</strong><br />
-                <button id="createGroupBtn" class="btn income-btn" type="button"><i class="fa-solid fa-people-group"></i> Create Group Account</button>
+                <button id="createGroupBtn" class="btn income-btn" type="button"><i
+                        class="fa-solid fa-people-group"></i> Create Group Account</button>
             </div>
             <div id="groupActionFormCard" class="settings-item hidden">
                 <strong id="groupActionTitle">Group Action</strong><br />
@@ -217,7 +222,8 @@
                         <i class="fa-regular fa-eye"></i>
                     </button>
                 </div>
-                <button id="groupActionSubmitBtn" class="btn expense-btn" type="button"><i class="fa-solid fa-paper-plane"></i> Submit</button>
+                <button id="groupActionSubmitBtn" class="btn expense-btn" type="button"><i
+                        class="fa-solid fa-paper-plane"></i> Submit</button>
             </div>
             <div class="settings-item">
                 <strong>Account Type</strong><br />
@@ -231,7 +237,8 @@
                 <strong>Group Credentials (Admin)</strong><br />
                 <div><b>Username:</b> <span id="adminCredentialUsername">-</span></div>
                 <div style="margin-top:6px;"><b>Password:</b> <span id="adminCredentialPassword">-</span></div>
-                <button id="copyAdminCredentialBtn" class="btn income-btn" type="button"><i class="fa-regular fa-copy"></i> Copy Credentials</button>
+                <button id="copyAdminCredentialBtn" class="btn income-btn" type="button"><i
+                        class="fa-regular fa-copy"></i> Copy Credentials</button>
             </div>
             <div id="groupMembersCard" class="settings-item hidden">
                 <strong>Group Members</strong><br />
@@ -244,7 +251,8 @@
                     <input id="inviteEmailInput" type="email" placeholder=" " />
                     <label class="floating-label" for="inviteEmailInput">Friend Gmail</label>
                 </div>
-                <button id="sendInviteBtn" class="btn expense-btn" type="button"><i class="fa-solid fa-envelope-circle-check"></i> Send Invite</button>
+                <button id="sendInviteBtn" class="btn expense-btn" type="button"><i
+                        class="fa-solid fa-envelope-circle-check"></i> Send Invite</button>
                 <p id="inviteStatusText" class="login-help"></p>
             </div>
             <div id="requestAccessCard" class="settings-item hidden">
@@ -253,7 +261,8 @@
                     <input id="requestAccessEmailInput" type="email" placeholder=" " />
                     <label class="floating-label" for="requestAccessEmailInput">Admin Gmail</label>
                 </div>
-                <button id="requestAccessBtn" class="btn income-btn" type="button"><i class="fa-solid fa-key"></i> Request Access</button>
+                <button id="requestAccessBtn" class="btn income-btn" type="button"><i class="fa-solid fa-key"></i>
+                    Request Access</button>
             </div>
             <div id="pendingRequestsCard" class="settings-item hidden">
                 <strong>Pending Access Requests</strong><br />
@@ -272,7 +281,8 @@
                 নিচের button চাপলে সব data clear হয়ে যাবে।
             </div>
             <div class="settings-item">
-                <button id="clearDataBtn" class="btn danger-btn" type="button"><i class="fa-solid fa-trash-can"></i> Clear All Data</button>
+                <button id="clearDataBtn" class="btn danger-btn" type="button"><i class="fa-solid fa-trash-can"></i>
+                    Clear All Data</button>
             </div>
         </div>
     </section>
@@ -299,8 +309,10 @@
             <h3 id="modalTitle">Notice</h3>
             <p id="modalMessage"></p>
             <div class="modal-actions">
-                <button id="modalCancelBtn" class="btn danger-btn hidden" type="button"><i class="fa-solid fa-xmark"></i> Cancel</button>
-                <button id="modalOkBtn" class="btn expense-btn" type="button"><i class="fa-solid fa-check"></i> OK</button>
+                <button id="modalCancelBtn" class="btn danger-btn hidden" type="button"><i
+                        class="fa-solid fa-xmark"></i> Cancel</button>
+                <button id="modalOkBtn" class="btn expense-btn" type="button"><i class="fa-solid fa-check"></i>
+                    OK</button>
             </div>
         </div>
     </div>
