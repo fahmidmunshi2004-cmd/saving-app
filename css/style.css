@@ -693,6 +693,96 @@ tbody tr:last-child td {
     margin-top: 4px;
 }
 
+.wallet-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+}
+
+.wallet-item {
+    position: relative;
+    overflow: hidden;
+    border-radius: 20px;
+    padding: 16px 16px 14px;
+    border: 1px solid color-mix(in srgb, var(--brand) 14%, #ffffff 86%);
+    background:
+        radial-gradient(150% 100% at 0% 0%, rgba(255, 255, 255, 0.86) 0%, rgba(255, 255, 255, 0) 55%),
+        linear-gradient(145deg, #ffffff, #f8fbff);
+}
+
+.wallet-item::after {
+    content: "";
+    position: absolute;
+    right: -36px;
+    top: -36px;
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    opacity: 0.12;
+    pointer-events: none;
+    background: linear-gradient(130deg, var(--brand), var(--brand-2));
+}
+
+.wallet-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #334155;
+    font-size: 1.02rem;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+}
+
+.wallet-head i {
+    width: 34px;
+    height: 34px;
+    border-radius: 11px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.95rem;
+    color: #ffffff;
+    box-shadow: 0 8px 18px rgba(15, 23, 42, 0.2);
+}
+
+.wallet-item strong {
+    margin-top: 10px;
+    font-size: 1.55rem;
+    line-height: 1.15;
+    font-weight: 800;
+}
+
+.wallet-balance .wallet-head i {
+    background: linear-gradient(130deg, #1ba2db, #2476ff);
+}
+
+.wallet-income .wallet-head i {
+    background: linear-gradient(130deg, #0fab72, #32d79a);
+}
+
+.wallet-expense .wallet-head i {
+    background: linear-gradient(130deg, #ff5572, #d11414);
+}
+
+.wallet-rate .wallet-head i {
+    background: linear-gradient(130deg, #ff9500, #ff6a00);
+}
+
+.wallet-balance strong {
+    color: #1b4dd8;
+}
+
+.wallet-income strong {
+    color: #0f8a57;
+}
+
+.wallet-expense strong {
+    color: #cc2e48;
+}
+
+.wallet-rate strong {
+    color: #cc5d00;
+}
+
 .bottom-nav {
     position: fixed;
     left: 50%;
@@ -1050,5 +1140,24 @@ tbody tr:last-child td {
 
     .modal-actions .btn {
         min-height: 42px;
+    }
+
+    .wallet-item {
+        border-radius: 16px;
+        padding: 14px 14px 12px;
+    }
+
+    .wallet-head {
+        font-size: 0.96rem;
+    }
+
+    .wallet-head i {
+        width: 30px;
+        height: 30px;
+        border-radius: 10px;
+    }
+
+    .wallet-item strong {
+        font-size: 1.32rem;
     }
 }
