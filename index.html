@@ -101,12 +101,14 @@
     </section>
 
     <section id="reportView" class="view">
-        <div class="side-head">
-            <h3><i class="fa-solid fa-chart-simple"></i> Category Overview</h3>
-            <span class="pill">Live</span>
+        <div id="categoryOverviewBlock" class="hidden">
+            <div class="side-head">
+                <h3><i class="fa-solid fa-chart-simple"></i> Category Overview</h3>
+                <span class="pill">Live</span>
+            </div>
+            <ul id="list" class="list"></ul>
+            <p id="emptyState" class="empty" hidden>No expense category yet.</p>
         </div>
-        <ul id="list" class="list"></ul>
-        <p id="emptyState" class="empty" hidden>No expense category yet.</p>
 
         <div class="chart-card">
             <div class="chart-head">
