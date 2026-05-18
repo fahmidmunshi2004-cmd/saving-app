@@ -6,6 +6,7 @@ let incomePieChart = null;
 
 const breakdown = JSON.parse(localStorage.getItem("breakdown")) || {};
 const transactions = JSON.parse(localStorage.getItem("transactions")) || [];
+const deletedTransactions = JSON.parse(localStorage.getItem("deletedTransactions")) || [];
 const SESSION_KEY = "vault_session";
 
 const root = document.documentElement;
@@ -51,6 +52,8 @@ const requestAccessEmailInput = document.getElementById("requestAccessEmailInput
 const requestAccessBtn = document.getElementById("requestAccessBtn");
 const pendingRequestsCard = document.getElementById("pendingRequestsCard");
 const pendingRequestsList = document.getElementById("pendingRequestsList");
+const deletedTransactionsCard = document.getElementById("deletedTransactionsCard");
+const deletedTransactionsList = document.getElementById("deletedTransactionsList");
 const groupActionsCard = document.getElementById("groupActionsCard");
 const createGroupBtn = document.getElementById("createGroupBtn");
 const groupActionFormCard = document.getElementById("groupActionFormCard");

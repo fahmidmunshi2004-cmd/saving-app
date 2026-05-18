@@ -616,6 +616,24 @@ tbody tr:last-child td {
     font-weight: 700;
 }
 
+.txn-delete-btn {
+    border: 0;
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #ffffff;
+    background: linear-gradient(120deg, #e14b6c, #ff7b6c);
+    box-shadow: 0 8px 16px rgba(225, 75, 108, 0.32);
+}
+
+.txn-delete-btn:hover {
+    filter: brightness(0.97);
+}
+
 .side-head {
     display: flex;
     justify-content: space-between;

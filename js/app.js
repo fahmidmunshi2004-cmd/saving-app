@@ -18,7 +18,9 @@ async function refreshSettingsPanels() {
     inviteCard.classList.add("hidden");
     requestAccessCard.classList.add("hidden");
     pendingRequestsCard.classList.add("hidden");
+    deletedTransactionsCard.classList.add("hidden");
     groupMembersList.innerHTML = "";
+    deletedTransactionsList.innerHTML = "";
     groupActionsCard.classList.add("hidden");
     groupActionFormCard.classList.add("hidden");
     return;
@@ -32,7 +34,9 @@ async function refreshSettingsPanels() {
     inviteCard.classList.add("hidden");
     requestAccessCard.classList.add("hidden");
     pendingRequestsCard.classList.add("hidden");
+    deletedTransactionsCard.classList.add("hidden");
     groupMembersList.innerHTML = "";
+    deletedTransactionsList.innerHTML = "";
     groupActionsCard.classList.toggle("hidden", currentSession.type !== "gmail");
     groupActionFormCard.classList.add("hidden");
     return;
@@ -44,6 +48,7 @@ async function refreshSettingsPanels() {
     groupMembersCard.classList.remove("hidden");
     inviteCard.classList.toggle("hidden", !isCurrentAdmin());
     pendingRequestsCard.classList.toggle("hidden", !isCurrentAdmin());
+    deletedTransactionsCard.classList.toggle("hidden", !isCurrentAdmin());
     requestAccessCard.classList.toggle("hidden", isCurrentAdmin());
     return;
   }
@@ -82,11 +87,13 @@ async function refreshSettingsPanels() {
 
   inviteCard.classList.toggle("hidden", !isCurrentAdmin());
   pendingRequestsCard.classList.toggle("hidden", !isCurrentAdmin());
+  deletedTransactionsCard.classList.toggle("hidden", !isCurrentAdmin());
   requestAccessCard.classList.toggle("hidden", isCurrentAdmin());
   groupActionsCard.classList.add("hidden");
   groupActionFormCard.classList.add("hidden");
 
   await renderPendingRequests();
+  renderDeletedTransactions();
 }
 
 async function removeGroupMember(memberDocId, label) {
@@ -241,6 +248,7 @@ async function processInviteLink() {
   };
   saveSession();
   await loadGroupSharedData();
+  syncTransactionState();
   updateUI();
 
   params.delete("inviteToken");
@@ -297,6 +305,7 @@ async function handleGoogleAuthUser(user) {
         saveSession();
       }
       await loadGroupSharedData();
+      syncTransactionState();
       updateUI();
     }
     applyAuthState();
@@ -327,6 +336,7 @@ async function handleGoogleAuthUser(user) {
 
   saveSession();
   await loadGroupSharedData();
+  syncTransactionState();
   updateUI();
   applyAuthState();
 }
@@ -412,6 +422,7 @@ async function createGroupFromGmail() {
   };
   saveSession();
   await loadGroupSharedData();
+  syncTransactionState();
   updateUI();
   applyAuthState();
   groupActionUsername.value = "";
@@ -468,6 +479,7 @@ async function joinGroupFromGmail() {
   };
   saveSession();
   await loadGroupSharedData();
+  syncTransactionState();
   updateUI();
   applyAuthState();
   groupActionUsername.value = "";
@@ -523,6 +535,135 @@ async function sendInviteToGmail() {
   }
 }
 
+function makeTransactionId() {
+  return `txn_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
+}
+
+function ensureTransactionIds() {
+  let changed = false;
+  for (const txn of transactions) {
+    if (!txn.id) {
+      txn.id = makeTransactionId();
+      changed = true;
+    }
+  }
+  for (const deletedTxn of deletedTransactions) {
+    if (deletedTxn?.txn && !deletedTxn.txn.id) {
+      deletedTxn.txn.id = makeTransactionId();
+      changed = true;
+    }
+  }
+  return changed;
+}
+
+function recalculateFinanceFromTransactions() {
+  income = 0;
+  expense = 0;
+  Object.keys(breakdown).forEach((key) => delete breakdown[key]);
+
+  for (const txn of transactions) {
+    const amount = Number(txn.amount || 0);
+    if (!amount || amount < 0) continue;
+    if (txn.type === "income") {
+      income += amount;
+      continue;
+    }
+    if (txn.type === "expense") {
+      expense += amount;
+      const cat = txn.category || "General";
+      breakdown[cat] = (breakdown[cat] || 0) + amount;
+    }
+  }
+}
+
+function syncTransactionState() {
+  const changed = ensureTransactionIds();
+  recalculateFinanceFromTransactions();
+  if (changed) {
+    saveData();
+  }
+}
+
+async function deleteTransaction(txnId) {
+  if (!isCurrentAdmin()) {
+    appAlert("শুধু admin transaction delete করতে পারবে।");
+    return;
+  }
+  const idx = transactions.findIndex((t) => t.id === txnId);
+  if (idx < 0) return;
+
+  const txn = transactions[idx];
+  const ok = await appConfirm("এই transaction delete করবেন?", "Delete Transaction");
+  if (!ok) return;
+
+  transactions.splice(idx, 1);
+  deletedTransactions.unshift({
+    txn,
+    originalIndex: idx,
+    deletedAt: new Date().toISOString()
+  });
+
+  recalculateFinanceFromTransactions();
+  updateUI();
+  renderDeletedTransactions();
+}
+
+function renderDeletedTransactions() {
+  if (!deletedTransactionsList) return;
+  if (!isCurrentAdmin()) {
+    deletedTransactionsList.innerHTML = "";
+    return;
+  }
+
+  deletedTransactionsList.innerHTML = "";
+  if (!deletedTransactions.length) {
+    const li = document.createElement("li");
+    li.innerText = "No deleted transactions";
+    deletedTransactionsList.appendChild(li);
+    return;
+  }
+
+  const fragment = document.createDocumentFragment();
+  for (const item of deletedTransactions) {
+    const li = document.createElement("li");
+    const txn = item.txn || {};
+    const amountText = formatMoney(Number(txn.amount || 0));
+    const deletedAtText = item.deletedAt ? new Date(item.deletedAt).toLocaleString("en-BD") : "-";
+    li.innerHTML = `<div>${txn.type || "-"} • ${txn.category || "-"}</div>
+      <div>${amountText} • Deleted: ${deletedAtText}</div>`;
+
+    const restoreBtn = document.createElement("button");
+    restoreBtn.className = "btn income-btn";
+    restoreBtn.style.marginTop = "8px";
+    restoreBtn.innerText = "Restore";
+    restoreBtn.onclick = () => {
+      withLoader("Restoring transaction...", async () => {
+        await restoreDeletedTransaction(txn.id);
+      }).catch((e) => appAlert(e.message || "Restore failed"));
+    };
+    li.appendChild(restoreBtn);
+    fragment.appendChild(li);
+  }
+  deletedTransactionsList.appendChild(fragment);
+}
+
+async function restoreDeletedTransaction(txnId) {
+  if (!isCurrentAdmin()) {
+    appAlert("শুধু admin restore করতে পারবে।");
+    return;
+  }
+  const idx = deletedTransactions.findIndex((item) => item?.txn?.id === txnId);
+  if (idx < 0) return;
+
+  const [item] = deletedTransactions.splice(idx, 1);
+  const insertAt = Math.min(Math.max(Number(item.originalIndex) || 0, 0), transactions.length);
+  transactions.splice(insertAt, 0, item.txn);
+
+  recalculateFinanceFromTransactions();
+  updateUI();
+  renderDeletedTransactions();
+}
+
 function renderTransactions() {
   const tbody = document.getElementById("txnTableBody");
   const txnEmpty = document.getElementById("txnEmpty");
@@ -539,6 +680,7 @@ function renderTransactions() {
     const type = document.createElement("td");
     const category = document.createElement("td");
     const amount = document.createElement("td");
+    const action = document.createElement("td");
     const chip = document.createElement("span");
 
     time.innerText = txn.time;
@@ -550,10 +692,27 @@ function renderTransactions() {
     amount.innerText = formatMoney(txn.amount);
     amount.className = txn.type === "income" ? "amount-income" : "amount-expense";
 
+    if (isCurrentAdmin()) {
+      const deleteBtn = document.createElement("button");
+      deleteBtn.type = "button";
+      deleteBtn.className = "txn-delete-btn";
+      deleteBtn.title = "Delete transaction";
+      deleteBtn.innerHTML = '<i class="fa-solid fa-trash"></i>';
+      deleteBtn.onclick = () => {
+        withLoader("Deleting transaction...", async () => {
+          await deleteTransaction(txn.id);
+        }).catch((e) => appAlert(e.message || "Delete failed"));
+      };
+      action.appendChild(deleteBtn);
+    } else {
+      action.innerText = "-";
+    }
+
     row.appendChild(time);
     row.appendChild(type);
     row.appendChild(category);
     row.appendChild(amount);
+    row.appendChild(action);
     fragment.appendChild(row);
   }
   tbody.appendChild(fragment);
@@ -704,8 +863,14 @@ function addIncome() {
   const val = Number(incomeInput.value);
   const source = incomeSourceInput.value.trim();
   if (!val || val < 0) return;
-  income += val;
-  transactions.push({ time: new Date().toLocaleString("en-BD"), type: "income", category: source || "General Income", amount: val });
+  transactions.push({
+    id: makeTransactionId(),
+    time: new Date().toLocaleString("en-BD"),
+    type: "income",
+    category: source || "General Income",
+    amount: val
+  });
+  recalculateFinanceFromTransactions();
   incomeInput.value = "";
   incomeSourceInput.value = "";
   updateUI();
@@ -716,9 +881,14 @@ function addExpense() {
   const val = Number(expenseInput.value);
   const cat = categoryInput.value.trim();
   if (!val || val < 0 || cat === "") return;
-  expense += val;
-  breakdown[cat] = (breakdown[cat] || 0) + val;
-  transactions.push({ time: new Date().toLocaleString("en-BD"), type: "expense", category: cat, amount: val });
+  transactions.push({
+    id: makeTransactionId(),
+    time: new Date().toLocaleString("en-BD"),
+    type: "expense",
+    category: cat,
+    amount: val
+  });
+  recalculateFinanceFromTransactions();
   expenseInput.value = "";
   categoryInput.value = "";
   updateUI();
@@ -945,6 +1115,7 @@ clearDataBtn.addEventListener("click", async () => {
     expense = 0;
     Object.keys(breakdown).forEach((key) => delete breakdown[key]);
     transactions.length = 0;
+    deletedTransactions.length = 0;
 
     // full local reset
     localStorage.clear();
@@ -977,6 +1148,7 @@ clearDataBtn.addEventListener("click", async () => {
 
 applyTheme();
 loadData();
+syncTransactionState();
 updateUI();
 loadSession();
 applyAuthState();

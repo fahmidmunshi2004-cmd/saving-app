@@ -24,6 +24,7 @@ function saveData() {
   localStorage.setItem("expense", expense);
   localStorage.setItem("breakdown", JSON.stringify(breakdown));
   localStorage.setItem("transactions", JSON.stringify(transactions));
+  localStorage.setItem("deletedTransactions", JSON.stringify(deletedTransactions));
 
   if (currentSession?.groupId && db) {
     db.collection("groupFinance").doc(currentSession.groupId).set({
@@ -31,6 +32,7 @@ function saveData() {
       expense,
       breakdown,
       transactions,
+      deletedTransactions,
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
     }, { merge: true }).catch(() => { });
   }
@@ -50,6 +52,12 @@ function loadData() {
   transactions.length = 0;
   for (const t of localTransactions) {
     transactions.push(t);
+  }
+
+  const localDeletedTransactions = JSON.parse(localStorage.getItem("deletedTransactions")) || [];
+  deletedTransactions.length = 0;
+  for (const t of localDeletedTransactions) {
+    deletedTransactions.push(t);
   }
 }
 
@@ -72,7 +80,7 @@ async function loadGroupSharedData() {
     }, { merge: true });
   }
 
-  const data = snap.exists ? snap.data() : { income: 0, expense: 0, breakdown: {}, transactions: [] };
+  const data = snap.exists ? snap.data() : { income: 0, expense: 0, breakdown: {}, transactions: [], deletedTransactions: [] };
   income = Number(data.income) || 0;
   expense = Number(data.expense) || 0;
 
@@ -84,6 +92,11 @@ async function loadGroupSharedData() {
   transactions.length = 0;
   for (const t of (data.transactions || [])) {
     transactions.push(t);
+  }
+
+  deletedTransactions.length = 0;
+  for (const t of (data.deletedTransactions || [])) {
+    deletedTransactions.push(t);
   }
 }
 
