@@ -1171,8 +1171,15 @@ tbody tr:last-child td {
 
     .stats,
     .forms,
-    .wallet-grid,
+    .wallet-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 12px;
+        margin-top: 14px;
+    }
+
     .settings-grid {
+        display: block;
         column-count: 1;
         column-gap: 0;
         margin-top: 14px;
@@ -1263,7 +1270,7 @@ tbody tr:last-child td {
     }
 
     table {
-        min-width: 560px;
+        min-width: 520px;
     }
 
     th,
@@ -1274,8 +1281,17 @@ tbody tr:last-child td {
 
     .history-actions {
         width: 100%;
-        justify-content: space-between;
+        justify-content: stretch;
         flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .history-actions .history-count {
+        width: 100%;
+    }
+
+    .history-actions .mini-btn {
+        width: 100%;
     }
 
     .bottom-nav {
