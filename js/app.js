@@ -11,7 +11,10 @@
 }
 
 function canManageHistory() {
-  return isCurrentAdmin() || (!currentSession?.groupId && currentSession?.type === "gmail" && currentSession?.role === "owner");
+  if (!currentSession) return false;
+  if (isCurrentAdmin()) return true;
+  if (!currentSession.groupId && currentSession.type === "gmail") return true;
+  return false;
 }
 
 async function refreshSettingsPanels() {
