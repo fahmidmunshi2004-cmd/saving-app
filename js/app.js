@@ -52,14 +52,20 @@ async function refreshSettingsPanels() {
   groupMembersCard.classList.remove("hidden");
   groupMemberCount.innerText = String(memberSnap.size || 0);
   groupMembersList.innerHTML = "";
-  memberSnap.forEach((doc) => {
+  memberSnap.forEach((doc, index) => {
     const m = doc.data();
     const li = document.createElement("li");
+    li.className = "group-member-item";
+    const topRow = document.createElement("div");
+    topRow.className = "group-member-top";
+    const memberText = document.createElement("div");
+    memberText.className = "group-member-text";
     const row = document.createElement("div");
     const label = m.label || m.email || m.memberId || "Member";
     const role = m.role || "viewer";
-    row.innerText = `${label} (${role})`;
-    li.appendChild(row);
+    row.innerText = `${index + 1}. ${label} (${role})`;
+    memberText.appendChild(row);
+    topRow.appendChild(memberText);
 
     if (isCurrentAdmin()) {
       const isSelf = m.memberId === currentSession.memberId;
@@ -67,16 +73,16 @@ async function refreshSettingsPanels() {
       if (!isSelf && !isAdminMember) {
         const kickBtn = document.createElement("button");
         kickBtn.className = "btn danger-btn";
-        kickBtn.style.marginTop = "8px";
         kickBtn.innerText = "Kick";
         kickBtn.onclick = () => {
           withLoader("Removing member...", async () => {
             await removeGroupMember(doc.id, label);
           }).catch((e) => appAlert(e.message || "Kick failed"));
         };
-        li.appendChild(kickBtn);
+        topRow.appendChild(kickBtn);
       }
     }
+    li.appendChild(topRow);
 
     groupMembersList.appendChild(li);
   });
