@@ -1015,9 +1015,10 @@ input:not(:placeholder-shown)+.floating-label {
     border-radius: 16px;
     padding: 14px;
     background:
-        radial-gradient(120% 120% at 0% 0%, rgba(27, 162, 219, 0.1) 0%, transparent 60%),
-        radial-gradient(120% 120% at 100% 0%, rgba(255, 1, 79, 0.08) 0%, transparent 58%),
+        radial-gradient(120% 120% at 0% 0%, rgba(30, 136, 229, 0.12) 0%, transparent 60%),
+        radial-gradient(120% 120% at 100% 0%, rgba(16, 201, 141, 0.12) 0%, transparent 58%),
         #ffffff;
+    border: 1px solid #e7edf7;
 }
 
 .bottom-nav {

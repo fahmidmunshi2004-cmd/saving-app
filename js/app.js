@@ -795,10 +795,34 @@ function renderExpenseChart() {
 
   if (!expenseChart) {
     const ctx = expenseChartCanvas.getContext("2d");
-    const gradient = ctx.createLinearGradient(0, 0, 0, 260);
+    const gradient = ctx.createLinearGradient(0, 0, 0, 280);
     gradient.addColorStop(0, "#ff014f");
-    gradient.addColorStop(0.5, "#f9004d");
-    gradient.addColorStop(1, "#d11414");
+    gradient.addColorStop(0.5, "#ff3a7a");
+    gradient.addColorStop(1, "#ff8aa8");
+
+    const expenseBarEnhancer = {
+      id: "expenseBarEnhancer",
+      afterDatasetsDraw(chart) {
+        const { ctx } = chart;
+        const meta = chart.getDatasetMeta(0);
+        ctx.save();
+        meta.data.forEach((bar) => {
+          const x = bar.x;
+          const y = bar.y;
+          ctx.beginPath();
+          ctx.fillStyle = "#ffffff";
+          ctx.arc(x, y, 4, 0, Math.PI * 2);
+          ctx.fill();
+
+          ctx.beginPath();
+          ctx.strokeStyle = "rgba(255, 1, 79, 0.32)";
+          ctx.lineWidth = 2;
+          ctx.arc(x, y, 7, 0, Math.PI * 2);
+          ctx.stroke();
+        });
+        ctx.restore();
+      }
+    };
 
     expenseChart = new Chart(ctx, {
       type: "bar",
@@ -807,25 +831,51 @@ function renderExpenseChart() {
         datasets: [{
           label: "Expense (BDT)",
           data: [],
-          borderRadius: 12,
+          borderRadius: 16,
           borderSkipped: false,
+          borderWidth: 1,
+          borderColor: "rgba(255,255,255,0.6)",
           maxBarThickness: 38,
           backgroundColor: gradient,
           hoverBackgroundColor: "#ff014f"
         }]
       },
       options: {
-        animation: { duration: 500, easing: "easeOutQuart" },
+        animation: { duration: 950, easing: "easeOutBack" },
         responsive: true,
         maintainAspectRatio: false,
-        plugins: { legend: { display: false } }
+        scales: {
+          x: {
+            grid: { display: false },
+            ticks: { color: "#596274", font: { weight: "700" } }
+          },
+          y: {
+            beginAtZero: true,
+            grid: {
+              color: "rgba(89,98,116,0.14)",
+              borderDash: [4, 4]
+            },
+            ticks: { color: "#596274" }
+          }
+        },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            backgroundColor: "#161b26",
+            titleColor: "#fff",
+            bodyColor: "#fff",
+            displayColors: false
+          }
+        }
       }
+      ,
+      plugins: [expenseBarEnhancer]
     });
   }
 
   expenseChart.data.labels = categories.length ? categories : ["No Data"];
   expenseChart.data.datasets[0].data = categories.length ? values : [0];
-  expenseChart.update("none");
+  expenseChart.update();
 }
 
 function renderIncomePieChart() {
@@ -871,77 +921,134 @@ function renderIncomePieChart() {
 
 function renderSavingsRateChart(animate = true) {
   if (!walletRateChartCanvas) return;
-  const rawRate = income > 0 ? Math.max(0, Math.round(((income - expense) / income) * 100)) : 0;
-  const rate = Math.min(100, rawRate);
-  const remain = 100 - rate;
+  const monthName = (d) => d.toLocaleString("en", { month: "short" });
+  const map = new Map();
+  for (const txn of transactions) {
+    const date = new Date(txn.time || Date.now());
+    if (Number.isNaN(date.getTime())) continue;
+    const key = `${date.getFullYear()}-${date.getMonth()}`;
+    if (!map.has(key)) {
+      map.set(key, { label: monthName(date), income: 0, expense: 0 });
+    }
+    const bucket = map.get(key);
+    if (txn.type === "income") bucket.income += Number(txn.amount || 0);
+    if (txn.type === "expense") bucket.expense += Number(txn.amount || 0);
+  }
 
-  const centerTextPlugin = {
-    id: "walletRateCenterText",
-    afterDraw(chart) {
+  const series = Array.from(map.values()).slice(-7);
+  if (!series.length) {
+    series.push({ label: "Now", income: Number(income || 0), expense: Number(expense || 0) });
+  }
+  const labels = series.map((x) => x.label);
+  const incomePoints = series.map((x, i) => ({ x: i, y: Math.max(0, x.income) }));
+  const expensePoints = series.map((x, i) => ({ x: i, y: Math.max(0, x.expense) }));
+
+  const rangeLinkPlugin = {
+    id: "rangeLinkPlugin",
+    afterDatasetsDraw(chart) {
+      const metaExpense = chart.getDatasetMeta(0);
+      const metaIncome = chart.getDatasetMeta(1);
+      if (!metaExpense?.data || !metaIncome?.data) return;
       const { ctx } = chart;
-      const meta = chart.getDatasetMeta(0);
-      if (!meta?.data?.length) return;
-      const x = meta.data[0].x;
-      const y = meta.data[0].y;
-
       ctx.save();
-      ctx.textAlign = "center";
-      ctx.fillStyle = "#1e2125";
-      ctx.font = "700 28px Nunito, sans-serif";
-      ctx.fillText(`${rate}%`, x, y + 6);
-      ctx.fillStyle = "#667085";
-      ctx.font = "600 12px Nunito, sans-serif";
-      ctx.fillText("Savings", x, y + 24);
+      ctx.lineWidth = 3;
+      ctx.strokeStyle = "#0fb5c7";
+      for (let i = 0; i < metaExpense.data.length; i += 1) {
+        const p1 = metaExpense.data[i];
+        const p2 = metaIncome.data[i];
+        if (!p1 || !p2) continue;
+        ctx.beginPath();
+        ctx.moveTo(p1.x, p1.y);
+        ctx.lineTo(p2.x, p2.y);
+        ctx.stroke();
+      }
       ctx.restore();
     }
   };
 
-  const ctx = walletRateChartCanvas.getContext("2d");
-  const grad = ctx.createLinearGradient(0, 0, 260, 0);
-  grad.addColorStop(0, "#0fab72");
-  grad.addColorStop(0.5, "#1ba2db");
-  grad.addColorStop(1, "#ff014f");
+  const maxY = Math.max(10, ...incomePoints.map((p) => p.y), ...expensePoints.map((p) => p.y));
 
   if (!walletRateChart) {
+    const ctx = walletRateChartCanvas.getContext("2d");
     walletRateChart = new Chart(ctx, {
-      type: "doughnut",
+      type: "scatter",
       data: {
-        labels: ["Savings", "Used"],
-        datasets: [{
-          data: [rate, remain],
-          backgroundColor: [grad, "#ecf0f6"],
-          borderWidth: 0,
-          hoverOffset: 2
-        }]
+        labels,
+        datasets: [
+          {
+            label: "Expense",
+            data: expensePoints,
+            pointRadius: 5,
+            pointHoverRadius: 7,
+            pointBackgroundColor: "#1e88e5",
+            pointBorderWidth: 0,
+            showLine: false
+          },
+          {
+            label: "Income",
+            data: incomePoints,
+            pointRadius: 5,
+            pointHoverRadius: 7,
+            pointBackgroundColor: "#10c98d",
+            pointBorderWidth: 0,
+            showLine: false
+          }
+        ]
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        cutout: "74%",
-        rotation: -100,
-        circumference: 340,
         animation: {
-          duration: animate ? 1200 : 0,
-          easing: "easeOutExpo"
+          duration: animate ? 1150 : 0,
+          easing: "easeOutQuart"
+        },
+        scales: {
+          x: {
+            type: "linear",
+            min: -0.4,
+            max: labels.length - 0.6,
+            grid: { color: "rgba(120,130,150,0.18)" },
+            ticks: {
+              stepSize: 1,
+              callback(value) {
+                return labels[value] || "";
+              },
+              color: "#5a6475",
+              font: { weight: "700" }
+            }
+          },
+          y: {
+            beginAtZero: true,
+            suggestedMax: maxY * 1.15,
+            grid: { color: "rgba(120,130,150,0.16)" },
+            ticks: { color: "#5a6475" }
+          }
         },
         plugins: {
-          legend: { display: false },
+          legend: {
+            position: "bottom",
+            labels: { usePointStyle: true, pointStyle: "circle" }
+          },
           tooltip: {
             callbacks: {
               label(context) {
-                return `${context.label}: ${context.parsed}%`;
+                return `${context.dataset.label}: ${formatMoney(Number(context.parsed.y || 0))}`;
               }
             }
           }
         }
       },
-      plugins: [centerTextPlugin]
+      plugins: [rangeLinkPlugin]
     });
     return;
   }
 
   walletRateChart.options.animation.duration = animate ? 900 : 0;
-  walletRateChart.data.datasets[0].data = [rate, remain];
+  walletRateChart.options.scales.x.max = labels.length - 0.6;
+  walletRateChart.options.scales.y.suggestedMax = maxY * 1.15;
+  walletRateChart.data.labels = labels;
+  walletRateChart.data.datasets[0].data = expensePoints;
+  walletRateChart.data.datasets[1].data = incomePoints;
   walletRateChart.update();
 }
 
