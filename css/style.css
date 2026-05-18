@@ -747,6 +747,8 @@ tbody tr:last-child td {
     border: 1px solid #e8edf7;
     border-radius: 12px;
     padding: 10px;
+    font-size: 15px;
+    font-weight: 600;
 }
 
 #groupMembersList .btn {
@@ -1048,6 +1050,7 @@ tbody tr:last-child td {
 
 /* Performance + layout optimization for touch devices */
 @media (max-width: 900px) {
+
     .auth-shell,
     .view {
         border-radius: 14px;
