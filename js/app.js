@@ -17,6 +17,17 @@ function canManageHistory() {
   return false;
 }
 
+function forceHistoryManagerPanel() {
+  if (!deletedTransactionsCard || !deletedTransactionsList) return;
+  const allowed = canManageHistory();
+  deletedTransactionsCard.classList.toggle("hidden", !allowed);
+  if (!allowed) {
+    deletedTransactionsList.innerHTML = "";
+    return;
+  }
+  renderDeletedTransactions();
+}
+
 async function refreshSettingsPanels() {
   if (!currentSession) {
     accountTypeText.innerText = "-";
@@ -25,13 +36,8 @@ async function refreshSettingsPanels() {
     inviteCard.classList.add("hidden");
     requestAccessCard.classList.add("hidden");
     pendingRequestsCard.classList.add("hidden");
-    deletedTransactionsCard.classList.toggle("hidden", !canManageHistory());
+    forceHistoryManagerPanel();
     groupMembersList.innerHTML = "";
-    if (canManageHistory()) {
-      renderDeletedTransactions();
-    } else {
-      deletedTransactionsList.innerHTML = "";
-    }
     groupActionsCard.classList.add("hidden");
     groupActionFormCard.classList.add("hidden");
     return;
@@ -45,13 +51,8 @@ async function refreshSettingsPanels() {
     inviteCard.classList.add("hidden");
     requestAccessCard.classList.add("hidden");
     pendingRequestsCard.classList.add("hidden");
-    deletedTransactionsCard.classList.toggle("hidden", !canManageHistory());
+    forceHistoryManagerPanel();
     groupMembersList.innerHTML = "";
-    if (canManageHistory()) {
-      renderDeletedTransactions();
-    } else {
-      deletedTransactionsList.innerHTML = "";
-    }
     groupActionsCard.classList.toggle("hidden", currentSession.type !== "gmail");
     groupActionFormCard.classList.add("hidden");
     return;
@@ -63,7 +64,7 @@ async function refreshSettingsPanels() {
     groupMembersCard.classList.remove("hidden");
     inviteCard.classList.toggle("hidden", !isCurrentAdmin());
     pendingRequestsCard.classList.toggle("hidden", !isCurrentAdmin());
-    deletedTransactionsCard.classList.toggle("hidden", !canManageHistory());
+    forceHistoryManagerPanel();
     requestAccessCard.classList.toggle("hidden", isCurrentAdmin());
     return;
   }
@@ -102,13 +103,13 @@ async function refreshSettingsPanels() {
 
   inviteCard.classList.toggle("hidden", !isCurrentAdmin());
   pendingRequestsCard.classList.toggle("hidden", !isCurrentAdmin());
-  deletedTransactionsCard.classList.toggle("hidden", !canManageHistory());
+  forceHistoryManagerPanel();
   requestAccessCard.classList.toggle("hidden", isCurrentAdmin());
   groupActionsCard.classList.add("hidden");
   groupActionFormCard.classList.add("hidden");
 
   await renderPendingRequests();
-  renderDeletedTransactions();
+  forceHistoryManagerPanel();
 }
 
 async function removeGroupMember(memberDocId, label) {
