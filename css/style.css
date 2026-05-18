@@ -703,7 +703,6 @@ tbody tr:last-child td {
     column-count: 2;
     column-gap: 18px;
     display: block;
-    column-fill: auto;
 }
 
 .settings-item {
@@ -723,9 +722,6 @@ tbody tr:last-child td {
     min-height: 0;
 }
 
-.settings-grid .settings-item:last-child {
-    margin-bottom: 0;
-}
 
 .settings-item::after {
     content: "";
