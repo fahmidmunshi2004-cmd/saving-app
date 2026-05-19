@@ -62,6 +62,7 @@ const deletedTransactionsCard = document.getElementById("deletedTransactionsCard
 const deletedTransactionsList = document.getElementById("deletedTransactionsList");
 const groupActionsCard = document.getElementById("groupActionsCard");
 const createGroupBtn = document.getElementById("createGroupBtn");
+const addAnotherGroupBtn = document.getElementById("addAnotherGroupBtn");
 const groupActionFormCard = document.getElementById("groupActionFormCard");
 const groupActionTitle = document.getElementById("groupActionTitle");
 const groupActionUsername = document.getElementById("groupActionUsername");

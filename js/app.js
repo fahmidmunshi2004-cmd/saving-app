@@ -95,6 +95,8 @@ async function refreshSettingsPanels() {
   const isSettingsOpen = document.getElementById("settingsView")?.classList.contains("active");
   await refreshAdminCredentialPanel(isSettingsOpen);
   if (!isSettingsOpen) {
+    groupActionsCard.classList.toggle("hidden", currentSession.type !== "gmail");
+    groupActionFormCard.classList.add("hidden");
     groupMembersCard.classList.remove("hidden");
     inviteCard.classList.toggle("hidden", !isCurrentAdmin());
     pendingRequestsCard.classList.toggle("hidden", !isCurrentAdmin());
@@ -139,7 +141,7 @@ async function refreshSettingsPanels() {
   pendingRequestsCard.classList.toggle("hidden", !isCurrentAdmin());
   forceHistoryManagerPanel();
   requestAccessCard.classList.toggle("hidden", isCurrentAdmin());
-  groupActionsCard.classList.add("hidden");
+  groupActionsCard.classList.toggle("hidden", currentSession.type !== "gmail");
   groupActionFormCard.classList.add("hidden");
 
   await renderPendingRequests();
@@ -400,11 +402,16 @@ async function handleGoogleAuthUser(user) {
   applyAuthState();
 }
 
-function openGroupActionForm() {
-  groupActionMode = "create";
+function openGroupActionForm(mode = "create") {
+  groupActionMode = mode === "join" ? "join" : "create";
   groupActionFormCard.classList.remove("hidden");
-  groupActionTitle.innerText = "Create Group Account";
-  groupActionSubmitBtn.innerHTML = '<i class="fa-solid fa-people-group"></i> Create Group';
+  if (groupActionMode === "join") {
+    groupActionTitle.innerText = "Add Another Group";
+    groupActionSubmitBtn.innerHTML = '<i class="fa-solid fa-right-left"></i> Join Group';
+  } else {
+    groupActionTitle.innerText = "Create Group Account";
+    groupActionSubmitBtn.innerHTML = '<i class="fa-solid fa-people-group"></i> Create Group';
+  }
 }
 
 async function createGroupFromGmail() {
@@ -1347,11 +1354,16 @@ copyAdminCredentialBtn?.addEventListener("click", async () => {
   }
 });
 
-createGroupBtn.addEventListener("click", () => openGroupActionForm());
+createGroupBtn.addEventListener("click", () => openGroupActionForm("create"));
+addAnotherGroupBtn?.addEventListener("click", () => openGroupActionForm("join"));
 groupActionSubmitBtn.addEventListener("click", async () => {
   try {
-    await withLoader("Creating group...", async () => {
-      await createGroupFromGmail();
+    await withLoader(groupActionMode === "join" ? "Joining group..." : "Creating group...", async () => {
+      if (groupActionMode === "join") {
+        await joinGroupFromGmail();
+      } else {
+        await createGroupFromGmail();
+      }
     });
   } catch (e) {
     appAlert(e.message || "Group action failed");
