@@ -761,13 +761,17 @@ function renderTransactions() {
     const chip = document.createElement("span");
 
     time.innerText = txn.time;
+    time.setAttribute("data-label", "Time");
     chip.className = `type-chip ${txn.type === "income" ? "type-income" : "type-expense"}`;
     chip.innerHTML = txn.type === "income" ? '<i class="fa-solid fa-arrow-up"></i> Income' : '<i class="fa-solid fa-arrow-down"></i> Expense';
+    type.setAttribute("data-label", "Type");
     type.appendChild(chip);
 
     category.innerText = txn.category;
+    category.setAttribute("data-label", "Category");
     amount.innerText = formatMoney(txn.amount);
     amount.className = txn.type === "income" ? "amount-income" : "amount-expense";
+    amount.setAttribute("data-label", "Amount");
     if (txn.type === "income") {
       totalIncome += Number(txn.amount || 0);
     } else {
@@ -789,6 +793,7 @@ function renderTransactions() {
     } else {
       action.innerText = "-";
     }
+    action.setAttribute("data-label", "Action");
 
     row.appendChild(time);
     row.appendChild(type);

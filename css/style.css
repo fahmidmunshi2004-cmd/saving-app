@@ -1396,17 +1396,97 @@ input:not(:placeholder-shown)+.floating-label {
     }
 
     .table-wrap {
-        border-radius: 10px;
+        overflow: visible;
+        border: 0;
+        background: transparent;
+        box-shadow: none;
+        border-radius: 0;
     }
 
-    table {
-        min-width: 520px;
+    .txn-table {
+        min-width: 100%;
+        table-layout: auto;
+        border-collapse: separate;
+        border-spacing: 0 10px;
     }
 
-    th,
-    td {
-        padding: 9px 8px;
-        font-size: 0.8rem;
+    .txn-table thead {
+        display: none;
+    }
+
+    .txn-table tbody {
+        display: block;
+    }
+
+    .txn-table tbody tr {
+        display: block;
+        border: 1px solid color-mix(in srgb, var(--brand) 20%, #e8edf5);
+        border-radius: 14px;
+        background:
+            radial-gradient(120% 90% at 0% 0%, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0) 55%),
+            linear-gradient(145deg, #ffffff, #f7fbff);
+        box-shadow: 0 8px 18px rgba(15, 23, 42, 0.08);
+        padding: 8px 10px;
+    }
+
+    .txn-table tbody tr:nth-child(odd),
+    .txn-table tbody tr:hover {
+        background:
+            radial-gradient(120% 90% at 0% 0%, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0) 55%),
+            linear-gradient(145deg, #ffffff, #f7fbff);
+    }
+
+    .txn-table tbody td {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+        width: 100% !important;
+        border: 0;
+        border-bottom: 1px dashed #e6ecf5;
+        padding: 8px 0;
+        text-align: right !important;
+        font-size: 0.83rem;
+    }
+
+    .txn-table tbody td::before {
+        content: attr(data-label);
+        color: #667085;
+        font-weight: 700;
+        letter-spacing: 0.2px;
+        text-align: left;
+        padding-right: 12px;
+    }
+
+    .txn-table tbody td:last-child {
+        border-bottom: 0;
+        padding-bottom: 2px;
+    }
+
+    .txn-table td:nth-child(5) {
+        justify-content: space-between;
+    }
+
+    .txn-table td:nth-child(5) .txn-delete-btn {
+        margin-left: auto;
+    }
+
+    .txn-table tfoot {
+        display: block;
+    }
+
+    .txn-table tfoot tr,
+    .txn-table tfoot td {
+        display: block;
+        width: 100%;
+    }
+
+    .txn-table tfoot td {
+        margin-top: 2px;
+        border: 1px dashed color-mix(in srgb, var(--brand) 25%, #dbe3ef);
+        border-radius: 12px;
+        background: linear-gradient(120deg, rgba(255, 1, 79, 0.07), rgba(27, 162, 219, 0.07));
+        padding: 10px;
     }
 
     .txn-footer-stats {
