@@ -565,8 +565,10 @@ async function sendInviteToGmail() {
   });
 
   const link = `${location.origin}${location.pathname}?groupId=${encodeURIComponent(currentSession.groupId)}&inviteToken=${encodeURIComponent(token)}&email=${encodeURIComponent(email)}`;
-  const subject = encodeURIComponent("VaultBudget Group Invite");
-  const body = encodeURIComponent(`Please join my group account. Click this link: ${link}`);
+  const subjectText = "VaultBudget Group Invite";
+  const bodyText = `Please join my group account. Click this link: ${link}`;
+  const subject = encodeURIComponent(subjectText);
+  const body = encodeURIComponent(bodyText);
 
   let copied = false;
   try {
@@ -576,20 +578,32 @@ async function sendInviteToGmail() {
     copied = false;
   }
 
-  const mailWindow = window.open(`mailto:${email}?subject=${subject}&body=${body}`, "_blank");
-  const popupBlocked = !mailWindow;
-
-  inviteEmailInput.value = "";
-  inviteStatusText.innerText = copied
-    ? `Invite ready. Link copied for ${email}.`
-    : `Invite created for ${email}.`;
-
-  if (popupBlocked) {
-    appAlert(`Popup blocked. এই invite link manually share করুন:\n\n${link}`);
-    return;
+  let shared = false;
+  if (navigator.share) {
+    try {
+      await navigator.share({
+        title: subjectText,
+        text: bodyText
+      });
+      shared = true;
+    } catch (_) {
+      shared = false;
+    }
   }
 
-  if (!copied) {
+  if (!shared) {
+    // Mobile browsers often block popup mail windows; location navigation is more reliable.
+    window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
+  }
+
+  inviteEmailInput.value = "";
+  inviteStatusText.innerText = shared
+    ? `Invite share opened for ${email}.`
+    : copied
+      ? `Invite ready. Mail app opening + link copied for ${email}.`
+      : `Invite ready for ${email}.`;
+
+  if (!shared && !copied) {
     appAlert(`Invite compose opened. প্রয়োজনে এই link manually share করুন:\n\n${link}`);
   }
 }
