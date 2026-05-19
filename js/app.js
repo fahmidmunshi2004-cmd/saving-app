@@ -244,6 +244,11 @@ function applyAuthState() {
     return;
   }
 
+  if (currentSession.role === "owner") {
+    currentSession.role = "personal";
+    saveSession();
+  }
+
   authInfo.innerText = currentSession.type === "gmail"
     ? `Logged in as ${currentSession.email}`
     : `Logged in as group user: ${currentSession.username}`;
@@ -354,7 +359,7 @@ async function handleGoogleAuthUser(user) {
       } else {
         currentSession.groupId = "";
         currentSession.memberId = "";
-        currentSession.role = "owner";
+        currentSession.role = "personal";
         currentSession.canEdit = true;
         saveSession();
       }
@@ -383,7 +388,7 @@ async function handleGoogleAuthUser(user) {
       type: "gmail",
       uid: firebaseUser.uid,
       email: firebaseUser.email,
-      role: "owner",
+      role: "personal",
       canEdit: true
     };
   }
@@ -1250,6 +1255,7 @@ function initFirebase() {
   auth = firebase.auth();
   db = firebase.firestore();
   googleProvider = new firebase.auth.GoogleAuthProvider();
+  googleProvider.setCustomParameters({ prompt: "select_account" });
   auth.onAuthStateChanged((user) => {
     handleGoogleAuthUser(user).catch((e) => appAlert(e.message || "Auth error"));
   });
@@ -1345,51 +1351,19 @@ googleLoginBtn.addEventListener("click", async () => {
 
 clearDataBtn.addEventListener("click", async () => {
   const isGroupMember = !!currentSession?.groupId;
-  const adminMode = isGroupMember && isCurrentAdmin();
-  const promptText = adminMode
-    ? "Admin reset: This will delete FULL group data for everyone. Continue?"
+  const promptText = isGroupMember
+    ? "This will clear only your app data/session on this device. Group data will stay safe. Continue?"
     : "This will clear only your app data/session on this device. Continue?";
   const ok = await appConfirm(promptText, "Clear Data");
   if (!ok) return;
   let remoteClearError = "";
   showLoader("Resetting data...");
   try {
-    // Clear remote data based on role
+    // Clear only personal cloud doc for non-group Gmail users.
+    // Group data is intentionally never deleted from this action.
     try {
       if (db) {
-        if (adminMode) {
-          const groupId = currentSession.groupId;
-
-          // group finance
-          await db.collection("groupFinance").doc(currentSession.groupId).delete();
-
-          // group meta doc
-          await db.collection("groups").doc(groupId).delete().catch(() => { });
-
-          // group members
-          const membersSnap = await db.collection("groupMembers").where("groupId", "==", groupId).get();
-          for (const d of membersSnap.docs) {
-            await d.ref.delete().catch(() => { });
-          }
-
-          // invitations
-          const inviteSnap = await db.collection("invitations").where("groupId", "==", groupId).get();
-          for (const d of inviteSnap.docs) {
-            await d.ref.delete().catch(() => { });
-          }
-
-          // access requests
-          const reqSnap = await db.collection("accessRequests").where("groupId", "==", groupId).get();
-          for (const d of reqSnap.docs) {
-            await d.ref.delete().catch(() => { });
-          }
-
-          // group user credential docs linked with this group
-          const groupUsersSnap = await db.collection("groupUsers").where("groupId", "==", groupId).get();
-          for (const d of groupUsersSnap.docs) {
-            await d.ref.delete().catch(() => { });
-          }
-        } else if (!isGroupMember && firebaseUser?.uid) {
+        if (!isGroupMember && firebaseUser?.uid) {
           await db.collection("userFinance").doc(firebaseUser.uid).delete();
         }
       }
@@ -1422,11 +1396,7 @@ clearDataBtn.addEventListener("click", async () => {
     if (remoteClearError) {
       appAlert(`Local reset complete, but cloud data delete failed: ${remoteClearError}`);
     } else {
-      if (adminMode) {
-        appAlert("Admin group reset complete. Logged out successfully.");
-      } else {
-        appAlert("Your app reset is complete. Group data was kept safe.");
-      }
+      appAlert("Your app reset is complete. Group data was kept safe.");
     }
   } finally {
     hideLoader();
