@@ -624,6 +624,11 @@ input:not(:placeholder-shown)+.floating-label {
     text-align: center;
 }
 
+.tfoot {
+    width: 100% !important;
+    margin-top: 10px;
+}
+
 .txn-table tbody tr:nth-child(odd) {
     background: rgba(255, 1, 79, 0.03);
 }
@@ -1511,17 +1516,30 @@ input:not(:placeholder-shown)+.floating-label {
 
     .history-actions {
         width: 100%;
-        justify-content: stretch;
+        justify-content: space-between;
+        align-items: center;
         flex-wrap: wrap;
-        gap: 10px;
+        gap: 8px;
     }
 
     .history-actions .history-count {
-        width: 100%;
+        width: auto;
+    }
+
+    .history-head {
+        flex-wrap: wrap;
+        align-items: center;
+        row-gap: 8px;
+    }
+
+    .history-head h3 {
+        flex: 1;
+        min-width: 0;
     }
 
     .history-actions .mini-btn {
         width: 100%;
+        margin-top: 2px;
     }
 
     .bottom-nav {
