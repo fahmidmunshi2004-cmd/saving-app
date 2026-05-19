@@ -1160,6 +1160,10 @@ function downloadReportPdf() {
     appAlert("Popup blocked. Please allow popups and try again.");
     return;
   }
+  const totalIncome = Number(income || 0);
+  const totalExpense = Number(expense || 0);
+  const totalBalance = totalIncome - totalExpense;
+  const totalRecords = Number(transactions.length || 0);
 
   const rows = [...transactions].reverse().map((txn) => {
     const typeLabel = txn.type === "income" ? "ইনকাম" : "খরচ";
@@ -1194,6 +1198,11 @@ function downloadReportPdf() {
     th, td { border: 1px solid #eaecf0; padding: 8px; text-align: left; font-size: 12px; }
     th { background: #ff014f !important; color: #fff !important; }
     tr:nth-child(even) td { background: #fff4f8; }
+    .totals { margin-top: 14px; border: 1px solid #eaecf0; border-radius: 10px; overflow: hidden; }
+    .totals-row { display: grid; grid-template-columns: repeat(4, 1fr); }
+    .totals-row div { padding: 10px; border-right: 1px solid #eaecf0; font-size: 12px; }
+    .totals-row div:last-child { border-right: 0; }
+    .totals-row strong { display: block; margin-top: 5px; font-size: 14px; color: #101828; }
     @media print { body { margin: 12mm; } }
   </style>
 </head>
@@ -1201,14 +1210,22 @@ function downloadReportPdf() {
   <h1>VaultBudget Report</h1>
   <p class="meta">Generated: ${escapeHtml(new Date().toLocaleString("en-BD"))}</p>
   <div class="summary">
-    <div class="card"><div class="label">Income</div><div class="value">${escapeHtml(formatMoney(income))}</div></div>
-    <div class="card"><div class="label">Expense</div><div class="value">${escapeHtml(formatMoney(expense))}</div></div>
-    <div class="card"><div class="label">Balance</div><div class="value">${escapeHtml(formatMoney(income - expense))}</div></div>
+    <div class="card"><div class="label">Income</div><div class="value">${escapeHtml(formatMoney(totalIncome))}</div></div>
+    <div class="card"><div class="label">Expense</div><div class="value">${escapeHtml(formatMoney(totalExpense))}</div></div>
+    <div class="card"><div class="label">Balance</div><div class="value">${escapeHtml(formatMoney(totalBalance))}</div></div>
   </div>
   <table>
     <thead><tr><th>Time</th><th>Type</th><th>Category</th><th>Amount</th></tr></thead>
     <tbody>${rows || "<tr><td colspan='4'>No transactions yet</td></tr>"}</tbody>
   </table>
+  <div class="totals">
+    <div class="totals-row">
+      <div>মোট ইনকাম<strong>${escapeHtml(formatMoney(totalIncome))}</strong></div>
+      <div>মোট খরচ<strong>${escapeHtml(formatMoney(totalExpense))}</strong></div>
+      <div>মোট ব্যালেন্স<strong>${escapeHtml(formatMoney(totalBalance))}</strong></div>
+      <div>মোট রেকর্ড<strong>${escapeHtml(String(totalRecords))}</strong></div>
+    </div>
+  </div>
 </body>
 </html>`;
 
