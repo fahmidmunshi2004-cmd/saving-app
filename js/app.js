@@ -1382,24 +1382,86 @@ googleLoginBtn.addEventListener("click", async () => {
 
 clearDataBtn.addEventListener("click", async () => {
   const isGroupMember = !!currentSession?.groupId;
-  const promptText = isGroupMember
-    ? "This will clear only your app data/session on this device. Group data will stay safe. Continue?"
-    : "This will clear only your app data/session on this device. Continue?";
+  const isAdmin = isGroupMember && isCurrentAdmin();
+  const promptText = isAdmin
+    ? "You are admin. This will delete full group data for everyone, then logout. Continue?"
+    : isGroupMember
+      ? "This will remove only your group access + your data, then logout. Continue?"
+      : "This will clear your account data and logout. Continue?";
   const ok = await appConfirm(promptText, "Clear Data");
   if (!ok) return;
   let remoteClearError = "";
   showLoader("Resetting data...");
   try {
-    // Clear only personal cloud doc for non-group Gmail users.
-    // Group data is intentionally never deleted from this action.
     try {
       if (db) {
-        if (!isGroupMember && firebaseUser?.uid) {
+        if (isAdmin && currentSession?.groupId) {
+          const groupId = currentSession.groupId;
+          const myMemberId = currentSession.memberId || (firebaseUser?.uid ? `gmail_${firebaseUser.uid}` : "");
+
+          // 1) Clear pending invites for this group.
+          const inviteSnap = await db.collection("invitations").where("groupId", "==", groupId).get();
+          for (const doc of inviteSnap.docs) {
+            await doc.ref.delete();
+          }
+
+          // 2) Clear access requests for this group.
+          const reqSnap = await db.collection("accessRequests").where("groupId", "==", groupId).get();
+          for (const doc of reqSnap.docs) {
+            await doc.ref.delete();
+          }
+
+          // 3) Delete all member rows.
+          const membersSnap = await db.collection("groupMembers").where("groupId", "==", groupId).get();
+          for (const doc of membersSnap.docs) {
+            if (doc.id !== `${groupId}__${myMemberId}`) {
+              await doc.ref.delete();
+            }
+          }
+
+          // 4) Delete shared finance + group meta.
+          await db.collection("groupFinance").doc(groupId).delete();
+          await db.collection("groups").doc(groupId).delete();
+
+          // 5) Delete my group user credential rows (if any).
+          const myUserRows = await db
+            .collection("groupUsers")
+            .where("groupId", "==", groupId)
+            .where("memberId", "==", myMemberId)
+            .get();
+          for (const doc of myUserRows.docs) {
+            await doc.ref.delete();
+          }
+
+          // 6) Delete my own membership last.
+          const selfMemberDocId = `${groupId}__${myMemberId}`;
+          await db.collection("groupMembers").doc(selfMemberDocId).delete();
+
+          if (firebaseUser?.uid) {
+            await db.collection("userFinance").doc(firebaseUser.uid).delete();
+          }
+        } else if (isGroupMember && currentSession?.groupId && currentSession?.memberId) {
+          const groupId = currentSession.groupId;
+          const memberDocId = `${groupId}__${currentSession.memberId}`;
+          await db.collection("groupMembers").doc(memberDocId).delete();
+
+          const myReqSnap = await db
+            .collection("accessRequests")
+            .where("groupId", "==", groupId)
+            .where("fromMemberId", "==", currentSession.memberId)
+            .get();
+          for (const doc of myReqSnap.docs) {
+            await doc.ref.delete();
+          }
+
+          if (firebaseUser?.uid) {
+            await db.collection("userFinance").doc(firebaseUser.uid).delete();
+          }
+        } else if (firebaseUser?.uid) {
           await db.collection("userFinance").doc(firebaseUser.uid).delete();
         }
       }
     } catch (err) {
-      // If remote delete fails, continue local cleanup + logout.
       remoteClearError = err?.message || "Remote clear failed";
     }
 
@@ -1427,7 +1489,7 @@ clearDataBtn.addEventListener("click", async () => {
     if (remoteClearError) {
       appAlert(`Local reset complete, but cloud data delete failed: ${remoteClearError}`);
     } else {
-      appAlert("Your app reset is complete. Group data was kept safe.");
+      appAlert("Clear all data complete. Logged out successfully.");
     }
   } finally {
     hideLoader();
