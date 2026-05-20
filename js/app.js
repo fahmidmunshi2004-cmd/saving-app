@@ -379,6 +379,10 @@ let loginProgress = false;
 function finalizeLoginFlow() {
   if (!loginProgress) return;
   loginProgress = false;
+  if (googleLoginBtn) {
+    googleLoginBtn.disabled = false;
+    googleLoginBtn.style.opacity = "";
+  }
   hideLoader();
 }
 
@@ -1420,8 +1424,11 @@ groupActionSubmitBtn.addEventListener("click", async () => {
 });
 
 googleLoginBtn.addEventListener("click", async () => {
+  if (loginProgress) return;
   try {
     loginProgress = true;
+    googleLoginBtn.disabled = true;
+    googleLoginBtn.style.opacity = "0.7";
     showLoader("Signing in with Google...");
     await auth.signInWithPopup(googleProvider);
   } catch (error) {
