@@ -268,20 +268,57 @@ function applyAuthState() {
   refreshSettingsPanels();
 }
 
+function normalizeInviteEmail(value) {
+  const raw = String(value || "").trim().toLowerCase();
+  const atIndex = raw.indexOf("@");
+  if (atIndex < 1) return raw;
+
+  const local = raw.slice(0, atIndex);
+  const domain = raw.slice(atIndex + 1);
+  if (domain !== "gmail.com") return raw;
+
+  const plusIndex = local.indexOf("+");
+  const cleanedLocal = (plusIndex >= 0 ? local.slice(0, plusIndex) : local).replace(/\./g, "");
+  return `${cleanedLocal}@${domain}`;
+}
+
+const INVITE_EXPIRY_MS = 24 * 60 * 60 * 1000;
+
 async function processInviteLink() {
   if (!firebaseUser || !db) return;
   const params = new URLSearchParams(window.location.search);
   const token = params.get("inviteToken");
   const groupId = params.get("groupId");
-  const invitedEmail = params.get("email");
-  if (!token || !groupId || !invitedEmail) return;
-  if (firebaseUser.email?.toLowerCase() !== invitedEmail.toLowerCase()) return;
+  if (!token || !groupId) return;
 
   const invRef = db.collection("invitations").doc(token);
   const invSnap = await invRef.get();
   if (!invSnap.exists) return;
   const inv = invSnap.data();
   if (inv.status !== "pending" || inv.groupId !== groupId) return;
+
+  const expiresAtMs = inv.expiresAt?.toMillis?.();
+  const createdAtMs = inv.createdAt?.toMillis?.();
+  const isExpiredByExpiresAt = !!expiresAtMs && Date.now() > expiresAtMs;
+  const isExpiredByCreatedAt = !!createdAtMs && (Date.now() - createdAtMs) > INVITE_EXPIRY_MS;
+  if (isExpiredByExpiresAt || isExpiredByCreatedAt) {
+    await invRef.update({
+      status: "expired",
+      expiredAt: firebase.firestore.FieldValue.serverTimestamp()
+    }).catch(() => { });
+    appAlert("এই invite link-এর সময় শেষ হয়ে গেছে। Admin থেকে নতুন invite নিন।", "Invite Expired");
+    return;
+  }
+
+  const invitedEmail = String(inv.email || "").trim().toLowerCase();
+  if (invitedEmail) {
+    const currentUserEmail = String(firebaseUser.email || "").trim().toLowerCase();
+    const emailMatched = normalizeInviteEmail(currentUserEmail) === normalizeInviteEmail(invitedEmail);
+    if (!emailMatched) {
+      appAlert(`এই invite ${invitedEmail} এর জন্য। আপনি ${currentUserEmail || "unknown"} দিয়ে login করেছেন।`, "Invite Mismatch");
+      return;
+    }
+  }
 
   const memberId = `gmail_${firebaseUser.uid}`;
   const memberDocId = `${groupId}__${memberId}`;
@@ -314,7 +351,6 @@ async function processInviteLink() {
 
   params.delete("inviteToken");
   params.delete("groupId");
-  params.delete("email");
   history.replaceState({}, "", `${location.pathname}${params.toString() ? `?${params.toString()}` : ""}`);
 }
 
@@ -338,68 +374,80 @@ async function resolveMembershipForUser(memberId, preferredGroupId = "") {
   return memberships[0];
 }
 
+let loginProgress = false;
+
+function finalizeLoginFlow() {
+  if (!loginProgress) return;
+  loginProgress = false;
+  hideLoader();
+}
+
 async function handleGoogleAuthUser(user) {
   firebaseUser = user || null;
-  if (!firebaseUser) {
-    if (currentSession?.type === "gmail") {
-      currentSession = null;
-      saveSession();
-    }
-    applyAuthState();
-    return;
-  }
-
-  await processInviteLink();
-
-  if (currentSession?.type === "gmail" && currentSession.uid === firebaseUser.uid) {
-    if (currentSession.groupId) {
-      const latestMember = await resolveMembershipForUser(`gmail_${firebaseUser.uid}`, currentSession.groupId);
-      if (latestMember) {
-        currentSession.role = latestMember.role || currentSession.role || "viewer";
-        currentSession.canEdit = !!latestMember.canEdit;
-        saveSession();
-      } else {
-        currentSession.groupId = "";
-        currentSession.memberId = "";
-        currentSession.role = "personal";
-        currentSession.canEdit = true;
+  try {
+    if (!firebaseUser) {
+      if (currentSession?.type === "gmail") {
+        currentSession = null;
         saveSession();
       }
-      await loadGroupSharedData();
-      syncTransactionState();
-      updateUI();
+      applyAuthState();
+      return;
     }
+
+    await processInviteLink();
+
+    if (currentSession?.type === "gmail" && currentSession.uid === firebaseUser.uid) {
+      if (currentSession.groupId) {
+        const latestMember = await resolveMembershipForUser(`gmail_${firebaseUser.uid}`, currentSession.groupId);
+        if (latestMember) {
+          currentSession.role = latestMember.role || currentSession.role || "viewer";
+          currentSession.canEdit = !!latestMember.canEdit;
+          saveSession();
+        } else {
+          currentSession.groupId = "";
+          currentSession.memberId = "";
+          currentSession.role = "personal";
+          currentSession.canEdit = true;
+          saveSession();
+        }
+        await loadGroupSharedData();
+        syncTransactionState();
+        updateUI();
+      }
+      applyAuthState();
+      return;
+    }
+
+    const memberId = `gmail_${firebaseUser.uid}`;
+    const m = await resolveMembershipForUser(memberId, currentSession?.groupId || "");
+    if (m) {
+      currentSession = {
+        type: "gmail",
+        uid: firebaseUser.uid,
+        email: firebaseUser.email,
+        groupId: m.groupId,
+        memberId,
+        role: m.role || "viewer",
+        canEdit: !!m.canEdit
+      };
+    } else {
+      currentSession = {
+        type: "gmail",
+        uid: firebaseUser.uid,
+        email: firebaseUser.email,
+        role: "personal",
+        canEdit: true
+      };
+    }
+
+    saveSession();
+    await loadGroupSharedData();
+    syncTransactionState();
+    updateUI();
     applyAuthState();
-    return;
+  } finally {
+    finalizeLoginFlow();
   }
-
-  const memberId = `gmail_${firebaseUser.uid}`;
-  const m = await resolveMembershipForUser(memberId, currentSession?.groupId || "");
-  if (m) {
-    currentSession = {
-      type: "gmail",
-      uid: firebaseUser.uid,
-      email: firebaseUser.email,
-      groupId: m.groupId,
-      memberId,
-      role: m.role || "viewer",
-      canEdit: !!m.canEdit
-    };
-  } else {
-    currentSession = {
-      type: "gmail",
-      uid: firebaseUser.uid,
-      email: firebaseUser.email,
-      role: "personal",
-      canEdit: true
-    };
-  }
-
-  saveSession();
-  await loadGroupSharedData();
-  syncTransactionState();
-  updateUI();
-  applyAuthState();
 }
 
 function openGroupActionForm(mode = "create") {
@@ -567,11 +615,12 @@ async function sendInviteToGmail() {
     groupId: currentSession.groupId,
     email,
     status: "pending",
+    expiresAt: firebase.firestore.Timestamp.fromMillis(Date.now() + INVITE_EXPIRY_MS),
     createdBy: currentSession.memberId,
     createdAt: firebase.firestore.FieldValue.serverTimestamp()
   });
 
-  const link = `${location.origin}${location.pathname}?groupId=${encodeURIComponent(currentSession.groupId)}&inviteToken=${encodeURIComponent(token)}&email=${encodeURIComponent(email)}`;
+  const link = `${location.origin}${location.pathname}?groupId=${encodeURIComponent(currentSession.groupId)}&inviteToken=${encodeURIComponent(token)}`;
   const subjectText = "VaultBudget Group Invite";
   const bodyText = `Please join my group account. Click this link: ${link}`;
   const subject = encodeURIComponent(subjectText);
@@ -1372,10 +1421,11 @@ groupActionSubmitBtn.addEventListener("click", async () => {
 
 googleLoginBtn.addEventListener("click", async () => {
   try {
-    await withLoader("Signing in with Google...", async () => {
-      await auth.signInWithPopup(googleProvider);
-    });
+    loginProgress = true;
+    showLoader("Signing in with Google...");
+    await auth.signInWithPopup(googleProvider);
   } catch (error) {
+    finalizeLoginFlow();
     appAlert(error?.message || "Google login failed.");
   }
 });
