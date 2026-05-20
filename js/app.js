@@ -494,17 +494,20 @@ async function createGroupFromGmail() {
 
   const unameKey = normalizeUsername(username);
   const userRef = db.collection("groupUsers").doc(unameKey);
-  const userSnap = await userRef.get();
+  const ownedGroupQuery = db
+    .collection("groups")
+    .where("createdByEmail", "==", (firebaseUser.email || "").toLowerCase())
+    .limit(1);
+  const [userSnap, ownedGroupSnap] = await Promise.all([
+    userRef.get(),
+    ownedGroupQuery.get()
+  ]);
+
   if (userSnap.exists) {
     appAlert("এই group username already আছে।");
     return;
   }
 
-  const ownedGroupSnap = await db
-    .collection("groups")
-    .where("createdByEmail", "==", (firebaseUser.email || "").toLowerCase())
-    .limit(1)
-    .get();
   if (!ownedGroupSnap.empty) {
     appAlert("আপনার Gmail দিয়ে already group account তৈরি আছে।");
     return;
@@ -513,35 +516,50 @@ async function createGroupFromGmail() {
   const groupRef = db.collection("groups").doc();
   const groupId = groupRef.id;
   const memberId = `gmail_${firebaseUser.uid}`;
+  const memberRef = db.collection("groupMembers").doc(`${groupId}__${memberId}`);
+  const financeRef = db.collection("groupFinance").doc(groupId);
+  const now = firebase.firestore.FieldValue.serverTimestamp();
 
-  await groupRef.set({
+  const batch = db.batch();
+  batch.set(groupRef, {
     id: groupId,
     adminUsername: username,
     adminUsernameLower: unameKey,
     createdByEmail: (firebaseUser.email || "").toLowerCase(),
     createdByUid: firebaseUser.uid,
-    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    createdAt: now
   });
 
-  await userRef.set({
+  batch.set(userRef, {
     username,
     password,
     groupId,
     role: "admin",
     canEdit: true,
     memberId,
-    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    createdAt: now
   });
 
-  await db.collection("groupMembers").doc(`${groupId}__${memberId}`).set({
+  batch.set(memberRef, {
     groupId,
     memberId,
     type: "gmail",
     label: firebaseUser.email || username,
     role: "admin",
     canEdit: true,
-    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    createdAt: now
   }, { merge: true });
+
+  batch.set(financeRef, {
+    income: 0,
+    expense: 0,
+    breakdown: {},
+    transactions: [],
+    deletedTransactions: [],
+    createdAt: now,
+    updatedAt: now
+  }, { merge: true });
+  await batch.commit();
 
   currentSession = {
     type: "gmail",
@@ -553,7 +571,11 @@ async function createGroupFromGmail() {
     canEdit: true
   };
   saveSession();
-  await loadGroupSharedData();
+  income = 0;
+  expense = 0;
+  Object.keys(breakdown).forEach((k) => delete breakdown[k]);
+  transactions.length = 0;
+  deletedTransactions.length = 0;
   syncTransactionState();
   updateUI();
   applyAuthState();
