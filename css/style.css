@@ -130,6 +130,90 @@ body {
     display: none !important;
 }
 
+.app-boot-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 5000;
+    display: grid;
+    place-items: center;
+    padding: 20px;
+    background:
+        radial-gradient(560px 300px at 12% 8%, rgba(255, 1, 79, 0.2), transparent 68%),
+        radial-gradient(500px 260px at 86% 90%, rgba(27, 162, 219, 0.22), transparent 70%),
+        linear-gradient(160deg, #f4f8ff, #eef4ff 45%, #f9fbff);
+    transition: opacity 0.35s ease, visibility 0.35s ease;
+}
+
+.app-boot-overlay.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.app-boot-card {
+    width: min(430px, 100%);
+    text-align: center;
+    padding: 24px 18px 20px;
+    border-radius: 22px;
+    background: linear-gradient(160deg, rgba(255, 255, 255, 0.96), rgba(244, 248, 255, 0.94));
+    border: 1px solid rgba(255, 255, 255, 0.85);
+    box-shadow:
+        0 20px 42px rgba(18, 34, 58, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.78);
+}
+
+.app-boot-logo {
+    width: 68px;
+    height: 68px;
+    margin: 0 auto 12px;
+    border-radius: 20px;
+    display: grid;
+    place-items: center;
+    color: #ffffff;
+    font-size: 1.5rem;
+    background: linear-gradient(130deg, var(--brand), var(--brand-2));
+    box-shadow:
+        0 16px 32px rgba(255, 1, 79, 0.34),
+        inset 0 1px 0 rgba(255, 255, 255, 0.42);
+    animation: bootFloat 1.25s ease-in-out infinite;
+}
+
+.app-boot-card h2 {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: 1.16rem;
+    letter-spacing: 0.25px;
+    color: var(--text);
+}
+
+.app-boot-card p {
+    margin: 8px 0 14px;
+    color: var(--muted);
+    font-size: 0.9rem;
+}
+
+.app-boot-line {
+    display: block;
+    width: 100%;
+    height: 6px;
+    border-radius: 999px;
+    background: rgba(203, 216, 235, 0.68);
+    position: relative;
+    overflow: hidden;
+}
+
+.app-boot-line::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -36%;
+    width: 36%;
+    height: 100%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, rgba(255, 1, 79, 0.18), rgba(255, 1, 79, 0.9));
+    animation: bootScan 1.05s ease-in-out infinite;
+}
+
 .login-overlay {
     position: fixed;
     inset: 0;
@@ -1262,6 +1346,27 @@ input:not(:placeholder-shown)+.floating-label {
 
     50% {
         transform: scale(1);
+    }
+}
+
+@keyframes bootFloat {
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-4px);
+    }
+}
+
+@keyframes bootScan {
+    0% {
+        left: -36%;
+    }
+
+    100% {
+        left: 100%;
     }
 }
 

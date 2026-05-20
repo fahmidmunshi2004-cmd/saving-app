@@ -268,6 +268,19 @@ function applyAuthState() {
   refreshSettingsPanels();
 }
 
+let bootOverlayClosed = false;
+
+function hideBootOverlay() {
+  if (bootOverlayClosed || !appBootOverlay) return;
+  bootOverlayClosed = true;
+  appBootOverlay.style.opacity = "0";
+  appBootOverlay.style.visibility = "hidden";
+  appBootOverlay.style.pointerEvents = "none";
+  setTimeout(() => {
+    appBootOverlay.classList.add("hidden");
+  }, 420);
+}
+
 function normalizeInviteEmail(value) {
   const raw = String(value || "").trim().toLowerCase();
   const atIndex = raw.indexOf("@");
@@ -451,6 +464,7 @@ async function handleGoogleAuthUser(user) {
     applyAuthState();
   } finally {
     finalizeLoginFlow();
+    hideBootOverlay();
   }
 }
 

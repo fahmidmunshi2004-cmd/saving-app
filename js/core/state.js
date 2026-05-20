@@ -14,6 +14,7 @@ const root = document.documentElement;
 const authInfo = document.getElementById("authInfo");
 const loginOverlay = document.getElementById("loginOverlay");
 const googleLoginBtn = document.getElementById("googleLoginBtn");
+const appBootOverlay = document.getElementById("appBootOverlay");
 const appLoader = document.getElementById("appLoader");
 const loaderText = document.getElementById("loaderText");
 const appModal = document.getElementById("appModal");
