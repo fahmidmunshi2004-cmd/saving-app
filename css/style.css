@@ -155,10 +155,12 @@ body {
     text-align: center;
     padding: 24px 18px 20px;
     border-radius: 22px;
-    background: linear-gradient(160deg, rgba(255, 255, 255, 0.96), rgba(244, 248, 255, 0.94));
+    background:
+        radial-gradient(130% 100% at 0% 0%, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.82) 55%, rgba(244, 248, 255, 0.94)),
+        linear-gradient(160deg, rgba(255, 255, 255, 0.96), rgba(244, 248, 255, 0.94));
     border: 1px solid rgba(255, 255, 255, 0.85);
     box-shadow:
-        0 20px 42px rgba(18, 34, 58, 0.2),
+        0 24px 46px rgba(18, 34, 58, 0.22),
         inset 0 1px 0 rgba(255, 255, 255, 0.78);
 }
 
@@ -169,7 +171,7 @@ body {
     display: grid;
     place-items: center;
     filter: drop-shadow(0 14px 24px rgba(255, 1, 79, 0.22));
-    animation: bootFloat 1.3s ease-in-out infinite;
+    animation: bootFloat 1.6s ease-in-out infinite;
 }
 
 .app-boot-svg {
@@ -181,15 +183,24 @@ body {
 .boot-orbit {
     fill: none;
     stroke: rgba(255, 1, 79, 0.28);
-    stroke-width: 4;
-    stroke-dasharray: 36 14;
+    stroke-width: 3.2;
+    stroke-dasharray: 22 12;
     transform-origin: 60px 60px;
-    animation: bootOrbit 2.2s linear infinite;
+}
+
+.boot-orbit-a {
+    animation: bootOrbit 2.6s linear infinite;
+}
+
+.boot-orbit-b {
+    stroke: rgba(27, 162, 219, 0.36);
+    stroke-dasharray: 14 10;
+    animation: bootOrbitReverse 2s linear infinite;
 }
 
 .boot-safe {
     transform-origin: 60px 66px;
-    animation: bootPop 1.3s ease-in-out infinite;
+    animation: bootSafePulse 1.6s ease-in-out infinite;
 }
 
 .boot-shackle {
@@ -197,14 +208,14 @@ body {
     stroke: #ff014f;
     stroke-width: 5;
     stroke-linecap: round;
-    stroke-dasharray: 68;
-    stroke-dashoffset: 68;
-    animation: bootDraw 1.6s ease-out infinite;
+    stroke-dasharray: 72;
+    stroke-dashoffset: 72;
+    animation: bootDrawWave 1.6s ease-in-out infinite;
 }
 
 .boot-core {
     fill: #ffffff;
-    animation: bootPulse 1.3s ease-in-out infinite;
+    animation: bootCoreFlash 1.6s ease-in-out infinite;
 }
 
 .boot-keyline {
@@ -248,7 +259,7 @@ body {
     height: 100%;
     border-radius: 999px;
     background: linear-gradient(90deg, rgba(255, 1, 79, 0.18), rgba(255, 1, 79, 0.9));
-    animation: bootScan 1.05s ease-in-out infinite;
+    animation: bootScan 1.2s cubic-bezier(.4, 0, .2, 1) infinite;
 }
 
 .login-overlay {
@@ -1413,38 +1424,58 @@ input:not(:placeholder-shown)+.floating-label {
     }
 }
 
-@keyframes bootDraw {
-    0% {
-        stroke-dashoffset: 68;
-    }
-
-    40%,
-    100% {
-        stroke-dashoffset: 0;
+@keyframes bootOrbitReverse {
+    to {
+        transform: rotate(-360deg);
     }
 }
 
-@keyframes bootPulse {
+@keyframes bootDrawWave {
+    0% {
+        stroke-dashoffset: 72;
+    }
+
+    45%,
+    75% {
+        stroke-dashoffset: 0;
+    }
+
+    100% {
+        stroke-dashoffset: -72;
+    }
+}
+
+@keyframes bootCoreFlash {
     0%,
     100% {
         opacity: 1;
         transform: scale(1);
     }
 
-    50% {
-        opacity: 0.72;
-        transform: scale(0.9);
+    30% {
+        opacity: 0.66;
+        transform: scale(0.88);
+    }
+
+    55% {
+        opacity: 1;
+        transform: scale(1.08);
+    }
+
+    75% {
+        opacity: 0.82;
+        transform: scale(0.95);
     }
 }
 
-@keyframes bootPop {
+@keyframes bootSafePulse {
     0%,
     100% {
-        transform: translateY(0);
+        transform: translateY(0) scale(1);
     }
 
     50% {
-        transform: translateY(-1.5px);
+        transform: translateY(-1px) scale(1.04);
     }
 }
 
