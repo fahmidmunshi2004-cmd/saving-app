@@ -271,23 +271,7 @@ h1 {
         inset 0 1px 0 rgba(255, 255, 255, 0.7),
         inset 0 -10px 22px rgba(196, 211, 234, 0.18);
     transform: perspective(1200px) translateZ(0);
-    transition: transform 0.22s ease, box-shadow 0.24s ease, border-color 0.22s ease, filter 0.22s ease;
-}
-
-.stat:hover,
-.box:hover,
-.history:hover,
-.chart-card:hover,
-.wallet-item:hover,
-.settings-item:hover,
-.list li:hover {
-    transform: perspective(1200px) translateY(-6px) translateZ(24px);
-    border-color: color-mix(in srgb, var(--brand) 30%, var(--stroke));
-    box-shadow:
-        var(--float-shadow-lift),
-        inset 0 1px 0 rgba(255, 255, 255, 0.82),
-        inset 0 -12px 24px rgba(193, 209, 236, 0.24);
-    filter: saturate(1.04);
+    transition: box-shadow 0.22s ease, border-color 0.22s ease;
 }
 
 .label {
@@ -1359,8 +1343,8 @@ input:not(:placeholder-shown)+.floating-label {
     .wallet-item:hover,
     .settings-item:hover,
     .list li:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 14px 24px rgba(17, 27, 44, 0.15), 0 6px 14px rgba(17, 27, 44, 0.1);
+        transform: none;
+        box-shadow: 0 10px 18px rgba(17, 27, 44, 0.12), 0 3px 8px rgba(17, 27, 44, 0.08);
     }
 
     .app-loader,
