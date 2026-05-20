@@ -31,7 +31,21 @@
 <body>
     <section id="appBootOverlay" class="app-boot-overlay" aria-live="polite" aria-label="App is loading">
         <div class="app-boot-card">
-            <div class="app-boot-logo"><i class="fa-solid fa-vault"></i></div>
+            <div class="app-boot-svg-wrap" aria-hidden="true">
+                <svg class="app-boot-svg" viewBox="0 0 120 120" role="img">
+                    <defs>
+                        <linearGradient id="bootGrad" x1="0" y1="0" x2="1" y2="1">
+                            <stop offset="0%" stop-color="#ff014f" />
+                            <stop offset="100%" stop-color="#d11414" />
+                        </linearGradient>
+                    </defs>
+                    <circle class="boot-orbit" cx="60" cy="60" r="46"></circle>
+                    <rect class="boot-safe" x="28" y="42" width="64" height="48" rx="12" fill="url(#bootGrad)"></rect>
+                    <path class="boot-shackle" d="M38 42v-8a22 22 0 0 1 44 0v8"></path>
+                    <circle class="boot-core" cx="60" cy="64" r="6"></circle>
+                    <path class="boot-keyline" d="M60 70v9"></path>
+                </svg>
+            </div>
             <h2>VaultBudget Prime</h2>
             <p>Preparing your secure workspace...</p>
             <span class="app-boot-line" aria-hidden="true"></span>

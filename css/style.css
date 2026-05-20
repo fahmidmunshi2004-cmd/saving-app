@@ -162,20 +162,57 @@ body {
         inset 0 1px 0 rgba(255, 255, 255, 0.78);
 }
 
-.app-boot-logo {
-    width: 68px;
-    height: 68px;
-    margin: 0 auto 12px;
-    border-radius: 20px;
+.app-boot-svg-wrap {
+    width: 96px;
+    height: 96px;
+    margin: 0 auto 10px;
     display: grid;
     place-items: center;
-    color: #ffffff;
-    font-size: 1.5rem;
-    background: linear-gradient(130deg, var(--brand), var(--brand-2));
-    box-shadow:
-        0 16px 32px rgba(255, 1, 79, 0.34),
-        inset 0 1px 0 rgba(255, 255, 255, 0.42);
-    animation: bootFloat 1.25s ease-in-out infinite;
+    filter: drop-shadow(0 14px 24px rgba(255, 1, 79, 0.22));
+    animation: bootFloat 1.3s ease-in-out infinite;
+}
+
+.app-boot-svg {
+    width: 96px;
+    height: 96px;
+    overflow: visible;
+}
+
+.boot-orbit {
+    fill: none;
+    stroke: rgba(255, 1, 79, 0.28);
+    stroke-width: 4;
+    stroke-dasharray: 36 14;
+    transform-origin: 60px 60px;
+    animation: bootOrbit 2.2s linear infinite;
+}
+
+.boot-safe {
+    transform-origin: 60px 66px;
+    animation: bootPop 1.3s ease-in-out infinite;
+}
+
+.boot-shackle {
+    fill: none;
+    stroke: #ff014f;
+    stroke-width: 5;
+    stroke-linecap: round;
+    stroke-dasharray: 68;
+    stroke-dashoffset: 68;
+    animation: bootDraw 1.6s ease-out infinite;
+}
+
+.boot-core {
+    fill: #ffffff;
+    animation: bootPulse 1.3s ease-in-out infinite;
+}
+
+.boot-keyline {
+    fill: none;
+    stroke: #ffffff;
+    stroke-width: 3;
+    stroke-linecap: round;
+    animation: bootPulse 1.3s ease-in-out infinite;
 }
 
 .app-boot-card h2 {
@@ -1367,6 +1404,47 @@ input:not(:placeholder-shown)+.floating-label {
 
     100% {
         left: 100%;
+    }
+}
+
+@keyframes bootOrbit {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes bootDraw {
+    0% {
+        stroke-dashoffset: 68;
+    }
+
+    40%,
+    100% {
+        stroke-dashoffset: 0;
+    }
+}
+
+@keyframes bootPulse {
+    0%,
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    50% {
+        opacity: 0.72;
+        transform: scale(0.9);
+    }
+}
+
+@keyframes bootPop {
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-1.5px);
     }
 }
 
