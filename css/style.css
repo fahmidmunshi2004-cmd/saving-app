@@ -83,6 +83,9 @@
     --hero-grad: #ffffff;
     --font-body: var(--font-primary);
     --font-display: var(--font-secondary);
+    --float-shadow-rest: 0 14px 26px rgba(23, 33, 52, 0.16), 0 3px 8px rgba(20, 30, 48, 0.1);
+    --float-shadow-lift: 0 24px 38px rgba(18, 28, 46, 0.22), 0 10px 18px rgba(24, 34, 54, 0.14);
+    --float-border: 1px solid rgba(255, 255, 255, 0.76);
 }
 
 * {
@@ -141,10 +144,8 @@ body {
 
 .login-card {
     width: min(420px, 100%);
-    border: none;
     border-radius: 16px;
     background: var(--surface);
-    box-shadow: var(--shadow-white-3);
     padding: 16px;
 }
 
@@ -251,32 +252,42 @@ h1 {
 .stat,
 .box,
 .history,
+.chart-card,
 .wallet-item,
 .settings-item,
+.wallet-rate-chart-card,
+.login-card,
+.loader-card,
+.modal-card,
 .note,
 .list li {
     background:
         linear-gradient(165deg, color-mix(in srgb, #fff 88%, var(--surface-soft) 12%), var(--surface-soft));
-    border: none;
+    border: var(--float-border);
     border-radius: 16px;
     padding: 12px;
     box-shadow:
-        0 8px 18px rgba(0, 0, 0, 0.11),
-        inset 0 1px 0 rgba(255, 255, 255, 0.62);
-    transition: transform 0.18s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+        var(--float-shadow-rest),
+        inset 0 1px 0 rgba(255, 255, 255, 0.7),
+        inset 0 -10px 22px rgba(196, 211, 234, 0.18);
+    transform: perspective(1200px) translateZ(0);
+    transition: transform 0.22s ease, box-shadow 0.24s ease, border-color 0.22s ease, filter 0.22s ease;
 }
 
 .stat:hover,
 .box:hover,
 .history:hover,
+.chart-card:hover,
 .wallet-item:hover,
 .settings-item:hover,
 .list li:hover {
-    transform: translateY(-2px);
+    transform: perspective(1200px) translateY(-6px) translateZ(24px);
     border-color: color-mix(in srgb, var(--brand) 30%, var(--stroke));
     box-shadow:
-        0 14px 26px rgba(0, 0, 0, 0.16),
-        inset 0 1px 0 rgba(255, 255, 255, 0.78);
+        var(--float-shadow-lift),
+        inset 0 1px 0 rgba(255, 255, 255, 0.82),
+        inset 0 -12px 24px rgba(193, 209, 236, 0.24);
+    filter: saturate(1.04);
 }
 
 .label {
@@ -1338,17 +1349,18 @@ input:not(:placeholder-shown)+.floating-label {
     .note,
     .list li,
     .chart-card {
-        box-shadow: 0 6px 14px rgba(0, 0, 0, 0.09);
+        box-shadow: 0 10px 18px rgba(17, 27, 44, 0.12), 0 3px 8px rgba(17, 27, 44, 0.08);
     }
 
     .stat:hover,
     .box:hover,
     .history:hover,
+    .chart-card:hover,
     .wallet-item:hover,
     .settings-item:hover,
     .list li:hover {
-        transform: none;
-        box-shadow: 0 6px 14px rgba(0, 0, 0, 0.09);
+        transform: translateY(-2px);
+        box-shadow: 0 14px 24px rgba(17, 27, 44, 0.15), 0 6px 14px rgba(17, 27, 44, 0.1);
     }
 
     .app-loader,
