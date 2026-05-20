@@ -181,52 +181,6 @@ body {
     display: block;
 }
 
-.boot-orbit {
-    fill: none;
-    stroke: rgba(255, 1, 79, 0.28);
-    stroke-width: 3.2;
-    stroke-dasharray: 22 12;
-    transform-origin: 60px 60px;
-}
-
-.boot-orbit-a {
-    animation: bootOrbit 2.6s linear infinite;
-}
-
-.boot-orbit-b {
-    stroke: rgba(27, 162, 219, 0.36);
-    stroke-dasharray: 14 10;
-    animation: bootOrbitReverse 2s linear infinite;
-}
-
-.boot-safe {
-    transform-origin: 60px 66px;
-    animation: bootSafePulse 1.6s ease-in-out infinite;
-}
-
-.boot-shackle {
-    fill: none;
-    stroke: #ff014f;
-    stroke-width: 5;
-    stroke-linecap: round;
-    stroke-dasharray: 72;
-    stroke-dashoffset: 72;
-    animation: bootDrawWave 1.6s ease-in-out infinite;
-}
-
-.boot-core {
-    fill: #ffffff;
-    animation: bootCoreFlash 1.6s ease-in-out infinite;
-}
-
-.boot-keyline {
-    fill: none;
-    stroke: #ffffff;
-    stroke-width: 3;
-    stroke-linecap: round;
-    animation: bootPulse 1.3s ease-in-out infinite;
-}
-
 .app-boot-card h2 {
     margin: 0;
     font-family: var(--font-display);
@@ -1398,17 +1352,6 @@ input:not(:placeholder-shown)+.floating-label {
     }
 }
 
-@keyframes bootFloat {
-    0%,
-    100% {
-        transform: translateY(0);
-    }
-
-    50% {
-        transform: translateY(-4px);
-    }
-}
-
 @keyframes bootScan {
     0% {
         left: -36%;
@@ -1416,67 +1359,6 @@ input:not(:placeholder-shown)+.floating-label {
 
     100% {
         left: 100%;
-    }
-}
-
-@keyframes bootOrbit {
-    to {
-        transform: rotate(360deg);
-    }
-}
-
-@keyframes bootOrbitReverse {
-    to {
-        transform: rotate(-360deg);
-    }
-}
-
-@keyframes bootDrawWave {
-    0% {
-        stroke-dashoffset: 72;
-    }
-
-    45%,
-    75% {
-        stroke-dashoffset: 0;
-    }
-
-    100% {
-        stroke-dashoffset: -72;
-    }
-}
-
-@keyframes bootCoreFlash {
-    0%,
-    100% {
-        opacity: 1;
-        transform: scale(1);
-    }
-
-    30% {
-        opacity: 0.66;
-        transform: scale(0.88);
-    }
-
-    55% {
-        opacity: 1;
-        transform: scale(1.08);
-    }
-
-    75% {
-        opacity: 0.82;
-        transform: scale(0.95);
-    }
-}
-
-@keyframes bootSafePulse {
-    0%,
-    100% {
-        transform: translateY(0) scale(1);
-    }
-
-    50% {
-        transform: translateY(-1px) scale(1.04);
     }
 }
 
