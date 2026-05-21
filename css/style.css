@@ -1446,6 +1446,51 @@ input:not(:placeholder-shown)+.floating-label {
     text-align: center;
 }
 
+.modal-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin: 2px auto 10px;
+    font-size: 1rem;
+}
+
+.modal-icon i {
+    line-height: 1;
+}
+
+.modal-icon-info {
+    color: #0f6bcf;
+    background: color-mix(in srgb, #0f6bcf 14%, #ffffff);
+}
+
+.modal-icon-confirm {
+    color: #9a5c00;
+    background: color-mix(in srgb, #ffb84d 20%, #ffffff);
+}
+
+.modal-icon-success {
+    color: #0d8f52;
+    background: color-mix(in srgb, #13b66b 16%, #ffffff);
+}
+
+.modal-icon-warn,
+.modal-icon-danger {
+    color: #c21a1a;
+    background: color-mix(in srgb, #ff4d6d 16%, #ffffff);
+}
+
+.modal-icon-edit {
+    color: var(--brand);
+    background: color-mix(in srgb, var(--brand) 14%, #ffffff);
+}
+
+.modal-copy {
+    white-space: pre-line;
+}
+
 .modal-message.edit-mode {
     white-space: normal;
     padding-bottom: 8px;
@@ -1453,7 +1498,7 @@ input:not(:placeholder-shown)+.floating-label {
 
 .modal-message .edit-form {
     display: grid;
-    gap: 16px;
+    gap: 0;
     margin-top: 0;
 }
 

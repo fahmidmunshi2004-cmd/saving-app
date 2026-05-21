@@ -889,6 +889,7 @@ function openTransactionEditModal(txnId) {
     modalMessage.className = "modal-message edit-mode";
     modalMessage.innerHTML = `
       <div class="edit-form">
+        <div class="modal-icon modal-icon-edit" aria-hidden="true"><i class="fa-solid fa-pen-to-square"></i></div>
         <div class="edit-meta">Date: ${escapeHtml(txn.time || "-")}</div>
         <div class="field edit-field">
           <input id="editTxnAmount" type="number" min="0" step="0.01" value="${Number(txn.amount || 0)}" placeholder=" " />
