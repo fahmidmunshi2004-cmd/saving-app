@@ -1310,10 +1310,12 @@ input:not(:placeholder-shown)+.floating-label {
 
 #loaderText {
     margin: 14px 0 0;
+    font-family: var(--font-display);
+    font-size: 0.95rem;
     font-weight: 700;
-    letter-spacing: 0.2px;
-    color: var(--text);
-    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
+    letter-spacing: 0.28px;
+    color: color-mix(in srgb, var(--text) 86%, #4b5563 14%);
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.72);
 }
 
 .modal-card h3 {
