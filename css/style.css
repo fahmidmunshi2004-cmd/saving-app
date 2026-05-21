@@ -1,4 +1,4 @@
-:root {
+﻿:root {
     --color-primary: #ff014f;
     --color-secondary: #f4f5f6;
     --color-tertiary: #0d1013;
@@ -1347,32 +1347,26 @@ input:not(:placeholder-shown)+.floating-label {
 
 .modal-card {
     cursor: auto;
-    isolation: isolate;
 }
 
 .modal-card::before {
     content: "";
     position: absolute;
     inset: 0;
+    padding: 4px;
     border-radius: inherit;
+    background: linear-gradient(90deg, var(--brand), #ff5f73, #1BA2DB);
+    -webkit-mask:
+        linear-gradient(#fff 0 0) content-box,
+        linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
     pointer-events: none;
-    box-shadow:
-        inset 0 0 0 3px color-mix(in srgb, var(--brand) 45%, #1BA2DB 30%, #ff30ff 25%),
-        0 0 26px rgba(255, 1, 79, 0.32),
-        0 0 22px rgba(27, 162, 219, 0.28),
-        0 0 18px rgba(255, 48, 255, 0.24);
-    z-index: 0;
-}
-
-.modal-card::after {
-    content: none;
 }
 
 .modal-card h3,
 .modal-message,
 .modal-actions {
-    position: relative;
-    z-index: 1;
     padding: 16px;
 }
 
@@ -2136,4 +2130,3 @@ input:not(:placeholder-shown)+.floating-label {
 #txnEmpty {
     text-align: center;
 }
-
