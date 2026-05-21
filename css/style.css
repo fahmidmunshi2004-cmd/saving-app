@@ -1351,49 +1351,28 @@ input:not(:placeholder-shown)+.floating-label {
 }
 
 .modal-card::before {
-    content: none;
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    box-shadow:
+        inset 0 0 0 1px color-mix(in srgb, var(--brand) 26%, #1BA2DB 18%),
+        0 0 22px rgba(255, 1, 79, 0.16),
+        0 0 18px rgba(27, 162, 219, 0.12);
+    z-index: 0;
 }
 
 .modal-card::after {
     content: none;
 }
 
-.modal-border-svg {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    z-index: 2;
-}
-
-.modal-border-runner {
-    fill: none;
-    stroke: url(#modalBorderGradient);
-    stroke-width: 3;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-    stroke-dasharray: 64 620;
-    animation: modalBorderRun 4.6s linear infinite;
-    shape-rendering: geometricPrecision;
-}
-
-.modal-border-runner.runner-2 {
-    stroke-dashoffset: 342;
-}
-
 .modal-card h3,
 .modal-message,
 .modal-actions {
     position: relative;
-    z-index: 3;
+    z-index: 1;
     padding: 16px;
-}
-
-@keyframes modalBorderRun {
-    to {
-        stroke-dashoffset: -684;
-    }
 }
 
 .loader-card {
