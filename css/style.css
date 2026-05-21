@@ -718,7 +718,8 @@ input:not(:placeholder-shown)+.floating-label {
 }
 
 .table-wrap {
-    overflow-x: auto;
+    overflow: auto;
+    max-height: 560px;
     border: 1px solid color-mix(in srgb, var(--brand) 18%, #e8edf5);
     border-radius: 16px;
     background:
@@ -1683,6 +1684,7 @@ input:not(:placeholder-shown)+.floating-label {
 
     .table-wrap {
         overflow: visible;
+        max-height: none;
         border: 0;
         background: transparent;
         box-shadow: none;
