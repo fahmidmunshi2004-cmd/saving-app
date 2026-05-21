@@ -32,7 +32,21 @@
     <section id="appBootOverlay" class="app-boot-overlay" aria-live="polite" aria-label="App is loading">
         <div class="app-boot-card">
             <div class="app-boot-lottie-wrap" aria-hidden="true">
-                <img class="app-boot-lottie" src="assets/icons/icon-192.svg" alt="VaultBudget loading icon" />
+                <svg class="app-boot-lottie" viewBox="0 0 64 64" role="img" aria-label="VaultBudget logo">
+                    <defs>
+                        <linearGradient id="bootLogoGrad" x1="0" y1="0" x2="1" y2="1">
+                            <stop offset="0%" stop-color="#ff014f" />
+                            <stop offset="100%" stop-color="#d11414" />
+                        </linearGradient>
+                    </defs>
+                    <rect x="6" y="6" width="52" height="52" rx="14" fill="#ffffff" />
+                    <path d="M21 30h22a3 3 0 0 1 3 3v13a4 4 0 0 1-4 4H22a4 4 0 0 1-4-4V33a3 3 0 0 1 3-3z"
+                        fill="url(#bootLogoGrad)" />
+                    <path d="M24 30v-4a8 8 0 1 1 16 0v4" fill="none" stroke="#ff014f" stroke-width="3.4"
+                        stroke-linecap="round" />
+                    <circle cx="32" cy="39" r="2.7" fill="#ffffff" />
+                    <path d="M32 41.7v3.6" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" />
+                </svg>
             </div>
             <h2>VaultBudget Prime</h2>
             <p>Preparing your secure workspace...</p>

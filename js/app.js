@@ -269,16 +269,23 @@ function applyAuthState() {
 }
 
 let bootOverlayClosed = false;
+const BOOT_MIN_SHOW_MS = 1200;
+const bootOverlayShownAt = Date.now();
 
 function hideBootOverlay() {
   if (bootOverlayClosed || !appBootOverlay) return;
-  bootOverlayClosed = true;
-  appBootOverlay.style.opacity = "0";
-  appBootOverlay.style.visibility = "hidden";
-  appBootOverlay.style.pointerEvents = "none";
+  const elapsed = Date.now() - bootOverlayShownAt;
+  const waitMs = Math.max(0, BOOT_MIN_SHOW_MS - elapsed);
   setTimeout(() => {
-    appBootOverlay.classList.add("hidden");
-  }, 420);
+    if (bootOverlayClosed || !appBootOverlay) return;
+    bootOverlayClosed = true;
+    appBootOverlay.style.opacity = "0";
+    appBootOverlay.style.visibility = "hidden";
+    appBootOverlay.style.pointerEvents = "none";
+    setTimeout(() => {
+      appBootOverlay.classList.add("hidden");
+    }, 420);
+  }, waitMs);
 }
 
 function normalizeInviteEmail(value) {
