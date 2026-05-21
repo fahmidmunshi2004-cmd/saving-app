@@ -1367,23 +1367,19 @@ input:not(:placeholder-shown)+.floating-label {
     z-index: 2;
 }
 
-.modal-border-track {
-    fill: none;
-    stroke: rgba(255, 255, 255, 0.12);
-    stroke-width: 2;
-}
-
 .modal-border-runner {
     fill: none;
     stroke: url(#modalBorderGradient);
     stroke-width: 3;
     stroke-linecap: round;
-    stroke-dasharray: 58 520;
-    animation: modalBorderRun 3.2s linear infinite;
+    stroke-linejoin: round;
+    stroke-dasharray: 64 620;
+    animation: modalBorderRun 4.6s linear infinite;
+    shape-rendering: geometricPrecision;
 }
 
 .modal-border-runner.runner-2 {
-    stroke-dashoffset: 290;
+    stroke-dashoffset: 342;
 }
 
 .modal-card h3,
@@ -1396,7 +1392,7 @@ input:not(:placeholder-shown)+.floating-label {
 
 @keyframes modalBorderRun {
     to {
-        stroke-dashoffset: -580;
+        stroke-dashoffset: -684;
     }
 }
 

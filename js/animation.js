@@ -33,9 +33,6 @@
     gradient.appendChild(stop2);
     defs.appendChild(gradient);
 
-    const track = document.createElementNS(ns, 'rect');
-    track.setAttribute('class', 'modal-border-track');
-
     const runner1 = document.createElementNS(ns, 'rect');
     runner1.setAttribute('class', 'modal-border-runner runner-1');
 
@@ -43,7 +40,6 @@
     runner2.setAttribute('class', 'modal-border-runner runner-2');
 
     svg.appendChild(defs);
-    svg.appendChild(track);
     svg.appendChild(runner1);
     svg.appendChild(runner2);
     modalCard.insertBefore(svg, modalCard.firstChild);
@@ -52,7 +48,6 @@
 
   function layoutSvg() {
     const svg = ensureBorderSvg();
-    const track = svg.querySelector('.modal-border-track');
     const runners = svg.querySelectorAll('.modal-border-runner');
 
     const width = modalCard.clientWidth;
@@ -66,12 +61,6 @@
     const y = inset;
     const w = Math.max(0, width - inset * 2);
     const h = Math.max(0, height - inset * 2);
-
-    track.setAttribute('x', String(x));
-    track.setAttribute('y', String(y));
-    track.setAttribute('width', String(w));
-    track.setAttribute('height', String(h));
-    track.setAttribute('rx', String(radius));
 
     runners.forEach((runner) => {
       runner.setAttribute('x', String(x));
