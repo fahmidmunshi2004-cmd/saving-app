@@ -270,6 +270,7 @@ body {
     justify-content: center;
     z-index: 1000;
     padding: 16px;
+    padding-bottom: 4px;
 }
 
 .login-card {
@@ -1358,8 +1359,7 @@ input:not(:placeholder-shown)+.floating-label {
 .modal-card h3,
 .modal-message,
 .modal-actions {
-    padding-left: 16px;
-    padding-right: 16px;
+    padding: 16px;
 }
 
 .loader-card {
@@ -1507,9 +1507,9 @@ input:not(:placeholder-shown)+.floating-label {
 }
 
 .modal-copy-title {
-    margin: 0 0 12px;
+    margin: 0 0 6px;
     font-family: var(--font-display);
-    font-size: 1.12rem;
+    font-size: 24px;
     font-weight: 700;
     color: var(--text);
     text-align: center;
@@ -1570,7 +1570,7 @@ input:not(:placeholder-shown)+.floating-label {
 
 .modal-actions {
     display: grid;
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 6px;
     padding-bottom: 12px;
 }
