@@ -1458,14 +1458,14 @@ input:not(:placeholder-shown)+.floating-label {
 }
 
 .modal-icon {
-    width: 40px;
-    height: 40px;
+    width: 55px;
+    height: 55px;
     border-radius: 12px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     margin: 2px auto 20px;
-    font-size: 1rem;
+    font-size: 24px;
 }
 
 .modal-icon i {
@@ -1573,6 +1573,14 @@ input:not(:placeholder-shown)+.floating-label {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 6px;
     padding-bottom: 12px;
+}
+
+.modal-actions.single-btn {
+    grid-template-columns: 1fr;
+}
+
+.modal-actions.single-btn .btn {
+    grid-column: 1 / -1;
 }
 
 .modal-actions .btn {

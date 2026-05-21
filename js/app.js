@@ -862,6 +862,7 @@ async function restoreDeletedTransaction(txnId) {
 
 function closeEditModalCleanup() {
   modalTitle.classList.remove("hidden");
+  modalOkBtn.parentElement?.classList.add("single-btn");
   modalOkBtn.innerHTML = '<i class="fa-solid fa-check"></i> OK';
   modalCancelBtn.innerHTML = '<i class="fa-solid fa-xmark"></i> Cancel';
   modalCancelBtn.classList.add("hidden");
@@ -884,6 +885,7 @@ function openTransactionEditModal(txnId) {
 
     modalTitle.innerText = "";
     modalTitle.classList.add("hidden");
+    modalOkBtn.parentElement?.classList.remove("single-btn");
     modalCancelBtn.classList.remove("hidden");
     modalOkBtn.innerHTML = '<i class="fa-solid fa-check"></i> Save';
     modalCancelBtn.innerHTML = '<i class="fa-solid fa-xmark"></i> Cancel';

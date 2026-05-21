@@ -267,6 +267,7 @@ function appAlert(message, title = "Notice") {
 
     modalTitle.innerText = "";
     modalTitle.classList.add("hidden");
+    modalOkBtn.parentElement?.classList.add("single-btn");
     modalMessage.className = "modal-message centered";
     modalMessage.innerHTML = buildModalMessageHtml(title, message, false);
     modalCancelBtn.classList.add("hidden");
@@ -296,6 +297,7 @@ function appConfirm(message, title = "Confirm") {
 
     modalTitle.innerText = "";
     modalTitle.classList.add("hidden");
+    modalOkBtn.parentElement?.classList.remove("single-btn");
     modalMessage.className = "modal-message centered";
     modalMessage.innerHTML = buildModalMessageHtml(title, message, true);
     modalCancelBtn.classList.remove("hidden");
