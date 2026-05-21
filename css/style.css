@@ -92,6 +92,18 @@
     box-sizing: border-box;
 }
 
+html,
+body,
+* {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+*::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+}
+
 body {
     margin: 0;
     font-family: var(--font-body);
@@ -1491,19 +1503,6 @@ input:not(:placeholder-shown)+.floating-label {
     max-height: 248px;
     overflow-y: auto;
     padding-right: 4px;
-}
-
-#groupMembersList::-webkit-scrollbar,
-#pendingRequestsList::-webkit-scrollbar,
-#deletedTransactionsList::-webkit-scrollbar {
-    width: 8px;
-}
-
-#groupMembersList::-webkit-scrollbar-thumb,
-#pendingRequestsList::-webkit-scrollbar-thumb,
-#deletedTransactionsList::-webkit-scrollbar-thumb {
-    background: color-mix(in srgb, var(--brand) 34%, #d1d5db);
-    border-radius: 999px;
 }
 
 .stats .stat {
