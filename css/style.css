@@ -1327,6 +1327,10 @@ input:not(:placeholder-shown)+.floating-label {
     text-align: left;
 }
 
+#loaderText .loader-suffix-text {
+    margin-left: 0;
+}
+
 .modal-card h3 {
     margin: 0;
     padding-top: 14px;

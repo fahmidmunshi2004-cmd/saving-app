@@ -150,25 +150,40 @@ function showLoader(text = "Please wait...") {
   clearLoaderDotsTimer();
   if (loaderText) {
     const rawText = String(text || "");
-    const baseText = rawText.replace(/\.\.\.$/, "");
-    const hasEllipsis = rawText.endsWith("...");
+    const ellipsisIndex = rawText.indexOf("...");
+    const hasEllipsis = ellipsisIndex >= 0;
+    const prefixText = hasEllipsis ? rawText.slice(0, ellipsisIndex) : rawText;
+    const suffixText = hasEllipsis ? rawText.slice(ellipsisIndex + 3) : "";
     loaderText.textContent = "";
     const baseNode = document.createElement("span");
     baseNode.className = "loader-base-text";
-    baseNode.textContent = baseText;
+    baseNode.textContent = prefixText;
     loaderText.appendChild(baseNode);
 
     if (hasEllipsis) {
       const dotsNode = document.createElement("span");
       dotsNode.className = "loader-dots";
-      dotsNode.textContent = "...";
+      dotsNode.textContent = "";
       loaderText.appendChild(dotsNode);
+
+      if (suffixText) {
+        const suffixNode = document.createElement("span");
+        suffixNode.className = "loader-suffix-text";
+        suffixNode.textContent = suffixText;
+        loaderText.appendChild(suffixNode);
+      }
+
       let step = 0;
       loaderDotsTimer = setInterval(() => {
         step = (step + 1) % 4;
         const dots = ".".repeat(step);
         dotsNode.textContent = dots;
       }, 320);
+    } else {
+      const suffixNode = document.createElement("span");
+      suffixNode.className = "loader-suffix-text";
+      suffixNode.textContent = suffixText;
+      if (suffixNode.textContent) loaderText.appendChild(suffixNode);
     }
   }
   appLoader.classList.remove("hidden");
