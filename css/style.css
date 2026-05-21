@@ -165,52 +165,52 @@ body {
 }
 
 .app-boot-lottie-wrap {
-    width: min(220px, 72vw);
-    height: min(220px, 72vw);
+    width: min(200px, 68vw);
+    height: min(200px, 68vw);
     margin: 0 auto 8px;
-    border-radius: 20px;
+    border-radius: 999px;
     display: grid;
     place-items: center;
     background:
-        radial-gradient(circle at center, rgba(255, 255, 255, 0.94) 0%, rgba(255, 255, 255, 0.72) 62%, rgba(255, 255, 255, 0.3) 100%);
+        radial-gradient(circle at center, rgba(255, 255, 255, 0.96) 0%, rgba(255, 255, 255, 0.78) 58%, rgba(255, 255, 255, 0.34) 100%);
     box-shadow:
         0 14px 28px rgba(18, 34, 58, 0.14),
         inset 0 0 0 1px rgba(255, 255, 255, 0.62);
 }
 
-.runner-track {
-    width: min(162px, 56vw);
-    height: 72px;
+.runner-ring {
+    width: min(146px, 52vw);
+    height: min(146px, 52vw);
     border-radius: 999px;
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
+    display: grid;
+    place-items: center;
     position: relative;
     overflow: hidden;
-    background: linear-gradient(120deg, rgba(255, 255, 255, 0.9), rgba(255, 240, 246, 0.95));
-    box-shadow: inset 0 -2px 0 rgba(255, 1, 79, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.75);
+    background: linear-gradient(135deg, #ffffff, #ffe8f0);
+    box-shadow:
+        0 10px 24px rgba(18, 34, 58, 0.16),
+        inset 0 0 0 2px rgba(255, 255, 255, 0.86);
 }
 
-.runner-track::before {
+.runner-ring::before {
     content: "";
     position: absolute;
-    left: 8px;
-    right: 8px;
-    bottom: 14px;
-    height: 6px;
+    inset: 0;
     border-radius: 999px;
-    background: linear-gradient(90deg, color-mix(in srgb, var(--brand) 30%, #ffdce7), color-mix(in srgb, var(--brand) 70%, #ffffff));
-    opacity: 0.65;
+    padding: 4px;
+    background: conic-gradient(from 0deg, var(--brand), color-mix(in srgb, var(--brand) 50%, #1BA2DB), #1BA2DB, var(--brand));
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    animation: ringRotate 1.6s linear infinite;
 }
 
-.app-boot-runner {
-    position: absolute;
-    left: 14px;
-    bottom: 18px;
-    font-size: 2.05rem;
-    color: var(--brand);
-    filter: drop-shadow(0 8px 12px rgba(255, 1, 79, 0.3));
-    animation: runnerMove 1.45s linear infinite;
+.app-boot-gif {
+    width: 84%;
+    height: 84%;
+    object-fit: cover;
+    border-radius: 999px;
+    z-index: 1;
 }
 
 .app-boot-card h2 {
@@ -1394,20 +1394,9 @@ input:not(:placeholder-shown)+.floating-label {
     }
 }
 
-@keyframes runnerMove {
-    0% {
-        transform: translateX(0) translateY(0) scale(0.96);
-        opacity: 0.86;
-    }
-
-    50% {
-        transform: translateX(62px) translateY(-3px) scale(1);
-        opacity: 1;
-    }
-
-    100% {
-        transform: translateX(124px) translateY(0) scale(0.96);
-        opacity: 0.9;
+@keyframes ringRotate {
+    to {
+        transform: rotate(360deg);
     }
 }
 
