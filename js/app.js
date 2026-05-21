@@ -890,19 +890,20 @@ function openTransactionEditModal(txnId) {
     modalMessage.innerHTML = `
       <div class="edit-form">
         <div class="edit-type">${txn.type === "income" ? "Income" : "Expense"}</div>
-        <div class="edit-meta">Date: ${txn.time || "-"}</div>
+        <div class="edit-meta">Date: ${escapeHtml(txn.time || "-")}</div>
         <div class="field edit-field">
           <input id="editTxnAmount" type="number" min="0" step="0.01" value="${Number(txn.amount || 0)}" placeholder=" " />
           <label class="floating-label" for="editTxnAmount">Amount</label>
         </div>
         <div class="field edit-field">
-          <input id="editTxnCategory" type="text" value="${String(txn.category || "")}" placeholder=" " />
+          <input id="editTxnCategory" type="text" value="${escapeHtml(String(txn.category || ""))}" placeholder=" " />
           <label class="floating-label" for="editTxnCategory">${txn.type === "income" ? "Income source" : "Category"}</label>
         </div>
         <div id="editTxnError" class="edit-error" aria-live="polite"></div>
       </div>
     `;
 
+    prepareModalMotion?.();
     appModal.classList.remove("hidden");
 
     const amountInput = document.getElementById("editTxnAmount");
@@ -911,7 +912,6 @@ function openTransactionEditModal(txnId) {
     if (amountInput) amountInput.focus();
 
     const cleanup = () => {
-      appModal.classList.add("hidden");
       modalOkBtn.removeEventListener("click", onSave);
       modalCancelBtn.removeEventListener("click", onCancel);
       closeEditModalCleanup();
@@ -935,13 +935,27 @@ function openTransactionEditModal(txnId) {
       updateUI();
       renderTransactions();
       renderDeletedTransactions();
-      cleanup();
-      resolve(true);
+      if (typeof closeModalMotion === "function") {
+        closeModalMotion(() => {
+          cleanup();
+          resolve(true);
+        });
+      } else {
+        cleanup();
+        resolve(true);
+      }
     };
 
     const onCancel = () => {
-      cleanup();
-      resolve(false);
+      if (typeof closeModalMotion === "function") {
+        closeModalMotion(() => {
+          cleanup();
+          resolve(false);
+        });
+      } else {
+        cleanup();
+        resolve(false);
+      }
     };
 
     modalOkBtn.addEventListener("click", onSave);

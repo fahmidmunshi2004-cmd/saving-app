@@ -1318,6 +1318,15 @@ input:not(:placeholder-shown)+.floating-label {
     backdrop-filter: blur(8px);
 }
 
+.app-modal.modal-meep .modal-card {
+    animation: roadRunnerIn 0.42s cubic-bezier(0.165, 0.84, 0.44, 1) both;
+    will-change: transform, opacity;
+}
+
+.app-modal.modal-meep.closing .modal-card {
+    animation: roadRunnerOut 0.46s cubic-bezier(0.165, 0.84, 0.44, 1) both;
+}
+
 .loader-card,
 .modal-card {
     width: min(380px, 100%);
@@ -1578,6 +1587,36 @@ input:not(:placeholder-shown)+.floating-label {
     background:
         radial-gradient(120% 90% at 0% 0%, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0) 55%),
         linear-gradient(145deg, #ffffff, #f8fbff);
+}
+
+@keyframes roadRunnerIn {
+    0% {
+        transform: translateX(-1500px) skewX(30deg) scaleX(1.15);
+        opacity: 0;
+    }
+    70% {
+        transform: translateX(24px) skewX(0deg) scaleX(0.95);
+        opacity: 1;
+    }
+    100% {
+        transform: translateX(0px) skewX(0deg) scaleX(1);
+        opacity: 1;
+    }
+}
+
+@keyframes roadRunnerOut {
+    0% {
+        transform: translateX(0px) skewX(0deg) scaleX(1);
+        opacity: 1;
+    }
+    35% {
+        transform: translateX(-20px) skewX(-5deg) scaleX(0.96);
+        opacity: 1;
+    }
+    100% {
+        transform: translateX(1500px) skewX(30deg) scaleX(1.15);
+        opacity: 0;
+    }
 }
 
 .stats .value {

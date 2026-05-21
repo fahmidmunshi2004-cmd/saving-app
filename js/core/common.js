@@ -137,11 +137,41 @@ function isCurrentAdmin() {
 
 let loaderCount = 0;
 let loaderDotsTimer = null;
+let modalCloseTimer = null;
 
 function clearLoaderDotsTimer() {
   if (!loaderDotsTimer) return;
   clearInterval(loaderDotsTimer);
   loaderDotsTimer = null;
+}
+
+function clearModalCloseTimer() {
+  if (!modalCloseTimer) return;
+  clearTimeout(modalCloseTimer);
+  modalCloseTimer = null;
+}
+
+function prepareModalMotion() {
+  if (!appModal) return;
+  clearModalCloseTimer();
+  appModal.classList.remove("closing");
+  appModal.classList.add("modal-meep");
+}
+
+function closeModalMotion(onDone) {
+  if (!appModal) {
+    if (typeof onDone === "function") onDone();
+    return;
+  }
+
+  clearModalCloseTimer();
+  appModal.classList.add("closing");
+  modalCloseTimer = setTimeout(() => {
+    appModal.classList.add("hidden");
+    appModal.classList.remove("closing");
+    appModal.classList.remove("modal-meep");
+    if (typeof onDone === "function") onDone();
+  }, 460);
 }
 
 function showLoader(text = "Please wait...") {
@@ -211,12 +241,12 @@ function appAlert(message, title = "Notice") {
     modalMessage.innerHTML = "";
     modalMessage.innerText = String(message || "");
     modalCancelBtn.classList.add("hidden");
+    prepareModalMotion();
     appModal.classList.remove("hidden");
 
     const close = () => {
-      appModal.classList.add("hidden");
       modalOkBtn.removeEventListener("click", onOk);
-      resolve(true);
+      closeModalMotion(() => resolve(true));
     };
     const onOk = () => close();
     modalOkBtn.addEventListener("click", onOk);
@@ -235,13 +265,13 @@ function appConfirm(message, title = "Confirm") {
     modalMessage.innerHTML = "";
     modalMessage.innerText = String(message || "");
     modalCancelBtn.classList.remove("hidden");
+    prepareModalMotion();
     appModal.classList.remove("hidden");
 
     const close = (result) => {
-      appModal.classList.add("hidden");
       modalOkBtn.removeEventListener("click", onOk);
       modalCancelBtn.removeEventListener("click", onCancel);
-      resolve(result);
+      closeModalMotion(() => resolve(result));
     };
     const onOk = () => close(true);
     const onCancel = () => close(false);
