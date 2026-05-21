@@ -1357,17 +1357,17 @@ input:not(:placeholder-shown)+.floating-label {
     border-radius: inherit;
     padding: 3px;
     background: conic-gradient(from 0deg,
-            var(--brand),
-            #ff5f73,
-            #1BA2DB,
-            #e440ff,
-            var(--brand));
+            transparent 0deg 38deg,
+            #2fb5ff 38deg 64deg,
+            transparent 64deg 218deg,
+            #e64dff 218deg 244deg,
+            transparent 244deg 360deg);
     -webkit-mask:
         linear-gradient(#fff 0 0) content-box,
         linear-gradient(#fff 0 0);
     -webkit-mask-composite: xor;
     mask-composite: exclude;
-    animation: modalBorderSpin 4.8s linear infinite;
+    animation: modalBorderSpin 3.6s linear infinite;
     z-index: 0;
     pointer-events: none;
 }
