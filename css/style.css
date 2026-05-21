@@ -1324,7 +1324,7 @@ input:not(:placeholder-shown)+.floating-label {
 }
 
 .app-modal {
-    cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='50' height='50' viewBox='0 0 50 50'%3E%3Cpath d='M14 14L36 36M36 14L14 36' stroke='%23ff0150' stroke-width='5' stroke-linecap='round'/%3E%3C/svg%3E") 25 25, pointer;
+    cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='50' height='50' viewBox='0 0 50 50'%3E%3Cpath d='M14 14L36 36M36 14L14 36' stroke='%23ffffff' stroke-width='5' stroke-linecap='round'/%3E%3C/svg%3E") 25 25, pointer;
 }
 
 .app-modal.modal-meep.closing .modal-card {
@@ -1444,10 +1444,10 @@ input:not(:placeholder-shown)+.floating-label {
 
 .modal-message {
     margin: 0;
-    padding-bottom: 14px;
+    padding-bottom: 10px;
     color: color-mix(in srgb, var(--muted) 88%, #1e2125 12%);
     white-space: pre-line;
-    line-height: 1.5;
+    line-height: 1.42;
 }
 
 .modal-message.centered {
@@ -1461,7 +1461,7 @@ input:not(:placeholder-shown)+.floating-label {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    margin: 2px auto 10px;
+    margin: 0 auto 6px;
     font-size: 1rem;
 }
 
@@ -1497,16 +1497,17 @@ input:not(:placeholder-shown)+.floating-label {
 
 .modal-copy {
     white-space: pre-line;
+    margin: 0;
 }
 
 .modal-copy-title {
-    margin: 0 0 8px;
+    margin: 0 0 4px;
     font-family: var(--font-display);
     font-size: 1.12rem;
     font-weight: 700;
     color: var(--text);
     text-align: center;
-    line-height: 1.35;
+    line-height: 1.25;
 }
 
 .modal-message.edit-mode {
