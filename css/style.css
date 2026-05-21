@@ -216,12 +216,26 @@ body {
     animation: ringRotate 2.2s linear infinite;
 }
 
+/* Mobile/Safari fallback when mask-composite support is unreliable */
+@supports not ((-webkit-mask-composite: xor) or (mask-composite: exclude)) {
+    .runner-ring::before {
+        inset: 2px;
+        padding: 0;
+        background: none;
+        border: 3px solid rgba(255, 255, 255, 0.3);
+        border-top-color: var(--brand);
+        border-right-color: #1BA2DB;
+        animation: ringRotate 1s linear infinite;
+    }
+}
+
 .app-boot-gif {
     width: 82%;
     height: 82%;
-    object-fit: cover;
+    object-fit: contain;
     border-radius: 999px;
     z-index: 1;
+    animation: bootRunnerFloat 0.95s ease-in-out infinite;
 }
 
 .app-boot-card h2 {
@@ -1674,6 +1688,17 @@ input:not(:placeholder-shown)+.floating-label {
 @keyframes ringRotate {
     to {
         transform: rotate(360deg);
+    }
+}
+
+@keyframes bootRunnerFloat {
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-2px);
     }
 }
 
