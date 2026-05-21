@@ -808,16 +808,28 @@ function renderDeletedTransactions() {
     li.innerHTML = `<div>${txn.type || "-"} • ${txn.category || "-"}</div>
       <div>${amountText} • Deleted: ${deletedAtText}</div>`;
 
+    const actionRow = document.createElement("div");
+    actionRow.className = "deleted-actions";
+
     const restoreBtn = document.createElement("button");
     restoreBtn.className = "btn income-btn";
-    restoreBtn.style.marginTop = "8px";
     restoreBtn.innerHTML = '<i class="fa-solid fa-rotate-left"></i> Restore';
     restoreBtn.onclick = () => {
       withLoader("Restoring transaction...", async () => {
         await restoreDeletedTransaction(txn.id);
       }).catch((e) => appAlert(e.message || "Restore failed"));
     };
-    li.appendChild(restoreBtn);
+
+    const permanentDeleteBtn = document.createElement("button");
+    permanentDeleteBtn.className = "btn danger-btn";
+    permanentDeleteBtn.innerHTML = '<i class="fa-solid fa-trash-can"></i> Delete';
+    permanentDeleteBtn.onclick = () => {
+      permanentDeleteDeletedTransaction(txn.id).catch((e) => appAlert(e.message || "Delete failed"));
+    };
+
+    actionRow.appendChild(restoreBtn);
+    actionRow.appendChild(permanentDeleteBtn);
+    li.appendChild(actionRow);
     fragment.appendChild(li);
   }
   deletedTransactionsList.appendChild(fragment);
@@ -836,6 +848,26 @@ async function restoreDeletedTransaction(txnId) {
   transactions.splice(insertAt, 0, item.txn);
 
   recalculateFinanceFromTransactions();
+  updateUI();
+  renderDeletedTransactions();
+}
+
+async function permanentDeleteDeletedTransaction(txnId) {
+  if (!canManageHistory()) {
+    appAlert("শুধু admin permanent delete করতে পারবে।");
+    return;
+  }
+
+  const ok = await appConfirm(
+    "এই deleted transaction একেবারে মুছে যাবে। এরপর restore করা যাবে না। Continue?",
+    "Permanent Delete"
+  );
+  if (!ok) return;
+
+  const idx = deletedTransactions.findIndex((item) => item?.txn?.id === txnId);
+  if (idx < 0) return;
+
+  deletedTransactions.splice(idx, 1);
   updateUI();
   renderDeletedTransactions();
 }
