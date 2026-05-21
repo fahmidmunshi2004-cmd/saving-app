@@ -805,8 +805,16 @@ function renderDeletedTransactions() {
     const txn = item.txn || {};
     const amountText = formatMoney(Number(txn.amount || 0));
     const deletedAtText = item.deletedAt ? new Date(item.deletedAt).toLocaleString("en-BD") : "-";
-    li.innerHTML = `<div>${txn.type || "-"} • ${txn.category || "-"}</div>
-      <div>${amountText} • Deleted: ${deletedAtText}</div>`;
+    const head = document.createElement("div");
+    head.className = "deleted-head";
+    head.textContent = `${txn.type || "-"} • ${txn.category || "-"}`;
+
+    const meta = document.createElement("div");
+    meta.className = "deleted-meta";
+    meta.textContent = `${amountText} • Deleted: ${deletedAtText}`;
+
+    li.appendChild(head);
+    li.appendChild(meta);
 
     const actionRow = document.createElement("div");
     actionRow.className = "deleted-actions";
