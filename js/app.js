@@ -886,10 +886,9 @@ function openTransactionEditModal(txnId) {
     modalOkBtn.innerHTML = '<i class="fa-solid fa-check"></i> Save';
     modalCancelBtn.innerHTML = '<i class="fa-solid fa-xmark"></i> Cancel';
 
-    modalMessage.className = "modal-message";
+    modalMessage.className = "modal-message edit-mode";
     modalMessage.innerHTML = `
       <div class="edit-form">
-        <div class="edit-type">${txn.type === "income" ? "Income" : "Expense"}</div>
         <div class="edit-meta">Date: ${escapeHtml(txn.time || "-")}</div>
         <div class="field edit-field">
           <input id="editTxnAmount" type="number" min="0" step="0.01" value="${Number(txn.amount || 0)}" placeholder=" " />

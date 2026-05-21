@@ -1446,9 +1446,14 @@ input:not(:placeholder-shown)+.floating-label {
     text-align: center;
 }
 
+.modal-message.edit-mode {
+    white-space: normal;
+    padding-bottom: 8px;
+}
+
 .modal-message .edit-form {
     display: grid;
-    gap: 4px;
+    gap: 2px;
     margin-top: 0;
 }
 
@@ -1457,6 +1462,7 @@ input:not(:placeholder-shown)+.floating-label {
     color: var(--muted);
     line-height: 1.45;
     margin-top: 0;
+    margin-bottom: 2px;
 }
 
 .modal-message .edit-type {
@@ -1477,7 +1483,7 @@ input:not(:placeholder-shown)+.floating-label {
 }
 
 .modal-message .edit-error {
-    min-height: 16px;
+    min-height: 0;
     margin-top: 0;
     font-size: 0.82rem;
     font-weight: 700;
@@ -1485,14 +1491,18 @@ input:not(:placeholder-shown)+.floating-label {
 }
 
 .modal-message .edit-form .field {
-    margin-top: 4px;
+    margin-top: 0;
+}
+
+.modal-message .edit-error:empty {
+    display: none;
 }
 
 .modal-actions {
     display: grid;
     grid-template-columns: 1fr;
-    gap: 8px;
-    padding-bottom: 16px;
+    gap: 6px;
+    padding-bottom: 12px;
 }
 
 .modal-actions .btn {
