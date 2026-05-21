@@ -152,14 +152,22 @@ function showLoader(text = "Please wait...") {
     const rawText = String(text || "");
     const baseText = rawText.replace(/\.\.\.$/, "");
     const hasEllipsis = rawText.endsWith("...");
-    loaderText.innerText = rawText;
+    loaderText.textContent = "";
+    const baseNode = document.createElement("span");
+    baseNode.className = "loader-base-text";
+    baseNode.textContent = baseText;
+    loaderText.appendChild(baseNode);
 
     if (hasEllipsis) {
+      const dotsNode = document.createElement("span");
+      dotsNode.className = "loader-dots";
+      dotsNode.textContent = "...";
+      loaderText.appendChild(dotsNode);
       let step = 0;
       loaderDotsTimer = setInterval(() => {
         step = (step + 1) % 4;
         const dots = ".".repeat(step);
-        loaderText.innerText = `${baseText}${dots}`;
+        dotsNode.textContent = dots;
       }, 320);
     }
   }

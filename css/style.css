@@ -52,8 +52,8 @@
     --s-extra-bold: 800;
     --s-black: 900;
     --transition: 0.4s;
-    --font-primary: "Poppins", sans-serif;
-    --font-secondary: "Montserrat", sans-serif;
+    --font-primary: "Manrope", sans-serif;
+    --font-secondary: "Plus Jakarta Sans", sans-serif;
     --font-size-b1: 18px;
     --font-size-b2: 22px;
     --font-size-b3: 14px;
@@ -1316,6 +1316,14 @@ input:not(:placeholder-shown)+.floating-label {
     letter-spacing: 0.28px;
     color: color-mix(in srgb, var(--text) 86%, #4b5563 14%);
     text-shadow: 0 1px 0 rgba(255, 255, 255, 0.72);
+    display: inline-flex;
+    align-items: baseline;
+}
+
+#loaderText .loader-dots {
+    display: inline-block;
+    width: 1.9ch;
+    text-align: left;
 }
 
 .modal-card h3 {
