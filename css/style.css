@@ -197,10 +197,10 @@ body {
     place-items: center;
     position: relative;
     overflow: hidden;
-    background: linear-gradient(135deg, #ffffff, #ffe8f0);
+    background: radial-gradient(circle at 30% 25%, #ffffff 0%, #ffeef4 48%, #ffdce8 100%);
     box-shadow:
-        0 10px 24px rgba(18, 34, 58, 0.16),
-        inset 0 0 0 2px rgba(255, 255, 255, 0.86);
+        0 12px 26px rgba(18, 34, 58, 0.2),
+        inset 0 0 0 2px rgba(255, 255, 255, 0.9);
 }
 
 .runner-ring::before {
@@ -208,10 +208,11 @@ body {
     position: absolute;
     inset: 2px;
     border-radius: 999px;
-    border: 3px solid rgba(255, 255, 255, 0.3);
-    border-top-color: var(--brand);
-    border-right-color: #1BA2DB;
-    animation: ringRotate 1s linear infinite;
+    border: 3px solid rgba(255, 255, 255, 0.28);
+    border-top-color: #ff2c6a;
+    border-right-color: #26b8ff;
+    border-bottom-color: #ff6fd8;
+    animation: ringRotate 1.15s linear infinite;
     will-change: transform;
 }
 
@@ -221,7 +222,8 @@ body {
     object-fit: contain;
     border-radius: 999px;
     z-index: 1;
-    animation: bootRunnerFloat 1s ease-in-out infinite;
+    filter: drop-shadow(0 4px 10px rgba(255, 1, 79, 0.25));
+    animation: bootRunnerFloat 1.2s ease-in-out infinite;
 }
 
 .app-boot-card h2 {
