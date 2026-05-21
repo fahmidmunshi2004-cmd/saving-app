@@ -1339,7 +1339,7 @@ input:not(:placeholder-shown)+.floating-label {
 }
 
 .modal-card h3,
-.modal-card p,
+.modal-message,
 .modal-actions {
     padding-left: 16px;
     padding-right: 16px;
@@ -1425,13 +1425,48 @@ input:not(:placeholder-shown)+.floating-label {
     text-align: center;
 }
 
-.modal-card p {
+.modal-message {
     margin: 0;
     padding-bottom: 14px;
     color: color-mix(in srgb, var(--muted) 88%, #1e2125 12%);
     white-space: pre-line;
     line-height: 1.5;
+}
+
+.modal-message.centered {
     text-align: center;
+}
+
+.modal-message .edit-form {
+    display: grid;
+    gap: 12px;
+    margin-top: 4px;
+}
+
+.modal-message .edit-meta {
+    font-size: 0.84rem;
+    color: var(--muted);
+    line-height: 1.45;
+}
+
+.modal-message .edit-type {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--brand);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+}
+
+.modal-message .edit-field {
+    margin-top: 0;
+}
+
+.modal-message .edit-error {
+    min-height: 18px;
+    margin-top: 2px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: #d11414;
 }
 
 .modal-actions {
@@ -1453,6 +1488,38 @@ input:not(:placeholder-shown)+.floating-label {
 .modal-actions .btn:hover {
     transform: translateY(-1px);
     filter: saturate(1.05);
+}
+
+.txn-action-group {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.txn-action-group .txn-edit-btn,
+.txn-action-group .txn-delete-btn {
+    width: 34px;
+    height: 34px;
+    min-height: 34px;
+    margin-top: 0;
+}
+
+.txn-edit-btn {
+    border: 0;
+    border-radius: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #ffffff;
+    background: linear-gradient(120deg, #1ba2db, #2476ff);
+    box-shadow: 0 8px 16px rgba(27, 162, 219, 0.28);
+}
+
+.txn-edit-btn:hover {
+    filter: brightness(0.98);
 }
 
 @keyframes bootScan {

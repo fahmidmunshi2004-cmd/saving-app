@@ -207,6 +207,8 @@ function appAlert(message, title = "Notice") {
     }
 
     modalTitle.innerText = title;
+    modalMessage.className = "modal-message centered";
+    modalMessage.innerHTML = "";
     modalMessage.innerText = String(message || "");
     modalCancelBtn.classList.add("hidden");
     appModal.classList.remove("hidden");
@@ -229,6 +231,8 @@ function appConfirm(message, title = "Confirm") {
     }
 
     modalTitle.innerText = title;
+    modalMessage.className = "modal-message centered";
+    modalMessage.innerHTML = "";
     modalMessage.innerText = String(message || "");
     modalCancelBtn.classList.remove("hidden");
     appModal.classList.remove("hidden");

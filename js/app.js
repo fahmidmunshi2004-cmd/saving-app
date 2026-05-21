@@ -860,6 +860,95 @@ async function restoreDeletedTransaction(txnId) {
   renderDeletedTransactions();
 }
 
+function closeEditModalCleanup() {
+  modalOkBtn.innerHTML = '<i class="fa-solid fa-check"></i> OK';
+  modalCancelBtn.innerHTML = '<i class="fa-solid fa-xmark"></i> Cancel';
+  modalCancelBtn.classList.add("hidden");
+  modalMessage.className = "modal-message";
+  modalMessage.innerHTML = "";
+}
+
+function openTransactionEditModal(txnId) {
+  return new Promise((resolve) => {
+    const txn = transactions.find((t) => t.id === txnId);
+    if (!txn) {
+      resolve(false);
+      return;
+    }
+    if (!canManageHistory()) {
+      appAlert("শুধু admin transaction edit করতে পারবে।");
+      resolve(false);
+      return;
+    }
+
+    modalTitle.innerText = txn.type === "income" ? "Edit Income" : "Edit Expense";
+    modalCancelBtn.classList.remove("hidden");
+    modalOkBtn.innerHTML = '<i class="fa-solid fa-check"></i> Save';
+    modalCancelBtn.innerHTML = '<i class="fa-solid fa-xmark"></i> Cancel';
+
+    modalMessage.className = "modal-message";
+    modalMessage.innerHTML = `
+      <div class="edit-form">
+        <div class="edit-type">${txn.type === "income" ? "Income" : "Expense"}</div>
+        <div class="edit-meta">Date: ${txn.time || "-"}</div>
+        <div class="field edit-field">
+          <input id="editTxnAmount" type="number" min="0" step="0.01" value="${Number(txn.amount || 0)}" placeholder=" " />
+          <label class="floating-label" for="editTxnAmount">Amount</label>
+        </div>
+        <div class="field edit-field">
+          <input id="editTxnCategory" type="text" value="${String(txn.category || "")}" placeholder=" " />
+          <label class="floating-label" for="editTxnCategory">${txn.type === "income" ? "Income source" : "Category"}</label>
+        </div>
+        <div id="editTxnError" class="edit-error" aria-live="polite"></div>
+      </div>
+    `;
+
+    appModal.classList.remove("hidden");
+
+    const amountInput = document.getElementById("editTxnAmount");
+    const categoryInputEl = document.getElementById("editTxnCategory");
+    const errorNode = document.getElementById("editTxnError");
+    if (amountInput) amountInput.focus();
+
+    const cleanup = () => {
+      appModal.classList.add("hidden");
+      modalOkBtn.removeEventListener("click", onSave);
+      modalCancelBtn.removeEventListener("click", onCancel);
+      closeEditModalCleanup();
+    };
+
+    const onSave = async () => {
+      const nextAmount = Number(amountInput?.value);
+      const nextCategory = String(categoryInputEl?.value || "").trim();
+      if (!nextAmount || nextAmount < 0) {
+        if (errorNode) errorNode.innerText = "Valid amount দিন।";
+        return;
+      }
+      if (!nextCategory) {
+        if (errorNode) errorNode.innerText = txn.type === "income" ? "Income source দিন।" : "Category দিন।";
+        return;
+      }
+
+      txn.amount = nextAmount;
+      txn.category = nextCategory;
+      recalculateFinanceFromTransactions();
+      updateUI();
+      renderTransactions();
+      renderDeletedTransactions();
+      cleanup();
+      resolve(true);
+    };
+
+    const onCancel = () => {
+      cleanup();
+      resolve(false);
+    };
+
+    modalOkBtn.addEventListener("click", onSave);
+    modalCancelBtn.addEventListener("click", onCancel);
+  });
+}
+
 async function permanentDeleteDeletedTransaction(txnId) {
   if (!canManageHistory()) {
     appAlert("শুধু admin permanent delete করতে পারবে।");
@@ -922,6 +1011,18 @@ function renderTransactions() {
     }
 
     if (canManageHistory()) {
+      const actionGroup = document.createElement("div");
+      actionGroup.className = "txn-action-group";
+
+      const editBtn = document.createElement("button");
+      editBtn.type = "button";
+      editBtn.className = "txn-edit-btn";
+      editBtn.title = "Edit transaction";
+      editBtn.innerHTML = '<i class="fa-solid fa-pen"></i>';
+      editBtn.onclick = () => {
+        openTransactionEditModal(txn.id).catch((e) => appAlert(e.message || "Edit failed"));
+      };
+
       const deleteBtn = document.createElement("button");
       deleteBtn.type = "button";
       deleteBtn.className = "txn-delete-btn";
@@ -932,7 +1033,9 @@ function renderTransactions() {
           await deleteTransaction(txn.id);
         }).catch((e) => appAlert(e.message || "Delete failed"));
       };
-      action.appendChild(deleteBtn);
+      actionGroup.appendChild(editBtn);
+      actionGroup.appendChild(deleteBtn);
+      action.appendChild(actionGroup);
     } else {
       action.innerText = "-";
     }
