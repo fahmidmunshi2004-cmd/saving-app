@@ -914,6 +914,7 @@ function openTransactionEditModal(txnId) {
     const cleanup = () => {
       modalOkBtn.removeEventListener("click", onSave);
       modalCancelBtn.removeEventListener("click", onCancel);
+      appModal?.removeEventListener("click", onOverlayClick);
       closeEditModalCleanup();
     };
 
@@ -957,9 +958,13 @@ function openTransactionEditModal(txnId) {
         resolve(false);
       }
     };
+    const onOverlayClick = (event) => {
+      if (event.target === appModal) onCancel();
+    };
 
     modalOkBtn.addEventListener("click", onSave);
     modalCancelBtn.addEventListener("click", onCancel);
+    appModal?.addEventListener("click", onOverlayClick);
   });
 }
 

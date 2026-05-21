@@ -1323,6 +1323,10 @@ input:not(:placeholder-shown)+.floating-label {
     will-change: transform, opacity;
 }
 
+.app-modal {
+    cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='11' fill='%23ffffff' fill-opacity='0.95'/%3E%3Cpath d='M7 7L17 17M17 7L7 17' stroke='%23ff0150' stroke-width='2.6' stroke-linecap='round'/%3E%3C/svg%3E") 12 12, pointer;
+}
+
 .app-modal.modal-meep.closing .modal-card {
     animation: roadRunnerOut 0.46s cubic-bezier(0.165, 0.84, 0.44, 1) both;
 }
@@ -1338,6 +1342,10 @@ input:not(:placeholder-shown)+.floating-label {
         0 20px 44px rgba(0, 0, 0, 0.2),
         inset 0 1px 0 rgba(255, 255, 255, 0.7);
     overflow: hidden;
+}
+
+.modal-card {
+    cursor: auto;
 }
 
 .modal-card::before {

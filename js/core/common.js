@@ -272,10 +272,15 @@ function appAlert(message, title = "Notice") {
 
     const close = () => {
       modalOkBtn.removeEventListener("click", onOk);
+      appModal.removeEventListener("click", onOverlayClick);
       closeModalMotion(() => resolve(true));
     };
     const onOk = () => close();
+    const onOverlayClick = (event) => {
+      if (event.target === appModal) close();
+    };
     modalOkBtn.addEventListener("click", onOk);
+    appModal.addEventListener("click", onOverlayClick);
   });
 }
 
@@ -296,12 +301,17 @@ function appConfirm(message, title = "Confirm") {
     const close = (result) => {
       modalOkBtn.removeEventListener("click", onOk);
       modalCancelBtn.removeEventListener("click", onCancel);
+      appModal.removeEventListener("click", onOverlayClick);
       closeModalMotion(() => resolve(result));
     };
     const onOk = () => close(true);
     const onCancel = () => close(false);
+    const onOverlayClick = (event) => {
+      if (event.target === appModal) close(false);
+    };
     modalOkBtn.addEventListener("click", onOk);
     modalCancelBtn.addEventListener("click", onCancel);
+    appModal.addEventListener("click", onOverlayClick);
   });
 }
 
