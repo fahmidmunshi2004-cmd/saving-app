@@ -177,8 +177,10 @@ body {
 .app-boot-lottie {
     width: 100%;
     height: 100%;
-    border: 0;
     display: block;
+    object-fit: contain;
+    padding: 18px;
+    animation: logoFloat 1.35s ease-in-out infinite;
 }
 
 .app-boot-card h2 {
@@ -1248,8 +1250,10 @@ input:not(:placeholder-shown)+.floating-label {
 .loader-lottie {
     width: 100%;
     height: 100%;
-    border: 0;
     display: block;
+    object-fit: contain;
+    padding: 14px;
+    animation: logoFloat 1.25s ease-in-out infinite;
 }
 
 #loaderText {
@@ -1307,6 +1311,19 @@ input:not(:placeholder-shown)+.floating-label {
 
     100% {
         left: 100%;
+    }
+}
+
+@keyframes logoFloat {
+    0%,
+    100% {
+        transform: translateY(0) scale(1);
+        filter: drop-shadow(0 10px 16px rgba(255, 1, 79, 0.24));
+    }
+
+    50% {
+        transform: translateY(-4px) scale(1.03);
+        filter: drop-shadow(0 14px 22px rgba(255, 1, 79, 0.32));
     }
 }
 
