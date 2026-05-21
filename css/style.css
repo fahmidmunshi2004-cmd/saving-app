@@ -1491,7 +1491,7 @@ input:not(:placeholder-shown)+.floating-label {
 }
 
 .modal-message .edit-form .field {
-    margin-top: 0;
+    margin-top: 12px;
 }
 
 .modal-message .edit-error:empty {
