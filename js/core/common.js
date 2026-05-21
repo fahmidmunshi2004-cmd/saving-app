@@ -136,11 +136,37 @@ function isCurrentAdmin() {
 }
 
 let loaderCount = 0;
+let loaderDotsTimer = null;
+
+function clearLoaderDotsTimer() {
+  if (!loaderDotsTimer) return;
+  clearInterval(loaderDotsTimer);
+  loaderDotsTimer = null;
+}
 
 function showLoader(text = "Please wait...") {
   if (!appLoader) return;
   loaderCount += 1;
-  if (loaderText) loaderText.innerText = text;
+  clearLoaderDotsTimer();
+  if (loaderText) {
+    const rawText = String(text || "");
+    const baseText = rawText.replace(/\.\.\.$/, "");
+    const hasEllipsis = rawText.endsWith("...");
+    loaderText.innerText = rawText;
+
+    if (hasEllipsis) {
+      let step = 0;
+      loaderDotsTimer = setInterval(() => {
+        step += 1;
+        const dots = ".".repeat(step % 4);
+        loaderText.innerText = `${baseText}${dots}`;
+        if (step >= 6) {
+          clearLoaderDotsTimer();
+          loaderText.innerText = baseText;
+        }
+      }, 240);
+    }
+  }
   appLoader.classList.remove("hidden");
 }
 
@@ -148,6 +174,7 @@ function hideLoader() {
   if (!appLoader) return;
   loaderCount = Math.max(0, loaderCount - 1);
   if (loaderCount === 0) {
+    clearLoaderDotsTimer();
     appLoader.classList.add("hidden");
   }
 }
