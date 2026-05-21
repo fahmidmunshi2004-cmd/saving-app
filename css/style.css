@@ -176,71 +176,48 @@ body {
 }
 
 .app-boot-lottie-wrap {
-    width: min(170px, 56vw);
-    height: min(170px, 56vw);
-    margin: 0 auto 12px;
-    border-radius: 24px;
+    width: min(158px, 54vw);
+    height: min(158px, 54vw);
+    margin: 0 auto 14px;
+    border-radius: 22px;
     display: grid;
     place-items: center;
     background:
-        radial-gradient(130% 120% at 20% 15%, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.72) 55%, rgba(246, 250, 255, 0.92) 100%);
+        radial-gradient(130% 120% at 22% 16%, rgba(255, 255, 255, 0.95) 0%, rgba(252, 246, 250, 0.92) 56%, rgba(246, 250, 255, 0.9) 100%);
     box-shadow:
-        0 14px 26px rgba(18, 34, 58, 0.18),
-        inset 0 0 0 1px rgba(255, 255, 255, 0.68);
+        0 18px 34px rgba(18, 34, 58, 0.18),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.72);
 }
 
-.boot-orb {
-    width: min(124px, 42vw);
-    height: min(124px, 42vw);
-    border-radius: 22px;
+.boot-brand-mark {
+    width: min(112px, 38vw);
+    height: min(112px, 38vw);
+    border-radius: 20px;
     position: relative;
     display: grid;
     place-items: center;
     background:
-        radial-gradient(100% 100% at 28% 24%, #ffffff 0%, #ffeef5 45%, #ffd7e6 100%);
+        linear-gradient(145deg, #ffffff, #fff6fa 62%, #fff2f8);
     box-shadow:
-        0 12px 24px rgba(255, 1, 79, 0.2),
-        inset 0 0 0 2px rgba(255, 255, 255, 0.85);
-    animation: bootOrbPulse 1.4s ease-in-out infinite;
+        0 12px 24px rgba(24, 36, 58, 0.16),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.88);
 }
 
-.boot-orb::before {
-    content: "";
-    position: absolute;
-    inset: -8px;
-    border-radius: 28px;
-    border: 3px solid rgba(255, 1, 79, 0.16);
-    border-top-color: rgba(255, 1, 79, 0.6);
-    border-right-color: rgba(27, 162, 219, 0.58);
-    animation: bootOrbSpin 1.35s linear infinite;
+.boot-brand-icon {
+    width: 64%;
+    height: 64%;
+    object-fit: contain;
+    filter: drop-shadow(0 6px 10px rgba(255, 1, 79, 0.2));
 }
 
-.boot-dot {
+.boot-spinner-ring {
     position: absolute;
-    width: 12px;
-    height: 12px;
+    inset: -10px;
     border-radius: 999px;
-    background: linear-gradient(130deg, #ff1f63, #1BA2DB);
-    box-shadow: 0 0 10px rgba(255, 1, 79, 0.35);
-    animation: bootDotBounce 0.95s ease-in-out infinite;
-}
-
-.dot-a {
-    left: 22px;
-    top: 56px;
-    animation-delay: 0s;
-}
-
-.dot-b {
-    left: 56px;
-    top: 40px;
-    animation-delay: 0.14s;
-}
-
-.dot-c {
-    left: 90px;
-    top: 56px;
-    animation-delay: 0.28s;
+    border: 3px solid rgba(255, 255, 255, 0.26);
+    border-top-color: var(--brand);
+    border-right-color: #1BA2DB;
+    animation: ringRotate 1s linear infinite;
 }
 
 .app-boot-card h2 {
@@ -1693,36 +1670,6 @@ input:not(:placeholder-shown)+.floating-label {
 @keyframes ringRotate {
     to {
         transform: rotate(360deg);
-    }
-}
-
-@keyframes bootOrbSpin {
-    to {
-        transform: rotate(360deg);
-    }
-}
-
-@keyframes bootOrbPulse {
-    0%,
-    100% {
-        transform: scale(0.98);
-    }
-
-    50% {
-        transform: scale(1);
-    }
-}
-
-@keyframes bootDotBounce {
-    0%,
-    100% {
-        transform: translateY(0);
-        opacity: 0.72;
-    }
-
-    50% {
-        transform: translateY(-8px);
-        opacity: 1;
     }
 }
 
