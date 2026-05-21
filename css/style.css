@@ -1336,7 +1336,6 @@ input:not(:placeholder-shown)+.floating-label {
 .modal-card {
     width: min(380px, 100%);
     border-radius: 18px;
-    border: var(--float-border);
     background:
         linear-gradient(160deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 255, 0.96));
     padding: 0;
@@ -1344,6 +1343,7 @@ input:not(:placeholder-shown)+.floating-label {
         0 20px 44px rgba(0, 0, 0, 0.2),
         inset 0 1px 0 rgba(255, 255, 255, 0.7);
     overflow: hidden;
+    position: relative;
 }
 
 .modal-card {
@@ -1351,7 +1351,18 @@ input:not(:placeholder-shown)+.floating-label {
 }
 
 .modal-card::before {
-    content: none;
+    content: "";
+    position: absolute;
+    inset: 0;
+    padding: 2px;
+    border-radius: inherit;
+    background: linear-gradient(90deg, var(--brand), #ff5f73, #1BA2DB);
+    -webkit-mask:
+        linear-gradient(#fff 0 0) content-box,
+        linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
 }
 
 .modal-card h3,
