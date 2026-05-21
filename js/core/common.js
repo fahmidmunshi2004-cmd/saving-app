@@ -157,14 +157,10 @@ function showLoader(text = "Please wait...") {
     if (hasEllipsis) {
       let step = 0;
       loaderDotsTimer = setInterval(() => {
-        step += 1;
-        const dots = ".".repeat(step % 4);
+        step = (step + 1) % 4;
+        const dots = ".".repeat(step);
         loaderText.innerText = `${baseText}${dots}`;
-        if (step >= 6) {
-          clearLoaderDotsTimer();
-          loaderText.innerText = baseText;
-        }
-      }, 240);
+      }, 320);
     }
   }
   appLoader.classList.remove("hidden");
