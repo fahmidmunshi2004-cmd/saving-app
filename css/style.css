@@ -206,36 +206,22 @@ body {
 .runner-ring::before {
     content: "";
     position: absolute;
-    inset: 0;
+    inset: 2px;
     border-radius: 999px;
-    padding: 3px;
-    background: conic-gradient(from 0deg, color-mix(in srgb, var(--brand) 70%, #ffffff), var(--brand), color-mix(in srgb, var(--brand) 50%, #1BA2DB), var(--brand));
-    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-    -webkit-mask-composite: xor;
-    mask-composite: exclude;
-    animation: ringRotate 2.2s linear infinite;
-}
-
-/* Mobile/Safari fallback when mask-composite support is unreliable */
-@supports not ((-webkit-mask-composite: xor) or (mask-composite: exclude)) {
-    .runner-ring::before {
-        inset: 2px;
-        padding: 0;
-        background: none;
-        border: 3px solid rgba(255, 255, 255, 0.3);
-        border-top-color: var(--brand);
-        border-right-color: #1BA2DB;
-        animation: ringRotate 1s linear infinite;
-    }
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-top-color: var(--brand);
+    border-right-color: #1BA2DB;
+    animation: ringRotate 1s linear infinite;
+    will-change: transform;
 }
 
 .app-boot-gif {
-    width: 82%;
-    height: 82%;
+    width: 68%;
+    height: 68%;
     object-fit: contain;
     border-radius: 999px;
     z-index: 1;
-    animation: bootRunnerFloat 0.95s ease-in-out infinite;
+    animation: bootRunnerFloat 1s ease-in-out infinite;
 }
 
 .app-boot-card h2 {
