@@ -1288,23 +1288,13 @@ input:not(:placeholder-shown)+.floating-label {
 }
 
 .loader-spinner::before {
-    padding: 4px;
-    background: conic-gradient(from 10deg,
-            var(--brand) 0deg 78deg,
-            transparent 78deg 132deg,
-            #1BA2DB 132deg 214deg,
-            transparent 214deg 360deg);
-    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-    -webkit-mask-composite: xor;
-    mask-composite: exclude;
+    border: 4px solid color-mix(in srgb, var(--brand) 22%, #ffffff);
+    border-top-color: var(--brand);
     animation: spin 0.9s linear infinite;
 }
 
 .loader-spinner::after {
-    inset: 8px;
-    border: 3px solid rgba(27, 162, 219, 0.2);
-    border-bottom-color: #1BA2DB;
-    animation: spin-reverse 1.35s linear infinite;
+    display: none;
 }
 
 .loader-core {
