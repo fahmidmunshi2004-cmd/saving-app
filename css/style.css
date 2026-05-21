@@ -1237,23 +1237,50 @@ input:not(:placeholder-shown)+.floating-label {
     padding: 26px 20px 22px;
 }
 
-.loader-lottie-wrap {
-    width: min(170px, 62vw);
-    height: min(170px, 62vw);
-    margin: 0 auto 4px;
-    border-radius: 16px;
-    overflow: hidden;
-    background: rgba(255, 255, 255, 0.62);
-    box-shadow: 0 12px 24px rgba(18, 34, 58, 0.14);
+.loader-spinner {
+    width: 62px;
+    height: 62px;
+    display: inline-grid;
+    place-items: center;
+    position: relative;
+    border-radius: 50%;
+    background: radial-gradient(circle at center, rgba(255, 1, 79, 0.22), rgba(255, 1, 79, 0.02) 66%, transparent 67%);
+    box-shadow:
+        0 0 0 1px rgba(255, 1, 79, 0.12),
+        0 10px 24px rgba(255, 1, 79, 0.2);
 }
 
-.loader-lottie {
-    width: 100%;
-    height: 100%;
-    display: block;
-    object-fit: contain;
-    padding: 14px;
-    animation: logoFloat 1.25s ease-in-out infinite;
+.loader-spinner::before,
+.loader-spinner::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+}
+
+.loader-spinner::before {
+    border: 4px solid rgba(255, 1, 79, 0.16);
+    border-top-color: var(--brand);
+    border-right-color: color-mix(in srgb, var(--brand) 55%, #1BA2DB 45%);
+    animation: spin 0.9s linear infinite;
+}
+
+.loader-spinner::after {
+    inset: 8px;
+    border: 3px solid rgba(27, 162, 219, 0.2);
+    border-bottom-color: #1BA2DB;
+    animation: spin-reverse 1.35s linear infinite;
+}
+
+.loader-core {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: linear-gradient(140deg, #ffffff, #ffd3df 58%, #ff4b78 100%);
+    box-shadow:
+        0 0 0 7px rgba(255, 1, 79, 0.08),
+        0 0 24px rgba(255, 1, 79, 0.33);
+    animation: pulse-core 1.25s ease-in-out infinite;
 }
 
 #loaderText {
@@ -1311,6 +1338,29 @@ input:not(:placeholder-shown)+.floating-label {
 
     100% {
         left: 100%;
+    }
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes spin-reverse {
+    to {
+        transform: rotate(-360deg);
+    }
+}
+
+@keyframes pulse-core {
+    0%,
+    100% {
+        transform: scale(0.82);
+    }
+
+    50% {
+        transform: scale(1);
     }
 }
 
