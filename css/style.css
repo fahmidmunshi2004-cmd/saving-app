@@ -1263,6 +1263,9 @@ input:not(:placeholder-shown)+.floating-label {
 
 .loader-card {
     text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     padding: 26px 20px 22px;
 }
 
@@ -1316,8 +1319,9 @@ input:not(:placeholder-shown)+.floating-label {
     letter-spacing: 0.28px;
     color: color-mix(in srgb, var(--text) 86%, #4b5563 14%);
     text-shadow: 0 1px 0 rgba(255, 255, 255, 0.72);
-    display: inline-flex;
+    display: flex;
     align-items: baseline;
+    justify-content: center;
 }
 
 #loaderText .loader-dots {
