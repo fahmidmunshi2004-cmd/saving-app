@@ -1301,8 +1301,7 @@ input:not(:placeholder-shown)+.floating-label {
     width: 13px;
     height: 13px;
     border-radius: 50%;
-    background: #ffffff;
-    border: 2px solid var(--brand);
+    background: linear-gradient(140deg, #ffffff, #ffd3df 58%, #ff4b78 100%);
     box-shadow:
         0 0 0 6px rgba(255, 1, 79, 0.09),
         0 0 18px rgba(255, 1, 79, 0.28);
