@@ -1499,6 +1499,16 @@ input:not(:placeholder-shown)+.floating-label {
     white-space: pre-line;
 }
 
+.modal-copy-title {
+    margin: 0 0 8px;
+    font-family: var(--font-display);
+    font-size: 1.12rem;
+    font-weight: 700;
+    color: var(--text);
+    text-align: center;
+    line-height: 1.35;
+}
+
 .modal-message.edit-mode {
     white-space: normal;
     padding-bottom: 8px;

@@ -249,8 +249,10 @@ function getModalIconConfig(title, message, isConfirm = false) {
 
 function buildModalMessageHtml(title, message, isConfirm = false) {
   const iconCfg = getModalIconConfig(title, message, isConfirm);
+  const safeTitle = modalEscapeHtml(title);
   return `
     <div class="modal-icon modal-icon-${iconCfg.klass}" aria-hidden="true"><i class="fa-solid ${iconCfg.icon}"></i></div>
+    <div class="modal-copy-title">${safeTitle}</div>
     <div class="modal-copy">${modalEscapeHtml(message)}</div>
   `;
 }
@@ -263,7 +265,8 @@ function appAlert(message, title = "Notice") {
       return;
     }
 
-    modalTitle.innerText = title;
+    modalTitle.innerText = "";
+    modalTitle.classList.add("hidden");
     modalMessage.className = "modal-message centered";
     modalMessage.innerHTML = buildModalMessageHtml(title, message, false);
     modalCancelBtn.classList.add("hidden");
@@ -291,7 +294,8 @@ function appConfirm(message, title = "Confirm") {
       return;
     }
 
-    modalTitle.innerText = title;
+    modalTitle.innerText = "";
+    modalTitle.classList.add("hidden");
     modalMessage.className = "modal-message centered";
     modalMessage.innerHTML = buildModalMessageHtml(title, message, true);
     modalCancelBtn.classList.remove("hidden");

@@ -861,6 +861,7 @@ async function restoreDeletedTransaction(txnId) {
 }
 
 function closeEditModalCleanup() {
+  modalTitle.classList.remove("hidden");
   modalOkBtn.innerHTML = '<i class="fa-solid fa-check"></i> OK';
   modalCancelBtn.innerHTML = '<i class="fa-solid fa-xmark"></i> Cancel';
   modalCancelBtn.classList.add("hidden");
@@ -881,7 +882,8 @@ function openTransactionEditModal(txnId) {
       return;
     }
 
-    modalTitle.innerText = txn.type === "income" ? "Edit Income" : "Edit Expense";
+    modalTitle.innerText = "";
+    modalTitle.classList.add("hidden");
     modalCancelBtn.classList.remove("hidden");
     modalOkBtn.innerHTML = '<i class="fa-solid fa-check"></i> Save';
     modalCancelBtn.innerHTML = '<i class="fa-solid fa-xmark"></i> Cancel';
@@ -890,6 +892,7 @@ function openTransactionEditModal(txnId) {
     modalMessage.innerHTML = `
       <div class="edit-form">
         <div class="modal-icon modal-icon-edit" aria-hidden="true"><i class="fa-solid fa-pen-to-square"></i></div>
+        <div class="modal-copy-title">${txn.type === "income" ? "Edit Income" : "Edit Expense"}</div>
         <div class="edit-meta">Date: ${escapeHtml(txn.time || "-")}</div>
         <div class="field edit-field">
           <input id="editTxnAmount" type="number" min="0" step="0.01" value="${Number(txn.amount || 0)}" placeholder=" " />
