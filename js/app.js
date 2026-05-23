@@ -1723,7 +1723,7 @@ googleLoginBtn.addEventListener("click", async () => {
 });
 
 logoutBtn?.addEventListener("click", async () => {
-  const ok = await appConfirm("শুধু logout হবে, data delete হবে না। Continue?", "Log Out");
+  const ok = await appConfirm("আপনি শুধু লগআউট হবেন। আপনার কোনো data delete হবে না এবং সবকিছু save অবস্থায় থাকবে। লগআউট করতে চান?", "লগআউট নিশ্চিত করুন");
   if (!ok) return;
   try {
     await withLoader("Logging out...", async () => {
