@@ -24,6 +24,7 @@ const modalOkBtn = document.getElementById("modalOkBtn");
 const modalCancelBtn = document.getElementById("modalCancelBtn");
 
 const clearDataBtn = document.getElementById("clearDataBtn");
+const logoutBtn = document.getElementById("logoutBtn");
 const incomeInput = document.getElementById("incomeInput");
 const incomeSourceInput = document.getElementById("incomeSourceInput");
 const expenseInput = document.getElementById("expenseInput");

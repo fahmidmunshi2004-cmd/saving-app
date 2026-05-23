@@ -1722,6 +1722,25 @@ googleLoginBtn.addEventListener("click", async () => {
   }
 });
 
+logoutBtn?.addEventListener("click", async () => {
+  const ok = await appConfirm("শুধু logout হবে, data delete হবে না। Continue?", "Log Out");
+  if (!ok) return;
+  try {
+    await withLoader("Logging out...", async () => {
+      if (auth && auth.currentUser) {
+        await auth.signOut();
+      } else {
+        currentSession = null;
+        saveSession();
+        applyAuthState();
+      }
+    });
+    appAlert("Logged out successfully.");
+  } catch (e) {
+    appAlert(e.message || "Logout failed");
+  }
+});
+
 clearDataBtn.addEventListener("click", async () => {
   const promptText = "This will permanently delete your data. If you own any group account, that group and related data will also be deleted. Continue?";
   const ok = await appConfirm(promptText, "Clear Data");
