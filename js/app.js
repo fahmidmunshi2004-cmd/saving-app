@@ -531,8 +531,7 @@ async function createGroupFromGmail() {
   const financeRef = db.collection("groupFinance").doc(groupId);
   const now = firebase.firestore.FieldValue.serverTimestamp();
 
-  const batch = db.batch();
-  batch.set(groupRef, {
+  await groupRef.set({
     id: groupId,
     adminUsername: username,
     adminUsernameLower: unameKey,
@@ -541,17 +540,7 @@ async function createGroupFromGmail() {
     createdAt: now
   });
 
-  batch.set(userRef, {
-    username,
-    password,
-    groupId,
-    role: "admin",
-    canEdit: true,
-    memberId,
-    createdAt: now
-  });
-
-  batch.set(memberRef, {
+  await memberRef.set({
     groupId,
     memberId,
     type: "gmail",
@@ -561,7 +550,17 @@ async function createGroupFromGmail() {
     createdAt: now
   }, { merge: true });
 
-  batch.set(financeRef, {
+  await userRef.set({
+    username,
+    password,
+    groupId,
+    role: "admin",
+    canEdit: true,
+    memberId,
+    createdAt: now
+  });
+
+  await financeRef.set({
     income: 0,
     expense: 0,
     breakdown: {},
@@ -570,7 +569,6 @@ async function createGroupFromGmail() {
     createdAt: now,
     updatedAt: now
   }, { merge: true });
-  await batch.commit();
 
   currentSession = {
     type: "gmail",
