@@ -966,6 +966,11 @@ input:not(:placeholder-shown)+.floating-label {
     pointer-events: none;
     opacity: 0.1;
     background: linear-gradient(130deg, var(--brand), var(--brand-2));
+    z-index: -1;
+}
+
+#logoutBtn {
+    background: linear-gradient(120deg, #e14b6c, #ff7b6c) !important;
 }
 
 .settings-item strong {
