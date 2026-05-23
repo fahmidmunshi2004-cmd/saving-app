@@ -118,7 +118,11 @@ service cloud.firestore {
           request.resource.data.memberId == myMemberId()
           || resource.data.memberId == myMemberId()
         );
-      allow delete: if signedIn() && resource.data.memberId == myMemberId();
+      allow delete: if signedIn()
+        && (
+          resource.data.memberId == myMemberId()
+          || isGroupAdmin(resource.data.groupId)
+        );
     }
 
     match /userFinance/{uid} {

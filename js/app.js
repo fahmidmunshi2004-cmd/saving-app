@@ -1723,85 +1723,65 @@ googleLoginBtn.addEventListener("click", async () => {
 });
 
 clearDataBtn.addEventListener("click", async () => {
-  const isGroupMember = !!currentSession?.groupId;
-  const isAdmin = isGroupMember && isCurrentAdmin();
-  const promptText = isAdmin
-    ? "You are admin. This will delete full group data for everyone, then logout. Continue?"
-    : isGroupMember
-      ? "This will remove only your group access + your data, then logout. Continue?"
-      : "This will clear your account data and logout. Continue?";
+  const promptText = "This will permanently delete your data. If you own any group account, that group and related data will also be deleted. Continue?";
   const ok = await appConfirm(promptText, "Clear Data");
   if (!ok) return;
   let remoteClearError = "";
   showLoader("Resetting data...");
   try {
     try {
-      if (db) {
-        if (isAdmin && currentSession?.groupId) {
-          const groupId = currentSession.groupId;
-          const myMemberId = currentSession.memberId || (firebaseUser?.uid ? `gmail_${firebaseUser.uid}` : "");
+      if (db && firebaseUser?.uid) {
+        const myMemberId = `gmail_${firebaseUser.uid}`;
 
-          // 1) Clear pending invites for this group.
+        // Delete all groups owned by this Gmail, even if the current session is not inside that group.
+        const ownedGroupsSnap = await db
+          .collection("groups")
+          .where("createdByUid", "==", firebaseUser.uid)
+          .get();
+
+        for (const groupDoc of ownedGroupsSnap.docs) {
+          const groupId = groupDoc.id;
+          const myMembershipRef = db.collection("groupMembers").doc(`${groupId}__${myMemberId}`);
+
+          // Ensure admin membership exists so admin-only cleanup operations can pass rules.
+          await myMembershipRef.set({
+            groupId,
+            memberId: myMemberId,
+            type: "gmail",
+            label: firebaseUser.email || "Admin",
+            role: "admin",
+            canEdit: true,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+          }, { merge: true });
+
           const inviteSnap = await db.collection("invitations").where("groupId", "==", groupId).get();
-          for (const doc of inviteSnap.docs) {
-            await doc.ref.delete();
-          }
+          for (const doc of inviteSnap.docs) await doc.ref.delete();
 
-          // 2) Clear access requests for this group.
           const reqSnap = await db.collection("accessRequests").where("groupId", "==", groupId).get();
-          for (const doc of reqSnap.docs) {
-            await doc.ref.delete();
-          }
+          for (const doc of reqSnap.docs) await doc.ref.delete();
 
-          // 3) Delete all member rows.
           const membersSnap = await db.collection("groupMembers").where("groupId", "==", groupId).get();
-          for (const doc of membersSnap.docs) {
-            if (doc.id !== `${groupId}__${myMemberId}`) {
-              await doc.ref.delete();
-            }
-          }
+          for (const doc of membersSnap.docs) await doc.ref.delete();
 
-          // 4) Delete shared finance + group meta.
+          const credsSnap = await db.collection("groupUsers").where("groupId", "==", groupId).get();
+          for (const doc of credsSnap.docs) await doc.ref.delete();
+
           await db.collection("groupFinance").doc(groupId).delete();
           await db.collection("groups").doc(groupId).delete();
-
-          // 5) Delete my group user credential rows (if any).
-          const myUserRows = await db
-            .collection("groupUsers")
-            .where("groupId", "==", groupId)
-            .where("memberId", "==", myMemberId)
-            .get();
-          for (const doc of myUserRows.docs) {
-            await doc.ref.delete();
-          }
-
-          // 6) Delete my own membership last.
-          const selfMemberDocId = `${groupId}__${myMemberId}`;
-          await db.collection("groupMembers").doc(selfMemberDocId).delete();
-
-          if (firebaseUser?.uid) {
-            await db.collection("userFinance").doc(firebaseUser.uid).delete();
-          }
-        } else if (isGroupMember && currentSession?.groupId && currentSession?.memberId) {
-          const groupId = currentSession.groupId;
-          const memberDocId = `${groupId}__${currentSession.memberId}`;
-          await db.collection("groupMembers").doc(memberDocId).delete();
-
-          const myReqSnap = await db
-            .collection("accessRequests")
-            .where("groupId", "==", groupId)
-            .where("fromMemberId", "==", currentSession.memberId)
-            .get();
-          for (const doc of myReqSnap.docs) {
-            await doc.ref.delete();
-          }
-
-          if (firebaseUser?.uid) {
-            await db.collection("userFinance").doc(firebaseUser.uid).delete();
-          }
-        } else if (firebaseUser?.uid) {
-          await db.collection("userFinance").doc(firebaseUser.uid).delete();
         }
+
+        // Remove any remaining memberships/credentials linked to this Gmail (joined groups etc.).
+        const myMembershipsSnap = await db.collection("groupMembers").where("memberId", "==", myMemberId).get();
+        for (const doc of myMembershipsSnap.docs) {
+          await doc.ref.delete();
+        }
+
+        const myCredSnap = await db.collection("groupUsers").where("memberId", "==", myMemberId).get();
+        for (const doc of myCredSnap.docs) {
+          await doc.ref.delete();
+        }
+
+        await db.collection("userFinance").doc(firebaseUser.uid).delete();
       }
     } catch (err) {
       remoteClearError = err?.message || "Remote clear failed";
