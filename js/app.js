@@ -524,13 +524,18 @@ async function createGroupFromGmail() {
 
   if (!ownedGroupSnap.empty) {
     const ownedGroupId = ownedGroupSnap.docs[0].id;
-    let myMemberSnap;
+    let myCredentialSnap;
     try {
-      myMemberSnap = await db.collection("groupMembers").doc(`${ownedGroupId}__${memberId}`).get();
+      myCredentialSnap = await db
+        .collection("groupUsers")
+        .where("groupId", "==", ownedGroupId)
+        .where("memberId", "==", memberId)
+        .limit(1)
+        .get();
     } catch (e) {
-      throw new Error(`Owned-group member check failed: ${e?.message || e}`);
+      throw new Error(`Owned-group credential check failed: ${e?.message || e}`);
     }
-    if (myMemberSnap.exists) {
+    if (!myCredentialSnap.empty) {
       appAlert("আপনার Gmail দিয়ে already group account তৈরি আছে।");
       return;
     }
