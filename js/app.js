@@ -1683,7 +1683,7 @@ copyAdminCredentialBtn?.addEventListener("click", async () => {
     appAlert("Credential এখনো ready না। একটু পরে try করুন।");
     return;
   }
-  const text = `Username: ${uname}\nPassword: ${pass}`;
+  const text = `${uname}\n${pass}`;
   try {
     await navigator.clipboard.writeText(text);
     appAlert("Credentials copied.");
