@@ -506,10 +506,16 @@ async function createGroupFromGmail() {
     .collection("groups")
     .where("createdByUid", "==", firebaseUser.uid)
     .limit(1);
-  const [userSnap, ownedGroupSnap] = await Promise.all([
-    userRef.get(),
-    ownedGroupQuery.get()
-  ]);
+  let userSnap;
+  let ownedGroupSnap;
+  try {
+    [userSnap, ownedGroupSnap] = await Promise.all([
+      userRef.get(),
+      ownedGroupQuery.get()
+    ]);
+  } catch (e) {
+    throw new Error(`Group pre-check failed: ${e?.message || e}`);
+  }
 
   if (userSnap.exists) {
     appAlert("এই group username already আছে।");
@@ -518,7 +524,12 @@ async function createGroupFromGmail() {
 
   if (!ownedGroupSnap.empty) {
     const ownedGroupId = ownedGroupSnap.docs[0].id;
-    const myMemberSnap = await db.collection("groupMembers").doc(`${ownedGroupId}__${memberId}`).get();
+    let myMemberSnap;
+    try {
+      myMemberSnap = await db.collection("groupMembers").doc(`${ownedGroupId}__${memberId}`).get();
+    } catch (e) {
+      throw new Error(`Owned-group member check failed: ${e?.message || e}`);
+    }
     if (myMemberSnap.exists) {
       appAlert("আপনার Gmail দিয়ে already group account তৈরি আছে।");
       return;
