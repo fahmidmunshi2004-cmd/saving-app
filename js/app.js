@@ -501,9 +501,10 @@ async function createGroupFromGmail() {
 
   const unameKey = normalizeUsername(username);
   const userRef = db.collection("groupUsers").doc(unameKey);
+  const memberId = `gmail_${firebaseUser.uid}`;
   const ownedGroupQuery = db
     .collection("groups")
-    .where("createdByEmail", "==", (firebaseUser.email || "").toLowerCase())
+    .where("createdByUid", "==", firebaseUser.uid)
     .limit(1);
   const [userSnap, ownedGroupSnap] = await Promise.all([
     userRef.get(),
@@ -516,13 +517,16 @@ async function createGroupFromGmail() {
   }
 
   if (!ownedGroupSnap.empty) {
-    appAlert("আপনার Gmail দিয়ে already group account তৈরি আছে।");
-    return;
+    const ownedGroupId = ownedGroupSnap.docs[0].id;
+    const myMemberSnap = await db.collection("groupMembers").doc(`${ownedGroupId}__${memberId}`).get();
+    if (myMemberSnap.exists) {
+      appAlert("আপনার Gmail দিয়ে already group account তৈরি আছে।");
+      return;
+    }
   }
 
   const groupRef = db.collection("groups").doc();
   const groupId = groupRef.id;
-  const memberId = `gmail_${firebaseUser.uid}`;
   const memberRef = db.collection("groupMembers").doc(`${groupId}__${memberId}`);
   const financeRef = db.collection("groupFinance").doc(groupId);
   const now = firebase.firestore.FieldValue.serverTimestamp();
