@@ -531,44 +531,60 @@ async function createGroupFromGmail() {
   const financeRef = db.collection("groupFinance").doc(groupId);
   const now = firebase.firestore.FieldValue.serverTimestamp();
 
-  await groupRef.set({
-    id: groupId,
-    adminUsername: username,
-    adminUsernameLower: unameKey,
-    createdByEmail: (firebaseUser.email || "").toLowerCase(),
-    createdByUid: firebaseUser.uid,
-    createdAt: now
-  });
+  try {
+    await groupRef.set({
+      id: groupId,
+      adminUsername: username,
+      adminUsernameLower: unameKey,
+      createdByEmail: (firebaseUser.email || "").toLowerCase(),
+      createdByUid: firebaseUser.uid,
+      createdAt: now
+    });
+  } catch (e) {
+    throw new Error(`Group meta create failed: ${e?.message || e}`);
+  }
 
-  await memberRef.set({
-    groupId,
-    memberId,
-    type: "gmail",
-    label: firebaseUser.email || username,
-    role: "admin",
-    canEdit: true,
-    createdAt: now
-  }, { merge: true });
+  try {
+    await memberRef.set({
+      groupId,
+      memberId,
+      type: "gmail",
+      label: firebaseUser.email || username,
+      role: "admin",
+      canEdit: true,
+      createdAt: now
+    }, { merge: true });
+  } catch (e) {
+    throw new Error(`Group member create failed: ${e?.message || e}`);
+  }
 
-  await userRef.set({
-    username,
-    password,
-    groupId,
-    role: "admin",
-    canEdit: true,
-    memberId,
-    createdAt: now
-  });
+  try {
+    await userRef.set({
+      username,
+      password,
+      groupId,
+      role: "admin",
+      canEdit: true,
+      memberId,
+      createdAt: now
+    });
+  } catch (e) {
+    throw new Error(`Group credentials create failed: ${e?.message || e}`);
+  }
 
-  await financeRef.set({
-    income: 0,
-    expense: 0,
-    breakdown: {},
-    transactions: [],
-    deletedTransactions: [],
-    createdAt: now,
-    updatedAt: now
-  }, { merge: true });
+  try {
+    await financeRef.set({
+      income: 0,
+      expense: 0,
+      breakdown: {},
+      transactions: [],
+      deletedTransactions: [],
+      createdAt: now,
+      updatedAt: now
+    }, { merge: true });
+  } catch (e) {
+    throw new Error(`Group finance create failed: ${e?.message || e}`);
+  }
 
   currentSession = {
     type: "gmail",
