@@ -618,14 +618,25 @@ async function joinGroupFromGmail() {
 
   const groupId = userData.groupId;
   const memberId = `gmail_${firebaseUser.uid}`;
+  const memberDocId = `${groupId}__${memberId}`;
+  const memberRef = db.collection("groupMembers").doc(memberDocId);
+  const memberSnap = await memberRef.get();
+  const existing = memberSnap.exists ? (memberSnap.data() || {}) : null;
+  const isCredentialOwner = userData.memberId === memberId;
+  const resolvedRole = isCredentialOwner
+    ? (userData.role || existing?.role || "viewer")
+    : (existing?.role || userData.role || "viewer");
+  const resolvedCanEdit = typeof existing?.canEdit === "boolean"
+    ? existing.canEdit
+    : (typeof userData.canEdit === "boolean" ? userData.canEdit : resolvedRole !== "viewer");
 
-  await db.collection("groupMembers").doc(`${groupId}__${memberId}`).set({
+  await memberRef.set({
     groupId,
     memberId,
     type: "gmail",
     label: firebaseUser.email || "",
-    role: "viewer",
-    canEdit: false,
+    role: resolvedRole,
+    canEdit: resolvedCanEdit,
     createdAt: firebase.firestore.FieldValue.serverTimestamp()
   }, { merge: true });
 
@@ -635,8 +646,8 @@ async function joinGroupFromGmail() {
     email: firebaseUser.email,
     groupId,
     memberId,
-    role: "viewer",
-    canEdit: false
+    role: resolvedRole,
+    canEdit: resolvedCanEdit
   };
   saveSession();
   await loadGroupSharedData();
