@@ -1785,13 +1785,19 @@ clearDataBtn.addEventListener("click", async () => {
           for (const doc of reqSnap.docs) await doc.ref.delete();
 
           const membersSnap = await db.collection("groupMembers").where("groupId", "==", groupId).get();
-          for (const doc of membersSnap.docs) await doc.ref.delete();
+          const selfMemberDocId = `${groupId}__${myMemberId}`;
+          for (const doc of membersSnap.docs) {
+            if (doc.id !== selfMemberDocId) {
+              await doc.ref.delete();
+            }
+          }
 
           const credsSnap = await db.collection("groupUsers").where("groupId", "==", groupId).get();
           for (const doc of credsSnap.docs) await doc.ref.delete();
 
           await db.collection("groupFinance").doc(groupId).delete();
           await db.collection("groups").doc(groupId).delete();
+          await myMembershipRef.delete();
         }
 
         // Remove any remaining memberships/credentials linked to this Gmail (joined groups etc.).
