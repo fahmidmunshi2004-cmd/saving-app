@@ -536,7 +536,37 @@ async function createGroupFromGmail() {
       throw new Error(`Owned-group credential check failed: ${e?.message || e}`);
     }
     if (!myCredentialSnap.empty) {
-      appAlert("আপনার Gmail দিয়ে already group account তৈরি আছে।");
+      const cred = myCredentialSnap.docs[0].data() || {};
+      const restoredRole = cred.role || "admin";
+      const restoredCanEdit = typeof cred.canEdit === "boolean" ? cred.canEdit : (restoredRole !== "viewer");
+      const ownedMemberRef = db.collection("groupMembers").doc(`${ownedGroupId}__${memberId}`);
+      await ownedMemberRef.set({
+        groupId: ownedGroupId,
+        memberId,
+        type: "gmail",
+        label: firebaseUser.email || cred.username || "Admin",
+        role: restoredRole,
+        canEdit: restoredCanEdit,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      }, { merge: true });
+
+      currentSession = {
+        type: "gmail",
+        uid: firebaseUser.uid,
+        email: firebaseUser.email,
+        groupId: ownedGroupId,
+        memberId,
+        role: restoredRole,
+        canEdit: restoredCanEdit
+      };
+      saveSession();
+      await loadGroupSharedData();
+      syncTransactionState();
+      updateUI();
+      applyAuthState();
+      groupActionUsername.value = "";
+      groupActionPassword.value = "";
+      appAlert("আপনার আগের group account recover করা হয়েছে।");
       return;
     }
   }
