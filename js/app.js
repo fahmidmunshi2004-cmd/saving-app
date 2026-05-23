@@ -730,6 +730,11 @@ async function sendInviteToGmail() {
     appAlert("Friend Gmail দিন");
     return;
   }
+  const myEmail = (firebaseUser?.email || currentSession?.email || "").trim().toLowerCase();
+  if (myEmail && email === myEmail) {
+    appAlert("নিজের Gmail-এ invite পাঠানো যাবে না। অন্য member-এর Gmail দিন।");
+    return;
+  }
 
   const token = `inv_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
   await db.collection("invitations").doc(token).set({
