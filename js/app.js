@@ -29,7 +29,10 @@ const i18n = {
     admin_gmail: "Admin Gmail", request_access: "Request Access", pending_access_requests: "Pending Access Requests", deleted_transactions_admin: "Deleted Transactions (Admin)",
     danger_zone: "Danger Zone", log_out: "Log Out", clear_all_data: "Clear All Data", please_wait: "Please wait...", notice: "Notice", cancel: "Cancel", ok: "OK",
     save: "Save", group_account: "Group Account", gmail_account: "Gmail Account", role_viewer: "viewer", role_editor: "editor", role_admin: "admin", role_personal: "personal",
-    join_group: "Join Group", top_category: "Top Category", top_expense: "Top Expense", categories: "Categories", total_income_label: "Total Income:", total_expense_label: "Total Expense:"
+    join_group: "Join Group", top_category: "Top Category", top_expense: "Top Expense", categories: "Categories", total_income_label: "Total Income:", total_expense_label: "Total Expense:",
+    fixed_light_mode: "App fixed light mode is active.", session_lock_note: "This session has login lock active. Refreshing the page requires login again.",
+    storage_note: "Data is saved in local browser storage.", reset_note: "Need reset? Clear browser local storage to reset app data.",
+    danger_desc: "Pressing the button below will clear all data.", no_deleted_transactions: "No deleted transactions"
   },
   bn: {
     app_title: "ভল্ট বাজেট প্রাইম", app_subtitle: "নিরাপদ ভিজ্যুয়াল আইডেন্টিটি সহ পরিষ্কার ফাইন্যান্স ট্র্যাকার", language_label: "ভাষা",
@@ -47,7 +50,10 @@ const i18n = {
     admin_gmail: "অ্যাডমিন জিমেইল", request_access: "অ্যাক্সেস রিকোয়েস্ট", pending_access_requests: "অপেক্ষমান এক্সেস রিকোয়েস্ট", deleted_transactions_admin: "ডিলিটেড ট্রানজ্যাকশন (অ্যাডমিন)",
     danger_zone: "ডেঞ্জার জোন", log_out: "লগ আউট", clear_all_data: "সব ডেটা মুছুন", please_wait: "অপেক্ষা করুন...", notice: "নোটিশ", cancel: "বাতিল", ok: "ঠিক আছে",
     save: "সেভ", group_account: "গ্রুপ অ্যাকাউন্ট", gmail_account: "জিমেইল অ্যাকাউন্ট", role_viewer: "ভিউয়ার", role_editor: "এডিটর", role_admin: "অ্যাডমিন", role_personal: "পার্সোনাল",
-    join_group: "গ্রুপে যোগ দিন", top_category: "শীর্ষ ক্যাটাগরি", top_expense: "সর্বোচ্চ খরচ", categories: "ক্যাটাগরি", total_income_label: "মোট আয়:", total_expense_label: "মোট খরচ:"
+    join_group: "গ্রুপে যোগ দিন", top_category: "শীর্ষ ক্যাটাগরি", top_expense: "সর্বোচ্চ খরচ", categories: "ক্যাটাগরি", total_income_label: "মোট আয়:", total_expense_label: "মোট খরচ:",
+    fixed_light_mode: "অ্যাপ fixed light mode-এ চলছে।", session_lock_note: "এই session-এ login lock active আছে। page refresh করলে পুনরায় login লাগবে।",
+    storage_note: "Data local browser storage-এ save হয়।", reset_note: "Need reset? Browser local storage clear করলে app data reset হবে।",
+    danger_desc: "নিচের button চাপলে সব data clear হয়ে যাবে।", no_deleted_transactions: "কোনো deleted transaction নেই"
   },
   ar: {
     app_title: "فولت بدجت برايم", app_subtitle: "متتبع مالي نظيف مع هوية بصرية آمنة", language_label: "اللغة",
@@ -65,7 +71,10 @@ const i18n = {
     admin_gmail: "Gmail المسؤول", request_access: "طلب صلاحية", pending_access_requests: "طلبات الصلاحية المعلقة", deleted_transactions_admin: "المعاملات المحذوفة (مسؤول)",
     danger_zone: "منطقة الخطر", log_out: "تسجيل الخروج", clear_all_data: "مسح كل البيانات", please_wait: "يرجى الانتظار...", notice: "تنبيه", cancel: "إلغاء", ok: "موافق",
     save: "حفظ", group_account: "حساب مجموعة", gmail_account: "حساب Gmail", role_viewer: "مشاهد", role_editor: "محرر", role_admin: "مسؤول", role_personal: "شخصي",
-    join_group: "الانضمام إلى المجموعة", top_category: "أعلى فئة", top_expense: "أعلى مصروف", categories: "الفئات", total_income_label: "إجمالي الدخل:", total_expense_label: "إجمالي المصروف:"
+    join_group: "الانضمام إلى المجموعة", top_category: "أعلى فئة", top_expense: "أعلى مصروف", categories: "الفئات", total_income_label: "إجمالي الدخل:", total_expense_label: "إجمالي المصروف:",
+    fixed_light_mode: "التطبيق يعمل بوضع الإضاءة الثابت.", session_lock_note: "هذه الجلسة بها قفل تسجيل دخول نشط. تحديث الصفحة يتطلب تسجيل الدخول مرة أخرى.",
+    storage_note: "يتم حفظ البيانات في التخزين المحلي للمتصفح.", reset_note: "تحتاج إعادة ضبط؟ امسح التخزين المحلي للمتصفح لإعادة ضبط بيانات التطبيق.",
+    danger_desc: "الضغط على الزر أدناه سيمسح كل البيانات.", no_deleted_transactions: "لا توجد معاملات محذوفة"
   }
 };
 
@@ -963,7 +972,7 @@ function renderDeletedTransactions() {
   deletedTransactionsList.innerHTML = "";
   if (!deletedTransactions.length) {
     const li = document.createElement("li");
-    li.innerText = "No deleted transactions";
+    li.innerText = t("no_deleted_transactions");
     deletedTransactionsList.appendChild(li);
     return;
   }
