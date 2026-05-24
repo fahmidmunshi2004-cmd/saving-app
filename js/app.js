@@ -13,9 +13,60 @@
 const LANG_STORAGE_KEY = "vault_lang";
 let currentLang = localStorage.getItem(LANG_STORAGE_KEY) || "en";
 const i18n = {
-  en: { app_title: "Vault Budget Prime", app_subtitle: "Clean finance tracker with secure visual identity", language_label: "Language", income: "Income", expense: "Expense", balance: "Balance", add_income: "Add Income", income_amount: "Income amount", income_source: "Income source (Salary/Freelance...)", save_income: "Save Income", add_expense: "Add Expense", expense_amount: "Expense amount", category: "Category (Food, Travel...)", save_expense: "Save Expense", category_overview: "Category Overview", no_expense_category: "No expense category yet.", expense_column_chart: "Expense Column Chart", income_pie_chart: "Income Pie Chart", transaction_history: "Transaction History", download_pdf: "Download PDF", time: "Time", type: "Type", category_short: "Category", amount: "Amount", action: "Action", no_transactions: "No transactions yet.", home: "Home", report: "Report", wallet: "Wallet", settings: "Settings", records: "records", type_income: "Income", type_expense: "Expense", general_income: "General Income" },
-  bn: { app_title: "ভল্ট বাজেট প্রাইম", app_subtitle: "নিরাপদ ভিজ্যুয়াল আইডেন্টিটি সহ পরিষ্কার ফাইন্যান্স ট্র্যাকার", language_label: "ভাষা", income: "আয়", expense: "খরচ", balance: "ব্যালেন্স", add_income: "আয় যোগ করুন", income_amount: "আয়ের পরিমাণ", income_source: "আয়ের উৎস (বেতন/ফ্রিল্যান্স...)", save_income: "আয় সংরক্ষণ", add_expense: "খরচ যোগ করুন", expense_amount: "খরচের পরিমাণ", category: "ক্যাটাগরি (খাবার, ভ্রমণ...)", save_expense: "খরচ সংরক্ষণ", category_overview: "ক্যাটাগরি ওভারভিউ", no_expense_category: "এখনও কোনো খরচের ক্যাটাগরি নেই।", expense_column_chart: "খরচ কলাম চার্ট", income_pie_chart: "আয় পাই চার্ট", transaction_history: "লেনদেনের ইতিহাস", download_pdf: "পিডিএফ ডাউনলোড", time: "সময়", type: "ধরণ", category_short: "ক্যাটাগরি", amount: "পরিমাণ", action: "অ্যাকশন", no_transactions: "এখনও কোনো লেনদেন নেই।", home: "হোম", report: "রিপোর্ট", wallet: "ওয়ালেট", settings: "সেটিংস", records: "রেকর্ড", type_income: "আয়", type_expense: "খরচ", general_income: "সাধারণ আয়" },
-  ar: { app_title: "فولت بدجت برايم", app_subtitle: "متتبع مالي نظيف مع هوية بصرية آمنة", language_label: "اللغة", income: "الدخل", expense: "المصروف", balance: "الرصيد", add_income: "إضافة دخل", income_amount: "مبلغ الدخل", income_source: "مصدر الدخل (راتب/عمل حر...)", save_income: "حفظ الدخل", add_expense: "إضافة مصروف", expense_amount: "مبلغ المصروف", category: "الفئة (طعام، سفر...)", save_expense: "حفظ المصروف", category_overview: "نظرة الفئات", no_expense_category: "لا توجد فئة مصروفات بعد.", expense_column_chart: "مخطط أعمدة المصروفات", income_pie_chart: "مخطط دائري للدخل", transaction_history: "سجل المعاملات", download_pdf: "تنزيل PDF", time: "الوقت", type: "النوع", category_short: "الفئة", amount: "المبلغ", action: "الإجراء", no_transactions: "لا توجد معاملات بعد.", home: "الرئيسية", report: "التقارير", wallet: "المحفظة", settings: "الإعدادات", records: "سجل", type_income: "دخل", type_expense: "مصروف", general_income: "دخل عام" }
+  en: {
+    app_title: "Vault Budget Prime", app_subtitle: "Clean finance tracker with secure visual identity", language_label: "Language",
+    income: "Income", expense: "Expense", balance: "Balance", add_income: "Add Income", income_amount: "Income amount", income_source: "Income source (Salary/Freelance...)",
+    save_income: "Save Income", add_expense: "Add Expense", expense_amount: "Expense amount", category: "Category (Food, Travel...)", save_expense: "Save Expense",
+    category_overview: "Category Overview", no_expense_category: "No expense category yet.", expense_column_chart: "Expense Column Chart", income_pie_chart: "Income Pie Chart",
+    transaction_history: "Transaction History", download_pdf: "Download PDF", time: "Time", type: "Type", category_short: "Category", amount: "Amount", action: "Action",
+    no_transactions: "No transactions yet.", home: "Home", report: "Report", wallet: "Wallet", settings: "Settings", records: "records", type_income: "Income", type_expense: "Expense",
+    general_income: "General Income", login_required: "Login Required", login_help: "Continue with Google (Gmail) to access the app.", continue_google: "Continue with Google",
+    summary: "Summary", current_balance: "Current Balance", total_income: "Total Income", total_expense: "Total Expense", savings_rate: "Savings Rate",
+    income_vs_expense: "Income vs Expense Range", animated: "Animated", control: "Control", group_actions: "Group Actions", create_group_account: "Create Group Account",
+    add_another_group: "Add Another Group", group_action: "Group Action", group_username: "Group Username", group_password: "Group Password", submit: "Submit",
+    account_type: "Account Type", role: "Role", group_credentials_admin: "Group Credentials (Admin)", copy_credentials: "Copy Credentials", group_members: "Group Members",
+    invite_member_admin: "Invite Member (Admin)", friend_gmail: "Friend Gmail", send_invite: "Send Invite", request_edit_access: "Request Edit Access",
+    admin_gmail: "Admin Gmail", request_access: "Request Access", pending_access_requests: "Pending Access Requests", deleted_transactions_admin: "Deleted Transactions (Admin)",
+    danger_zone: "Danger Zone", log_out: "Log Out", clear_all_data: "Clear All Data", please_wait: "Please wait...", notice: "Notice", cancel: "Cancel", ok: "OK",
+    save: "Save", group_account: "Group Account", gmail_account: "Gmail Account", role_viewer: "viewer", role_editor: "editor", role_admin: "admin", role_personal: "personal",
+    join_group: "Join Group", top_category: "Top Category", top_expense: "Top Expense", categories: "Categories", total_income_label: "Total Income:", total_expense_label: "Total Expense:"
+  },
+  bn: {
+    app_title: "ভল্ট বাজেট প্রাইম", app_subtitle: "নিরাপদ ভিজ্যুয়াল আইডেন্টিটি সহ পরিষ্কার ফাইন্যান্স ট্র্যাকার", language_label: "ভাষা",
+    income: "আয়", expense: "খরচ", balance: "ব্যালেন্স", add_income: "আয় যোগ করুন", income_amount: "আয়ের পরিমাণ", income_source: "আয়ের উৎস (বেতন/ফ্রিল্যান্স...)",
+    save_income: "আয় সংরক্ষণ", add_expense: "খরচ যোগ করুন", expense_amount: "খরচের পরিমাণ", category: "ক্যাটাগরি (খাবার, ভ্রমণ...)", save_expense: "খরচ সংরক্ষণ",
+    category_overview: "ক্যাটাগরি ওভারভিউ", no_expense_category: "এখনও কোনো খরচের ক্যাটাগরি নেই।", expense_column_chart: "খরচ কলাম চার্ট", income_pie_chart: "আয় পাই চার্ট",
+    transaction_history: "লেনদেনের ইতিহাস", download_pdf: "পিডিএফ ডাউনলোড", time: "সময়", type: "ধরণ", category_short: "ক্যাটাগরি", amount: "পরিমাণ", action: "অ্যাকশন",
+    no_transactions: "এখনও কোনো লেনদেন নেই।", home: "হোম", report: "রিপোর্ট", wallet: "ওয়ালেট", settings: "সেটিংস", records: "রেকর্ড", type_income: "আয়", type_expense: "খরচ",
+    general_income: "সাধারণ আয়", login_required: "লগইন প্রয়োজন", login_help: "অ্যাপ ব্যবহার করতে Google (Gmail) দিয়ে লগইন করুন।", continue_google: "Google দিয়ে চালিয়ে যান",
+    summary: "সারসংক্ষেপ", current_balance: "বর্তমান ব্যালেন্স", total_income: "মোট আয়", total_expense: "মোট খরচ", savings_rate: "সঞ্চয় হার",
+    income_vs_expense: "আয় বনাম খরচ রেঞ্জ", animated: "অ্যানিমেটেড", control: "কন্ট্রোল", group_actions: "গ্রুপ অ্যাকশন", create_group_account: "গ্রুপ অ্যাকাউন্ট তৈরি করুন",
+    add_another_group: "আরেকটি গ্রুপ যোগ করুন", group_action: "গ্রুপ অ্যাকশন", group_username: "গ্রুপ ইউজারনেম", group_password: "গ্রুপ পাসওয়ার্ড", submit: "সাবমিট",
+    account_type: "অ্যাকাউন্ট টাইপ", role: "রোল", group_credentials_admin: "গ্রুপ ক্রেডেনশিয়াল (অ্যাডমিন)", copy_credentials: "ক্রেডেনশিয়াল কপি করুন", group_members: "গ্রুপ মেম্বার",
+    invite_member_admin: "মেম্বার ইনভাইট (অ্যাডমিন)", friend_gmail: "বন্ধুর জিমেইল", send_invite: "ইনভাইট পাঠান", request_edit_access: "এডিট এক্সেস রিকোয়েস্ট",
+    admin_gmail: "অ্যাডমিন জিমেইল", request_access: "অ্যাক্সেস রিকোয়েস্ট", pending_access_requests: "অপেক্ষমান এক্সেস রিকোয়েস্ট", deleted_transactions_admin: "ডিলিটেড ট্রানজ্যাকশন (অ্যাডমিন)",
+    danger_zone: "ডেঞ্জার জোন", log_out: "লগ আউট", clear_all_data: "সব ডেটা মুছুন", please_wait: "অপেক্ষা করুন...", notice: "নোটিশ", cancel: "বাতিল", ok: "ঠিক আছে",
+    save: "সেভ", group_account: "গ্রুপ অ্যাকাউন্ট", gmail_account: "জিমেইল অ্যাকাউন্ট", role_viewer: "ভিউয়ার", role_editor: "এডিটর", role_admin: "অ্যাডমিন", role_personal: "পার্সোনাল",
+    join_group: "গ্রুপে যোগ দিন", top_category: "শীর্ষ ক্যাটাগরি", top_expense: "সর্বোচ্চ খরচ", categories: "ক্যাটাগরি", total_income_label: "মোট আয়:", total_expense_label: "মোট খরচ:"
+  },
+  ar: {
+    app_title: "فولت بدجت برايم", app_subtitle: "متتبع مالي نظيف مع هوية بصرية آمنة", language_label: "اللغة",
+    income: "الدخل", expense: "المصروف", balance: "الرصيد", add_income: "إضافة دخل", income_amount: "مبلغ الدخل", income_source: "مصدر الدخل (راتب/عمل حر...)",
+    save_income: "حفظ الدخل", add_expense: "إضافة مصروف", expense_amount: "مبلغ المصروف", category: "الفئة (طعام، سفر...)", save_expense: "حفظ المصروف",
+    category_overview: "نظرة الفئات", no_expense_category: "لا توجد فئة مصروفات بعد.", expense_column_chart: "مخطط أعمدة المصروفات", income_pie_chart: "مخطط دائري للدخل",
+    transaction_history: "سجل المعاملات", download_pdf: "تنزيل PDF", time: "الوقت", type: "النوع", category_short: "الفئة", amount: "المبلغ", action: "الإجراء",
+    no_transactions: "لا توجد معاملات بعد.", home: "الرئيسية", report: "التقارير", wallet: "المحفظة", settings: "الإعدادات", records: "سجل", type_income: "دخل", type_expense: "مصروف",
+    general_income: "دخل عام", login_required: "تسجيل الدخول مطلوب", login_help: "تابع باستخدام Google (Gmail) للوصول إلى التطبيق.", continue_google: "المتابعة باستخدام Google",
+    summary: "ملخص", current_balance: "الرصيد الحالي", total_income: "إجمالي الدخل", total_expense: "إجمالي المصروف", savings_rate: "معدل الادخار",
+    income_vs_expense: "نطاق الدخل مقابل المصروف", animated: "متحرك", control: "التحكم", group_actions: "إجراءات المجموعة", create_group_account: "إنشاء حساب مجموعة",
+    add_another_group: "إضافة مجموعة أخرى", group_action: "إجراء المجموعة", group_username: "اسم مستخدم المجموعة", group_password: "كلمة مرور المجموعة", submit: "إرسال",
+    account_type: "نوع الحساب", role: "الدور", group_credentials_admin: "بيانات المجموعة (المسؤول)", copy_credentials: "نسخ البيانات", group_members: "أعضاء المجموعة",
+    invite_member_admin: "دعوة عضو (مسؤول)", friend_gmail: "Gmail الصديق", send_invite: "إرسال دعوة", request_edit_access: "طلب صلاحية التعديل",
+    admin_gmail: "Gmail المسؤول", request_access: "طلب صلاحية", pending_access_requests: "طلبات الصلاحية المعلقة", deleted_transactions_admin: "المعاملات المحذوفة (مسؤول)",
+    danger_zone: "منطقة الخطر", log_out: "تسجيل الخروج", clear_all_data: "مسح كل البيانات", please_wait: "يرجى الانتظار...", notice: "تنبيه", cancel: "إلغاء", ok: "موافق",
+    save: "حفظ", group_account: "حساب مجموعة", gmail_account: "حساب Gmail", role_viewer: "مشاهد", role_editor: "محرر", role_admin: "مسؤول", role_personal: "شخصي",
+    join_group: "الانضمام إلى المجموعة", top_category: "أعلى فئة", top_expense: "أعلى مصروف", categories: "الفئات", total_income_label: "إجمالي الدخل:", total_expense_label: "إجمالي المصروف:"
+  }
 };
 
 function t(key) {
@@ -38,6 +89,13 @@ function applyLanguage(lang = "en") {
   });
   const langSwitcher = document.getElementById("langSwitcher");
   if (langSwitcher) langSwitcher.value = currentLang;
+  if (currentSession && accountTypeText && accountRoleText) {
+    accountTypeText.innerText = currentSession.type === "group" ? t("group_account") : t("gmail_account");
+    accountRoleText.innerText = t(`role_${currentSession.role || "viewer"}`);
+  }
+  if (!groupActionFormCard?.classList.contains("hidden")) {
+    openGroupActionForm(groupActionMode);
+  }
   localStorage.setItem(LANG_STORAGE_KEY, currentLang);
 }
 
@@ -106,8 +164,8 @@ async function refreshSettingsPanels() {
     return;
   }
 
-  accountTypeText.innerText = currentSession.type === "group" ? "Group Account" : "Gmail Account";
-  accountRoleText.innerText = currentSession.role || "viewer";
+  accountTypeText.innerText = currentSession.type === "group" ? t("group_account") : t("gmail_account");
+  accountRoleText.innerText = t(`role_${currentSession.role || "viewer"}`);
 
   if (!currentSession.groupId || !db) {
     groupMembersCard.classList.add("hidden");
@@ -510,11 +568,11 @@ function openGroupActionForm(mode = "create") {
   groupActionMode = mode === "join" ? "join" : "create";
   groupActionFormCard.classList.remove("hidden");
   if (groupActionMode === "join") {
-    groupActionTitle.innerText = "Add Another Group";
-    groupActionSubmitBtn.innerHTML = '<i class="fa-solid fa-right-left"></i> Join Group';
+    groupActionTitle.innerText = t("add_another_group");
+    groupActionSubmitBtn.innerHTML = `<i class="fa-solid fa-right-left"></i> ${t("join_group")}`;
   } else {
-    groupActionTitle.innerText = "Create Group Account";
-    groupActionSubmitBtn.innerHTML = '<i class="fa-solid fa-people-group"></i> Create Group';
+    groupActionTitle.innerText = t("create_group_account");
+    groupActionSubmitBtn.innerHTML = `<i class="fa-solid fa-people-group"></i> ${t("create_group_account")}`;
   }
 }
 
@@ -974,8 +1032,8 @@ async function restoreDeletedTransaction(txnId) {
 function closeEditModalCleanup() {
   modalTitle.classList.remove("hidden");
   modalOkBtn.parentElement?.classList.add("single-btn");
-  modalOkBtn.innerHTML = '<i class="fa-solid fa-check"></i> OK';
-  modalCancelBtn.innerHTML = '<i class="fa-solid fa-xmark"></i> Cancel';
+  modalOkBtn.innerHTML = `<i class="fa-solid fa-check"></i> ${t("ok")}`;
+  modalCancelBtn.innerHTML = `<i class="fa-solid fa-xmark"></i> ${t("cancel")}`;
   modalCancelBtn.classList.add("hidden");
   modalMessage.className = "modal-message";
   modalMessage.innerHTML = "";
@@ -998,8 +1056,8 @@ function openTransactionEditModal(txnId) {
     modalTitle.classList.add("hidden");
     modalOkBtn.parentElement?.classList.remove("single-btn");
     modalCancelBtn.classList.remove("hidden");
-    modalOkBtn.innerHTML = '<i class="fa-solid fa-check"></i> Save';
-    modalCancelBtn.innerHTML = '<i class="fa-solid fa-xmark"></i> Cancel';
+    modalOkBtn.innerHTML = `<i class="fa-solid fa-check"></i> ${t("save")}`;
+    modalCancelBtn.innerHTML = `<i class="fa-solid fa-xmark"></i> ${t("cancel")}`;
 
     modalMessage.className = "modal-message edit-mode";
     modalMessage.innerHTML = `
