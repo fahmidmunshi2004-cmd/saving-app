@@ -304,6 +304,48 @@ body {
     gap: 10px;
 }
 
+.lang-picker-wrap {
+    margin-left: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 132px;
+}
+
+.lang-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--muted);
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+}
+
+.lang-switcher {
+    border: 1px solid color-mix(in srgb, var(--brand) 26%, #dbe3ef);
+    border-radius: 10px;
+    padding: 8px 10px;
+    background: #ffffff;
+    color: var(--text);
+    font: inherit;
+    font-size: 0.86rem;
+    font-weight: 700;
+    outline: none;
+    cursor: pointer;
+}
+
+html[dir="rtl"] .hero,
+html[dir="rtl"] .chart-head,
+html[dir="rtl"] .history-head,
+html[dir="rtl"] .side-head,
+html[dir="rtl"] .wallet-head {
+    direction: rtl;
+}
+
+html[dir="rtl"] .lang-picker-wrap {
+    margin-left: 0;
+    margin-right: auto;
+}
+
 .brand {
     display: flex;
     align-items: center;

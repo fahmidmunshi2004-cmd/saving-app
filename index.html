@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html lang="en">
+<html lang="en" dir="ltr">
 
 <head>
     <meta charset="UTF-8" />
@@ -59,53 +59,61 @@
             <div class="brand">
                 <div class="logo"><i class="fa-solid fa-vault"></i></div>
                 <div>
-                    <h1>Vault Budget Prime</h1>
-                    <p class="sub">Clean finance tracker with secure visual identity</p>
+                    <h1 data-i18n="app_title">Vault Budget Prime</h1>
+                    <p class="sub" data-i18n="app_subtitle">Clean finance tracker with secure visual identity</p>
                 </div>
+            </div>
+            <div class="lang-picker-wrap">
+                <label for="langSwitcher" class="lang-label" data-i18n="language_label">Language</label>
+                <select id="langSwitcher" class="lang-switcher" aria-label="Language selector">
+                    <option value="en">English</option>
+                    <option value="bn">বাংলা</option>
+                    <option value="ar">العربية</option>
+                </select>
             </div>
         </div>
 
         <div class="stats">
             <div class="stat income">
-                <div class="label"><i class="fa-solid fa-coins"></i> Income</div>
+                <div class="label"><i class="fa-solid fa-coins"></i> <span data-i18n="income">Income</span></div>
                 <div class="value" id="income">0 BDT</div>
             </div>
             <div class="stat expense">
-                <div class="label"><i class="fa-solid fa-receipt"></i> Expense</div>
+                <div class="label"><i class="fa-solid fa-receipt"></i> <span data-i18n="expense">Expense</span></div>
                 <div class="value" id="expense">0 BDT</div>
             </div>
             <div class="stat balance">
-                <div class="label"><i class="fa-solid fa-piggy-bank"></i> Balance</div>
+                <div class="label"><i class="fa-solid fa-piggy-bank"></i> <span data-i18n="balance">Balance</span></div>
                 <div class="value" id="balance">0 BDT</div>
             </div>
         </div>
 
         <div class="forms">
             <div class="box">
-                <h3><i class="fa-solid fa-hand-holding-dollar"></i> Add Income</h3>
+                <h3><i class="fa-solid fa-hand-holding-dollar"></i> <span data-i18n="add_income">Add Income</span></h3>
                 <div class="field">
                     <input type="number" id="incomeInput" placeholder=" " />
-                    <label class="floating-label" for="incomeInput">Income amount</label>
+                    <label class="floating-label" for="incomeInput" data-i18n="income_amount">Income amount</label>
                 </div>
                 <div class="field">
                     <input type="text" id="incomeSourceInput" placeholder=" " />
-                    <label class="floating-label" for="incomeSourceInput">Income source (Salary/Freelance...)</label>
+                    <label class="floating-label" for="incomeSourceInput" data-i18n="income_source">Income source (Salary/Freelance...)</label>
                 </div>
                 <button id="incomeBtn" class="btn income-btn" onclick="addIncome()"><i
-                        class="fa-solid fa-circle-plus"></i> Save Income</button>
+                        class="fa-solid fa-circle-plus"></i> <span data-i18n="save_income">Save Income</span></button>
             </div>
             <div class="box">
-                <h3><i class="fa-solid fa-credit-card"></i> Add Expense</h3>
+                <h3><i class="fa-solid fa-credit-card"></i> <span data-i18n="add_expense">Add Expense</span></h3>
                 <div class="field">
                     <input type="number" id="expenseInput" placeholder=" " />
-                    <label class="floating-label" for="expenseInput">Expense amount</label>
+                    <label class="floating-label" for="expenseInput" data-i18n="expense_amount">Expense amount</label>
                 </div>
                 <div class="field">
                     <input type="text" id="categoryInput" placeholder=" " />
-                    <label class="floating-label" for="categoryInput">Category (Food, Travel...)</label>
+                    <label class="floating-label" for="categoryInput" data-i18n="category">Category (Food, Travel...)</label>
                 </div>
                 <button id="expenseBtn" class="btn expense-btn" onclick="addExpense()"><i
-                        class="fa-solid fa-circle-minus"></i> Save Expense</button>
+                        class="fa-solid fa-circle-minus"></i> <span data-i18n="save_expense">Save Expense</span></button>
             </div>
         </div>
     </section>
@@ -113,16 +121,16 @@
     <section id="reportView" class="view">
         <div id="categoryOverviewBlock" class="hidden">
             <div class="side-head">
-                <h3><i class="fa-solid fa-chart-simple"></i> Category Overview</h3>
+                <h3><i class="fa-solid fa-chart-simple"></i> <span data-i18n="category_overview">Category Overview</span></h3>
                 <span class="pill">Live</span>
             </div>
             <ul id="list" class="list"></ul>
-            <p id="emptyState" class="empty" hidden>No expense category yet.</p>
+            <p id="emptyState" class="empty" hidden data-i18n="no_expense_category">No expense category yet.</p>
         </div>
 
         <div class="chart-card">
             <div class="chart-head">
-                <h3><i class="fa-solid fa-chart-column"></i> Expense Column Chart</h3>
+                <h3><i class="fa-solid fa-chart-column"></i> <span data-i18n="expense_column_chart">Expense Column Chart</span></h3>
                 <span class="history-count">Category wise</span>
             </div>
             <div class="chart-wrap">
@@ -137,7 +145,7 @@
 
         <div class="chart-card">
             <div class="chart-head">
-                <h3><i class="fa-solid fa-chart-pie"></i> Income Pie Chart</h3>
+                <h3><i class="fa-solid fa-chart-pie"></i> <span data-i18n="income_pie_chart">Income Pie Chart</span></h3>
                 <span class="history-count">Source wise</span>
             </div>
             <div class="chart-wrap">
@@ -147,22 +155,22 @@
 
         <div class="history">
             <div class="history-head">
-                <h3><i class="fa-solid fa-timeline"></i> Transaction History</h3>
+                <h3><i class="fa-solid fa-timeline"></i> <span data-i18n="transaction_history">Transaction History</span></h3>
                 <div class="history-actions">
                     <span id="txnCount" class="history-count">0 records</span>
                     <button id="downloadPdfBtn" type="button" class="mini-btn"><i class="fa-solid fa-file-pdf"></i>
-                        Download PDF</button>
+                        <span data-i18n="download_pdf">Download PDF</span></button>
                 </div>
             </div>
             <div class="table-wrap">
                 <table class="txn-table">
                     <thead>
                         <tr>
-                            <th>Time</th>
-                            <th>Type</th>
-                            <th>Category</th>
-                            <th>Amount</th>
-                            <th>Action</th>
+                            <th data-i18n="time">Time</th>
+                            <th data-i18n="type">Type</th>
+                            <th data-i18n="category_short">Category</th>
+                            <th data-i18n="amount">Amount</th>
+                            <th data-i18n="action">Action</th>
                         </tr>
                     </thead>
                     <tbody id="txnTableBody"></tbody>
@@ -181,7 +189,7 @@
                     </tfoot>
                 </table>
             </div>
-            <p id="txnEmpty" class="empty" hidden>No transactions yet.</p>
+            <p id="txnEmpty" class="empty" hidden data-i18n="no_transactions">No transactions yet.</p>
         </div>
     </section>
 
@@ -317,12 +325,12 @@
 
     <nav class="bottom-nav" aria-label="Bottom navigation">
         <button class="nav-btn active" type="button" data-view="homeView"><i class="fa-solid fa-house"></i>
-            Home</button>
+            <span data-i18n="home">Home</span></button>
         <button class="nav-btn" type="button" data-view="reportView"><i class="fa-solid fa-chart-line"></i>
-            Report</button>
-        <button class="nav-btn" type="button" data-view="walletView"><i class="fa-solid fa-wallet"></i> Wallet</button>
+            <span data-i18n="report">Report</span></button>
+        <button class="nav-btn" type="button" data-view="walletView"><i class="fa-solid fa-wallet"></i> <span data-i18n="wallet">Wallet</span></button>
         <button class="nav-btn" type="button" data-view="settingsView"><i class="fa-solid fa-gear"></i>
-            Settings</button>
+            <span data-i18n="settings">Settings</span></button>
     </nav>
 
     <div id="appLoader" class="app-loader hidden" aria-live="polite" aria-busy="true">

@@ -10,6 +10,37 @@
   return { id: snap.docs[0].id, ...snap.docs[0].data() };
 }
 
+const LANG_STORAGE_KEY = "vault_lang";
+let currentLang = localStorage.getItem(LANG_STORAGE_KEY) || "en";
+const i18n = {
+  en: { app_title: "Vault Budget Prime", app_subtitle: "Clean finance tracker with secure visual identity", language_label: "Language", income: "Income", expense: "Expense", balance: "Balance", add_income: "Add Income", income_amount: "Income amount", income_source: "Income source (Salary/Freelance...)", save_income: "Save Income", add_expense: "Add Expense", expense_amount: "Expense amount", category: "Category (Food, Travel...)", save_expense: "Save Expense", category_overview: "Category Overview", no_expense_category: "No expense category yet.", expense_column_chart: "Expense Column Chart", income_pie_chart: "Income Pie Chart", transaction_history: "Transaction History", download_pdf: "Download PDF", time: "Time", type: "Type", category_short: "Category", amount: "Amount", action: "Action", no_transactions: "No transactions yet.", home: "Home", report: "Report", wallet: "Wallet", settings: "Settings", records: "records", type_income: "Income", type_expense: "Expense", general_income: "General Income" },
+  bn: { app_title: "ভল্ট বাজেট প্রাইম", app_subtitle: "নিরাপদ ভিজ্যুয়াল আইডেন্টিটি সহ পরিষ্কার ফাইন্যান্স ট্র্যাকার", language_label: "ভাষা", income: "আয়", expense: "খরচ", balance: "ব্যালেন্স", add_income: "আয় যোগ করুন", income_amount: "আয়ের পরিমাণ", income_source: "আয়ের উৎস (বেতন/ফ্রিল্যান্স...)", save_income: "আয় সংরক্ষণ", add_expense: "খরচ যোগ করুন", expense_amount: "খরচের পরিমাণ", category: "ক্যাটাগরি (খাবার, ভ্রমণ...)", save_expense: "খরচ সংরক্ষণ", category_overview: "ক্যাটাগরি ওভারভিউ", no_expense_category: "এখনও কোনো খরচের ক্যাটাগরি নেই।", expense_column_chart: "খরচ কলাম চার্ট", income_pie_chart: "আয় পাই চার্ট", transaction_history: "লেনদেনের ইতিহাস", download_pdf: "পিডিএফ ডাউনলোড", time: "সময়", type: "ধরণ", category_short: "ক্যাটাগরি", amount: "পরিমাণ", action: "অ্যাকশন", no_transactions: "এখনও কোনো লেনদেন নেই।", home: "হোম", report: "রিপোর্ট", wallet: "ওয়ালেট", settings: "সেটিংস", records: "রেকর্ড", type_income: "আয়", type_expense: "খরচ", general_income: "সাধারণ আয়" },
+  ar: { app_title: "فولت بدجت برايم", app_subtitle: "متتبع مالي نظيف مع هوية بصرية آمنة", language_label: "اللغة", income: "الدخل", expense: "المصروف", balance: "الرصيد", add_income: "إضافة دخل", income_amount: "مبلغ الدخل", income_source: "مصدر الدخل (راتب/عمل حر...)", save_income: "حفظ الدخل", add_expense: "إضافة مصروف", expense_amount: "مبلغ المصروف", category: "الفئة (طعام، سفر...)", save_expense: "حفظ المصروف", category_overview: "نظرة الفئات", no_expense_category: "لا توجد فئة مصروفات بعد.", expense_column_chart: "مخطط أعمدة المصروفات", income_pie_chart: "مخطط دائري للدخل", transaction_history: "سجل المعاملات", download_pdf: "تنزيل PDF", time: "الوقت", type: "النوع", category_short: "الفئة", amount: "المبلغ", action: "الإجراء", no_transactions: "لا توجد معاملات بعد.", home: "الرئيسية", report: "التقارير", wallet: "المحفظة", settings: "الإعدادات", records: "سجل", type_income: "دخل", type_expense: "مصروف", general_income: "دخل عام" }
+};
+
+function t(key) {
+  return i18n[currentLang]?.[key] || i18n.en[key] || key;
+}
+
+function getLocaleForLang() {
+  if (currentLang === "bn") return "bn-BD";
+  if (currentLang === "ar") return "ar-SA";
+  return "en-BD";
+}
+
+function applyLanguage(lang = "en") {
+  currentLang = i18n[lang] ? lang : "en";
+  document.documentElement.lang = currentLang;
+  document.documentElement.dir = currentLang === "ar" ? "rtl" : "ltr";
+  document.querySelectorAll("[data-i18n]").forEach((el) => {
+    const key = el.getAttribute("data-i18n");
+    if (key) el.textContent = t(key);
+  });
+  const langSwitcher = document.getElementById("langSwitcher");
+  if (langSwitcher) langSwitcher.value = currentLang;
+  localStorage.setItem(LANG_STORAGE_KEY, currentLang);
+}
+
 function canManageHistory() {
   if (!currentSession) return false;
   if (isCurrentAdmin()) return true;
@@ -1084,7 +1115,7 @@ function renderTransactions() {
   let totalIncome = 0;
   let totalExpense = 0;
 
-  txnCount.innerText = `${transactions.length} records`;
+  txnCount.innerText = `${transactions.length} ${t("records")}`;
   txnEmpty.hidden = transactions.length > 0;
 
   for (const txn of [...transactions].reverse()) {
@@ -1097,17 +1128,19 @@ function renderTransactions() {
     const chip = document.createElement("span");
 
     time.innerText = txn.time;
-    time.setAttribute("data-label", "Time");
+    time.setAttribute("data-label", t("time"));
     chip.className = `type-chip ${txn.type === "income" ? "type-income" : "type-expense"}`;
-    chip.innerHTML = txn.type === "income" ? '<i class="fa-solid fa-arrow-up"></i> Income' : '<i class="fa-solid fa-arrow-down"></i> Expense';
-    type.setAttribute("data-label", "Type");
+    chip.innerHTML = txn.type === "income"
+      ? `<i class="fa-solid fa-arrow-up"></i> ${t("type_income")}`
+      : `<i class="fa-solid fa-arrow-down"></i> ${t("type_expense")}`;
+    type.setAttribute("data-label", t("type"));
     type.appendChild(chip);
 
     category.innerText = txn.category;
-    category.setAttribute("data-label", "Category");
+    category.setAttribute("data-label", t("category_short"));
     amount.innerText = formatMoney(txn.amount);
     amount.className = txn.type === "income" ? "amount-income" : "amount-expense";
-    amount.setAttribute("data-label", "Amount");
+    amount.setAttribute("data-label", t("amount"));
     if (txn.type === "income") {
       totalIncome += Number(txn.amount || 0);
     } else {
@@ -1143,7 +1176,7 @@ function renderTransactions() {
     } else {
       action.innerText = "-";
     }
-    action.setAttribute("data-label", "Action");
+    action.setAttribute("data-label", t("action"));
 
     row.appendChild(time);
     row.appendChild(type);
@@ -1490,9 +1523,9 @@ function addIncome() {
   if (!val || val < 0) return;
   transactions.push({
     id: makeTransactionId(),
-    time: new Date().toLocaleString("en-BD"),
+    time: new Date().toLocaleString(getLocaleForLang()),
     type: "income",
-    category: source || "General Income",
+    category: source || t("general_income"),
     amount: val
   });
   recalculateFinanceFromTransactions();
@@ -1508,7 +1541,7 @@ function addExpense() {
   if (!val || val < 0 || cat === "") return;
   transactions.push({
     id: makeTransactionId(),
-    time: new Date().toLocaleString("en-BD"),
+    time: new Date().toLocaleString(getLocaleForLang()),
     type: "expense",
     category: cat,
     amount: val
@@ -1849,6 +1882,7 @@ clearDataBtn.addEventListener("click", async () => {
 });
 
 applyTheme();
+applyLanguage(currentLang);
 loadData();
 syncTransactionState();
 updateUI();
@@ -1860,6 +1894,11 @@ registerServiceWorker();
 if (document.querySelector(".view.active")?.id === "walletView") {
   renderSavingsRateChart(false);
 }
+
+document.getElementById("langSwitcher")?.addEventListener("change", (event) => {
+  applyLanguage(event.target.value);
+  updateUI();
+});
 
 window.addIncome = addIncome;
 window.addExpense = addExpense;
