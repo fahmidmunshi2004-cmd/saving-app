@@ -394,20 +394,21 @@ body {
 }
 
 .lang-flag {
-    min-width: 34px;
-    height: 28px;
-    padding: 0 8px;
-    border-radius: 999px;
+    width: 36px;
+    height: 27px;
+    padding: 0;
+    border-radius: 4px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(120deg, var(--brand), var(--brand-2));
+    background: transparent;
     color: #ffffff;
     font-size: 0.7rem;
     font-weight: 800;
     letter-spacing: 0.6px;
-    box-shadow: 0 8px 14px rgba(255, 1, 79, 0.2);
-    transition: transform 0.22s ease, box-shadow 0.22s ease, filter 0.22s ease;
+    box-shadow: none;
+    overflow: hidden;
+    transition: transform 0.22s ease, filter 0.22s ease;
 }
 
 .lang-flag__img,
@@ -484,23 +485,24 @@ body {
 }
 
 .lang-option-flag {
-    min-width: 40px;
-    height: 32px;
-    padding: 0 10px;
-    border-radius: 12px;
+    width: 40px;
+    height: 30px;
+    padding: 0;
+    border-radius: 4px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(120deg, color-mix(in srgb, var(--brand) 88%, #fff), color-mix(in srgb, var(--brand-2) 85%, #fff));
+    background: transparent;
     color: #ffffff;
     font-size: 0.95rem;
     font-weight: 800;
-    box-shadow: 0 8px 14px rgba(255, 1, 79, 0.16);
+    box-shadow: none;
+    overflow: hidden;
     flex: 0 0 auto;
 }
 
 .lang-option-flag.flag-fallback {
-    padding: 0 8px;
+    padding: 0;
 }
 
 .lang-option:hover {
