@@ -216,6 +216,21 @@ function getFriendlyGroupError(error, fallback = "Group action failed") {
   return error?.message || fallback;
 }
 
+const BUTTON_CLICK_SOUND_SRC = "assets/btn-click-sound.mp3";
+const buttonClickSoundTemplate = new Audio(BUTTON_CLICK_SOUND_SRC);
+buttonClickSoundTemplate.preload = "auto";
+buttonClickSoundTemplate.volume = 0.35;
+
+function playButtonClickSound() {
+  try {
+    const clip = buttonClickSoundTemplate.cloneNode(true);
+    clip.volume = buttonClickSoundTemplate.volume;
+    clip.play().catch(() => { });
+  } catch (_) {
+    // Ignore sound failures so buttons still work normally.
+  }
+}
+
 function canManageHistory() {
   if (!currentSession) return false;
   if (isCurrentAdmin()) return true;
@@ -1933,6 +1948,12 @@ groupActionSubmitBtn.addEventListener("click", async () => {
     appAlert(getFriendlyGroupError(e));
   }
 });
+
+document.addEventListener("click", (event) => {
+  const button = event.target?.closest?.("button");
+  if (!button || button.disabled) return;
+  playButtonClickSound();
+}, true);
 
 langSwitcher?.addEventListener("click", (event) => {
   event.stopPropagation();
