@@ -49,7 +49,35 @@ const i18n = {
     group_action_permission_tip: "If permission errors appear, sign out and sign in again, then try the exact username and password.",
     fixed_light_mode: "App fixed light mode is active.", session_lock_note: "This session has login lock active. Refreshing the page requires login again.",
     storage_note: "Data is saved in local browser storage.", reset_note: "Need reset? Clear browser local storage to reset app data.",
-    danger_desc: "Pressing the button below will clear all data.", no_deleted_transactions: "No deleted transactions"
+    danger_desc: "Pressing the button below will clear all data.", no_deleted_transactions: "No deleted transactions",
+    no_pending_request: "No pending request", edit_access_requested: "Access request sent to the admin queue.",
+    login_first: "Please log in with Gmail first.", username_password_required: "Please enter username and password.",
+    group_username_exists: "That group username already exists.", group_account_recovered: "Your previous group account has been restored.",
+    group_account_created: "Group account created.", group_username_not_found: "Group username not found.", wrong_password: "Wrong password.",
+    joined_group_success: "Joined group successfully.", friend_gmail_required: "Please enter a friend Gmail.", invite_self_error: "You cannot invite your own Gmail. Use another member's Gmail.",
+    invite_compose_opened: "Invite compose opened. Please share this link manually if needed:\n\n{link}", invite_expired: "This invite link has expired. Ask the admin for a new invite.",
+    invite_mismatch: "This invite is for {invited}. You are signed in as {current}.", admin_only_delete: "Only the admin can delete transactions.",
+    invite_expired: "This invite link has expired. Ask the admin for a new invite.",
+    invite_mismatch_title: "Invite Mismatch",
+    delete_transaction_confirm: "Do you want to delete this transaction?", admin_only_restore: "Only the admin can restore transactions.",
+    admin_only_edit: "Only the admin can edit transactions.", admin_only_permanent_delete: "Only the admin can permanently delete transactions.",
+    permanent_delete_confirm: "This deleted transaction will be removed forever. It cannot be restored. Continue?",
+    popup_blocked: "Popup blocked. Please allow popups and try again.", auth_error: "Authentication error.", google_login_failed: "Google login failed.",
+    logout_confirm: "You will be logged out only. Your data will stay saved.", logout_title: "Log Out?", clear_data_title: "Clear Data",
+    logout_success: "Logged out successfully.", logout_failed: "Logout failed", clear_data_confirm: "This will permanently delete your data. If you own any group account, that group and related data will also be deleted. Continue?",
+    local_reset_remote_failed: "Local reset complete, but cloud data delete failed: {error}", clear_all_data_complete: "Clear all data complete. Logged out successfully.",
+    credentials_not_ready: "Credentials are not ready yet. Please try again later.", credentials_copied: "Credentials copied.",
+    copy_failed: "Copy failed. Please copy manually:\n\n{text}", kick_member_confirm: "Do you want to remove {label} from the group?", kick_title: "Kick Member",
+    kick_failed: "Kick failed", invite_failed: "Invite failed", request_failed: "Request failed", restore_failed: "Restore failed",
+    delete_failed: "Delete failed", edit_failed: "Edit failed", signing_in: "Signing in with Google...", logging_out: "Logging out...",
+    resetting_data: "Resetting data...", joining_group: "Joining group...", creating_group: "Creating group...", sending_invite: "Sending invite...",
+    submitting_request: "Submitting request...", restoring_transaction: "Restoring transaction...", deleting_transaction: "Deleting transaction...",
+    copying_credentials: "Copying credentials...", no_pending_request_label: "No pending request", delete_transaction_title: "Delete Transaction",
+    edit_income_title: "Edit Income", edit_expense_title: "Edit Expense", edit_date: "Date", edit_amount: "Amount",
+    edit_income_source: "Income source", edit_category: "Category", valid_amount_required: "Please enter a valid amount.",
+    income_source_required: "Please enter an income source.", category_required: "Please enter a category.",
+    private_mode_login_first: "Private mode is enabled. Log in first.", logged_in_as_email: "Logged in as {email}",
+    logged_in_as_group_user: "Logged in as group user: {username}", approve: "Approve", remove: "Remove", restore: "Restore"
   },
   bn: {
     app_title: "ভল্ট বাজেট প্রাইম", app_subtitle: "নিরাপদ ভিজ্যুয়াল আইডেন্টিটি সহ পরিষ্কার ফাইন্যান্স ট্র্যাকার", language_label: "ভাষা", language_search: "ভাষা খুঁজুন", language_no_match: "কোনো ভাষা পাওয়া যায়নি",
@@ -71,9 +99,36 @@ const i18n = {
     group_action_help_join: "Admin-এর দেয়া exact group username আর password ব্যবহার করুন।",
     group_action_help_create: "Admin account-এর জন্য নতুন group username আর password দিন।",
     group_action_permission_tip: "Permission error এলে logout করে আবার login করুন, তারপর exact username/password দিয়ে try করুন।",
-    fixed_light_mode: "অ্যাপ fixed light mode-এ চলছে।", session_lock_note: "এই session-এ login lock active আছে। page refresh করলে পুনরায় login লাগবে।",
-    storage_note: "Data local browser storage-এ save হয়।", reset_note: "Need reset? Browser local storage clear করলে app data reset হবে।",
-    danger_desc: "নিচের button চাপলে সব data clear হয়ে যাবে।", no_deleted_transactions: "কোনো deleted transaction নেই"
+    fixed_light_mode: "অ্যাপ স্থির লাইট মোডে চলছে।", session_lock_note: "এই সেশনে login lock active আছে। page refresh করলে আবার login লাগবে।",
+    storage_note: "ডেটা local browser storage-এ save হয়।", reset_note: "রিসেট দরকার? App data reset করতে browser local storage clear করুন।",
+    danger_desc: "নিচের বাটন চাপলে সব ডেটা মুছে যাবে।", no_deleted_transactions: "কোনো মুছে ফেলা লেনদেন নেই",
+    no_pending_request: "কোনো pending request নেই", edit_access_requested: "অ্যাক্সেস রিকোয়েস্ট admin queue-তে গেছে।",
+    login_first: "আগে Gmail দিয়ে লগইন করুন।", username_password_required: "Username আর password দিন।",
+    group_username_exists: "এই group username আগে থেকেই আছে।", group_account_recovered: "আপনার আগের group account recover করা হয়েছে।",
+    group_account_created: "Group account তৈরি হয়েছে।", group_username_not_found: "Group username পাওয়া যায়নি।", wrong_password: "Password ভুল।",
+    joined_group_success: "সফলভাবে group-এ যোগ দিয়েছেন।", friend_gmail_required: "Friend Gmail দিন।", invite_self_error: "নিজের Gmail-এ invite পাঠানো যাবে না। অন্য member-এর Gmail দিন।",
+    invite_compose_opened: "Invite compose খুলেছে। দরকার হলে link manually share করুন:\n\n{link}", invite_expired: "এই invite link-এর সময় শেষ হয়ে গেছে। Admin থেকে নতুন invite নিন।",
+    invite_mismatch: "এই invite {invited} এর জন্য। আপনি {current} দিয়ে login করেছেন।", admin_only_delete: "শুধু admin transaction delete করতে পারবে।",
+    invite_expired: "এই invite link-এর সময় শেষ হয়ে গেছে। Admin থেকে নতুন invite নিন।", invite_mismatch_title: "Invite Mismatch",
+    delete_transaction_confirm: "এই transaction delete করবেন?", admin_only_restore: "শুধু admin restore করতে পারবে।",
+    admin_only_edit: "শুধু admin transaction edit করতে পারবে।", admin_only_permanent_delete: "শুধু admin permanent delete করতে পারবে।",
+    permanent_delete_confirm: "এই deleted transaction একেবারে মুছে যাবে। এরপর restore করা যাবে না। Continue?",
+    popup_blocked: "Popup blocked. Please allow popups and try again.", auth_error: "Authentication error.", google_login_failed: "Google login failed.",
+    logout_confirm: "আপনি শুধু logout হবেন। আপনার data সেভ থাকবে।", logout_title: "Log Out?", clear_data_title: "ডেটা মুছুন",
+    logout_success: "সফলভাবে লগ out হয়েছে।", logout_failed: "Logout failed", clear_data_confirm: "এটি আপনার সব data স্থায়ীভাবে মুছে ফেলবে। কোনো group account থাকলে সেটিও delete হবে। Continue?",
+    local_reset_remote_failed: "Local reset complete, কিন্তু cloud data delete failed: {error}", clear_all_data_complete: "সব data clear হয়েছে। সফলভাবে logout হয়েছে।",
+    credentials_not_ready: "Credential এখনো ready না। একটু পরে try করুন।", credentials_copied: "Credentials copied.",
+    copy_failed: "Copy failed. Manually copy করুন:\n\n{text}", kick_member_confirm: "{label} কে group থেকে remove করতে চান?", kick_title: "Kick Member",
+    kick_failed: "Kick failed", invite_failed: "Invite failed", request_failed: "Request failed", restore_failed: "Restore failed",
+    delete_failed: "Delete failed", edit_failed: "Edit failed", signing_in: "Google দিয়ে sign in করা হচ্ছে...", logging_out: "Logging out...",
+    resetting_data: "Data reset করা হচ্ছে...", joining_group: "Group-এ join করা হচ্ছে...", creating_group: "Group account তৈরি করা হচ্ছে...", sending_invite: "Invite পাঠানো হচ্ছে...",
+    submitting_request: "Request পাঠানো হচ্ছে...", restoring_transaction: "Transaction restore করা হচ্ছে...", deleting_transaction: "Transaction delete করা হচ্ছে...",
+    copying_credentials: "Credentials copy করা হচ্ছে...", no_pending_request_label: "No pending request", delete_transaction_title: "Delete Transaction",
+    edit_income_title: "আয় সম্পাদনা", edit_expense_title: "খরচ সম্পাদনা", edit_date: "তারিখ", edit_amount: "পরিমাণ",
+    edit_income_source: "আয়ের উৎস", edit_category: "ক্যাটাগরি", valid_amount_required: "সঠিক পরিমাণ দিন।",
+    income_source_required: "আয়ের উৎস দিন।", category_required: "ক্যাটাগরি দিন।",
+    private_mode_login_first: "Private mode চালু আছে। আগে লগইন করুন।", logged_in_as_email: "{email} হিসেবে লগইন করা আছে",
+    logged_in_as_group_user: "গ্রুপ ইউজার হিসেবে লগইন করা আছে: {username}", approve: "Approve", remove: "Remove", restore: "Restore"
   },
   ar: {
     app_title: "فولت بدجت برايم", app_subtitle: "متتبع مالي نظيف مع هوية بصرية آمنة", language_label: "اللغة", language_search: "ابحث عن اللغات", language_no_match: "لم يتم العثور على لغة",
@@ -271,6 +326,10 @@ const i18n = {
 
 function t(key) {
   return i18n[currentLang]?.[key] || i18n.en[key] || key;
+}
+
+function tx(key, vars = {}) {
+  return String(t(key)).replace(/\{(\w+)\}/g, (_, name) => String(vars[name] ?? ""));
 }
 
 function getLocaleForLang() {
@@ -584,9 +643,9 @@ async function refreshSettingsPanels() {
         kickBtn.className = "btn danger-btn";
         kickBtn.innerHTML = '<i class="fa-solid fa-user-minus"></i> Kick';
         kickBtn.onclick = () => {
-          withLoader("Removing member...", async () => {
+        withLoader(tx("removing_member"), async () => {
             await removeGroupMember(doc.id, label);
-          }).catch((e) => appAlert(e.message || "Kick failed"));
+          }).catch((e) => appAlert(e.message || tx("kick_failed")));
         };
         li.appendChild(kickBtn);
       }
@@ -608,7 +667,7 @@ async function refreshSettingsPanels() {
 
 async function removeGroupMember(memberDocId, label) {
   if (!isCurrentAdmin() || !currentSession?.groupId || !memberDocId || !db) return;
-  const ok = await appConfirm(`${label} কে group থেকে remove করতে চান?`, "Kick Member");
+  const ok = await appConfirm(tx("kick_member_confirm", { label }), tx("kick_title"));
   if (!ok) return;
 
   await db.collection("groupMembers").doc(memberDocId).delete();
@@ -627,7 +686,7 @@ async function renderPendingRequests() {
 
   if (snap.empty) {
     const li = document.createElement("li");
-    li.innerText = "No pending request";
+    li.innerText = tx("no_pending_request");
     pendingRequestsList.appendChild(li);
     return;
   }
@@ -640,7 +699,7 @@ async function renderPendingRequests() {
     info.innerText = `${req.fromLabel} চাইছে edit access`;
     btn.className = "btn income-btn";
     btn.style.marginTop = "8px";
-    btn.innerHTML = '<i class="fa-solid fa-check"></i> Approve';
+    btn.innerHTML = `<i class="fa-solid fa-check"></i> ${tx("approve")}`;
     btn.onclick = () => approveAccessRequest(doc.id, req.fromMemberId);
     li.appendChild(info);
     li.appendChild(btn);
@@ -690,13 +749,13 @@ async function requestEditAccess() {
   });
 
   requestAccessEmailInput.value = "";
-  appAlert("Access request admin queue-তে গেছে। Admin approve করতে পারবে।");
+  appAlert(tx("edit_access_requested"));
 }
 
 function applyAuthState() {
   if (!currentSession) {
     stopGroupRealtimeSync();
-    authInfo.innerText = "Private mode is enabled. Login first.";
+    authInfo.innerText = tx("private_mode_login_first");
     views.forEach((view) => view.classList.remove("active"));
     document.querySelector(".bottom-nav").classList.add("hidden");
     loginOverlay.classList.remove("hidden");
@@ -711,8 +770,8 @@ function applyAuthState() {
   }
 
   authInfo.innerText = currentSession.type === "gmail"
-    ? `Logged in as ${currentSession.email}`
-    : `Logged in as group user: ${currentSession.username}`;
+    ? tx("logged_in_as_email", { email: currentSession.email })
+    : tx("logged_in_as_group_user", { username: currentSession.username });
 
   const lastView = sessionStorage.getItem("vault_active_view") || "homeView";
   showView(lastView);
@@ -786,7 +845,7 @@ async function processInviteLink() {
       status: "expired",
       expiredAt: firebase.firestore.FieldValue.serverTimestamp()
     }).catch(() => { });
-    appAlert("এই invite link-এর সময় শেষ হয়ে গেছে। Admin থেকে নতুন invite নিন।", "Invite Expired");
+    appAlert(tx("invite_expired"), tx("notice"));
     return;
   }
 
@@ -795,7 +854,7 @@ async function processInviteLink() {
     const currentUserEmail = String(firebaseUser.email || "").trim().toLowerCase();
     const emailMatched = normalizeInviteEmail(currentUserEmail) === normalizeInviteEmail(invitedEmail);
     if (!emailMatched) {
-      appAlert(`এই invite ${invitedEmail} এর জন্য। আপনি ${currentUserEmail || "unknown"} দিয়ে login করেছেন।`, "Invite Mismatch");
+      appAlert(tx("invite_mismatch", { invited: invitedEmail, current: currentUserEmail || "unknown" }), tx("invite_mismatch_title"));
       return;
     }
   }
@@ -958,13 +1017,13 @@ function openGroupActionForm(mode = "create") {
 
 async function createGroupFromGmail() {
   if (!firebaseUser || !db) {
-    appAlert("আগে Gmail login করুন।");
+    appAlert(tx("login_first"));
     return;
   }
   const username = groupActionUsername.value.trim();
   const password = groupActionPassword.value;
   if (!username || !password) {
-    appAlert("Username এবং password দিন।");
+    appAlert(tx("username_password_required"));
     return;
   }
 
@@ -987,7 +1046,7 @@ async function createGroupFromGmail() {
   }
 
   if (userSnap.exists) {
-    appAlert("এই group username already আছে।");
+    appAlert(tx("group_username_exists"));
     return;
   }
 
@@ -1035,7 +1094,7 @@ async function createGroupFromGmail() {
       applyAuthState();
       groupActionUsername.value = "";
       groupActionPassword.value = "";
-      appAlert("আপনার আগের group account recover করা হয়েছে।");
+      appAlert(tx("group_account_recovered"));
       return;
     }
   }
@@ -1121,31 +1180,31 @@ async function createGroupFromGmail() {
   applyAuthState();
   groupActionUsername.value = "";
   groupActionPassword.value = "";
-  appAlert("Group account created.");
+  appAlert(tx("group_account_created"));
 }
 
 async function joinGroupFromGmail() {
   if (!firebaseUser || !db) {
-    appAlert("আগে Gmail login করুন।");
+    appAlert(tx("login_first"));
     return;
   }
   const username = groupActionUsername.value.trim();
   const password = groupActionPassword.value;
   if (!username || !password) {
-    appAlert("Username এবং password দিন।");
+    appAlert(tx("username_password_required"));
     return;
   }
 
   const unameKey = normalizeUsername(username);
   const userSnap = await db.collection("groupUsers").doc(unameKey).get();
   if (!userSnap.exists) {
-    appAlert("Group username পাওয়া যায়নি।");
+    appAlert(tx("group_username_not_found"));
     return;
   }
 
   const userData = userSnap.data();
   if (userData.password !== password) {
-    appAlert("Password ভুল।");
+    appAlert(tx("wrong_password"));
     return;
   }
 
@@ -1187,19 +1246,19 @@ async function joinGroupFromGmail() {
   applyAuthState();
   groupActionUsername.value = "";
   groupActionPassword.value = "";
-  appAlert("Joined group successfully.");
+  appAlert(tx("joined_group_success"));
 }
 
 async function sendInviteToGmail() {
   if (!isCurrentAdmin() || !currentSession?.groupId) return;
   const email = inviteEmailInput.value.trim().toLowerCase();
   if (!email) {
-    appAlert("Friend Gmail দিন");
+    appAlert(tx("friend_gmail_required"));
     return;
   }
   const myEmail = (firebaseUser?.email || currentSession?.email || "").trim().toLowerCase();
   if (myEmail && email === myEmail) {
-    appAlert("নিজের Gmail-এ invite পাঠানো যাবে না। অন্য member-এর Gmail দিন।");
+    appAlert(tx("invite_self_error"));
     return;
   }
 
@@ -1254,7 +1313,7 @@ async function sendInviteToGmail() {
       : `Invite ready for ${email}.`;
 
   if (!shared && !copied) {
-    appAlert(`Invite compose opened. প্রয়োজনে এই link manually share করুন:\n\n${link}`);
+    appAlert(tx("invite_compose_opened", { link }));
   }
 }
 
@@ -1309,14 +1368,14 @@ function syncTransactionState() {
 
 async function deleteTransaction(txnId) {
   if (!canManageHistory()) {
-    appAlert("শুধু admin transaction delete করতে পারবে।");
+    appAlert(tx("admin_only_delete"));
     return;
   }
   const idx = transactions.findIndex((t) => t.id === txnId);
   if (idx < 0) return;
 
   const txn = transactions[idx];
-  const ok = await appConfirm("এই transaction delete করবেন?", "Delete Transaction");
+  const ok = await appConfirm(tx("delete_transaction_confirm"), tx("delete_transaction_confirm"));
   if (!ok) return;
 
   transactions.splice(idx, 1);
@@ -1368,18 +1427,18 @@ function renderDeletedTransactions() {
 
     const restoreBtn = document.createElement("button");
     restoreBtn.className = "btn income-btn";
-    restoreBtn.innerHTML = '<i class="fa-solid fa-rotate-left"></i> Restore';
+    restoreBtn.innerHTML = `<i class="fa-solid fa-rotate-left"></i> ${tx("restore")}`;
     restoreBtn.onclick = () => {
-      withLoader("Restoring transaction...", async () => {
+      withLoader(tx("restoring_transaction"), async () => {
         await restoreDeletedTransaction(txn.id);
-      }).catch((e) => appAlert(e.message || "Restore failed"));
+      }).catch((e) => appAlert(e.message || tx("restore_failed")));
     };
 
     const permanentDeleteBtn = document.createElement("button");
     permanentDeleteBtn.className = "btn danger-btn";
-    permanentDeleteBtn.innerHTML = '<i class="fa-solid fa-trash-can"></i> Delete';
+    permanentDeleteBtn.innerHTML = `<i class="fa-solid fa-trash-can"></i> ${tx("delete_transaction_title")}`;
     permanentDeleteBtn.onclick = () => {
-      permanentDeleteDeletedTransaction(txn.id).catch((e) => appAlert(e.message || "Delete failed"));
+      permanentDeleteDeletedTransaction(txn.id).catch((e) => appAlert(e.message || tx("delete_failed")));
     };
 
     actionRow.appendChild(restoreBtn);
@@ -1392,7 +1451,7 @@ function renderDeletedTransactions() {
 
 async function restoreDeletedTransaction(txnId) {
   if (!canManageHistory()) {
-    appAlert("শুধু admin restore করতে পারবে।");
+    appAlert(tx("admin_only_restore"));
     return;
   }
   const idx = deletedTransactions.findIndex((item) => item?.txn?.id === txnId);
@@ -1425,7 +1484,7 @@ function openTransactionEditModal(txnId) {
       return;
     }
     if (!canManageHistory()) {
-      appAlert("শুধু admin transaction edit করতে পারবে।");
+    appAlert(tx("admin_only_edit"));
       resolve(false);
       return;
     }
@@ -1441,15 +1500,15 @@ function openTransactionEditModal(txnId) {
     modalMessage.innerHTML = `
       <div class="edit-form">
         <div class="modal-icon modal-icon-edit" aria-hidden="true"><i class="fa-solid fa-pen-to-square"></i></div>
-        <div class="modal-copy-title">${txn.type === "income" ? "Edit Income" : "Edit Expense"}</div>
-        <div class="edit-meta">Date: ${escapeHtml(txn.time || "-")}</div>
+        <div class="modal-copy-title">${txn.type === "income" ? tx("edit_income_title") : tx("edit_expense_title")}</div>
+        <div class="edit-meta">${tx("edit_date")}: ${escapeHtml(txn.time || "-")}</div>
         <div class="field edit-field">
           <input id="editTxnAmount" type="number" min="0" step="0.01" value="${Number(txn.amount || 0)}" placeholder=" " />
-          <label class="floating-label" for="editTxnAmount">Amount</label>
+          <label class="floating-label" for="editTxnAmount">${tx("edit_amount")}</label>
         </div>
         <div class="field edit-field">
           <input id="editTxnCategory" type="text" value="${escapeHtml(String(txn.category || ""))}" placeholder=" " />
-          <label class="floating-label" for="editTxnCategory">${txn.type === "income" ? "Income source" : "Category"}</label>
+          <label class="floating-label" for="editTxnCategory">${txn.type === "income" ? tx("edit_income_source") : tx("edit_category")}</label>
         </div>
         <div id="editTxnError" class="edit-error" aria-live="polite"></div>
       </div>
@@ -1474,11 +1533,11 @@ function openTransactionEditModal(txnId) {
       const nextAmount = Number(amountInput?.value);
       const nextCategory = String(categoryInputEl?.value || "").trim();
       if (!nextAmount || nextAmount < 0) {
-        if (errorNode) errorNode.innerText = "Valid amount দিন।";
+        if (errorNode) errorNode.innerText = tx("valid_amount_required");
         return;
       }
       if (!nextCategory) {
-        if (errorNode) errorNode.innerText = txn.type === "income" ? "Income source দিন।" : "Category দিন।";
+        if (errorNode) errorNode.innerText = txn.type === "income" ? tx("income_source_required") : tx("category_required");
         return;
       }
 
@@ -1522,13 +1581,13 @@ function openTransactionEditModal(txnId) {
 
 async function permanentDeleteDeletedTransaction(txnId) {
   if (!canManageHistory()) {
-    appAlert("শুধু admin permanent delete করতে পারবে।");
+    appAlert(tx("admin_only_permanent_delete"));
     return;
   }
 
   const ok = await appConfirm(
-    "এই deleted transaction একেবারে মুছে যাবে। এরপর restore করা যাবে না। Continue?",
-    "Permanent Delete"
+    tx("permanent_delete_confirm"),
+    tx("admin_only_permanent_delete")
   );
   if (!ok) return;
 
@@ -1593,18 +1652,18 @@ function renderTransactions() {
       editBtn.title = "Edit transaction";
       editBtn.innerHTML = '<i class="fa-solid fa-pen"></i>';
       editBtn.onclick = () => {
-        openTransactionEditModal(txn.id).catch((e) => appAlert(e.message || "Edit failed"));
+        openTransactionEditModal(txn.id).catch((e) => appAlert(e.message || tx("edit_failed")));
       };
 
       const deleteBtn = document.createElement("button");
       deleteBtn.type = "button";
       deleteBtn.className = "txn-delete-btn";
-      deleteBtn.title = "Delete transaction";
+      deleteBtn.title = tx("delete_transaction_title");
       deleteBtn.innerHTML = '<i class="fa-solid fa-trash"></i>';
       deleteBtn.onclick = () => {
         withLoader("Deleting transaction...", async () => {
           await deleteTransaction(txn.id);
-        }).catch((e) => appAlert(e.message || "Delete failed"));
+        }).catch((e) => appAlert(e.message || tx("delete_failed")));
       };
       actionGroup.appendChild(editBtn);
       actionGroup.appendChild(deleteBtn);
@@ -2004,7 +2063,7 @@ function escapeHtml(value) {
 function downloadReportPdf() {
   const printWindow = window.open("", "_blank");
   if (!printWindow) {
-    appAlert("Popup blocked. Please allow popups and try again.");
+    appAlert(tx("popup_blocked"));
     return;
   }
   const totalIncome = Number(income || 0);
@@ -2099,7 +2158,7 @@ function initFirebase() {
   googleProvider = new firebase.auth.GoogleAuthProvider();
   googleProvider.setCustomParameters({ prompt: "select_account" });
   auth.onAuthStateChanged((user) => {
-    handleGoogleAuthUser(user).catch((e) => appAlert(e.message || "Auth error"));
+    handleGoogleAuthUser(user).catch((e) => appAlert(e.message || tx("auth_error")));
   });
 }
 
@@ -2143,30 +2202,30 @@ navButtons.forEach((btn) => btn.addEventListener("click", async () => {
 downloadPdfBtn.addEventListener("click", downloadReportPdf);
 
 sendInviteBtn.addEventListener("click", () => {
-  withLoader("Sending invite...", async () => {
+  withLoader(tx("sending_invite"), async () => {
     await sendInviteToGmail();
-  }).catch((e) => appAlert(e.message || "Invite failed"));
+  }).catch((e) => appAlert(e.message || tx("invite_failed")));
 });
 
 requestAccessBtn.addEventListener("click", () => {
-  withLoader("Submitting request...", async () => {
+  withLoader(tx("submitting_request"), async () => {
     await requestEditAccess();
-  }).catch((e) => appAlert(e.message || "Request failed"));
+  }).catch((e) => appAlert(e.message || tx("request_failed")));
 });
 
 copyAdminCredentialBtn?.addEventListener("click", async () => {
   const uname = adminCredentialUsername?.innerText?.trim() || "-";
   const pass = adminCredentialPassword?.innerText?.trim() || "-";
   if (uname === "-" || pass === "-") {
-    appAlert("Credential এখনো ready না। একটু পরে try করুন।");
+    appAlert(tx("credentials_not_ready"));
     return;
   }
   const text = `${uname}\n${pass}`;
   try {
     await navigator.clipboard.writeText(text);
-    appAlert("Credentials copied.");
+    appAlert(tx("credentials_copied"));
   } catch (_) {
-    appAlert(`Copy failed. Manually copy করুন:\n\n${text}`);
+    appAlert(tx("copy_failed", { text }));
   }
 });
 
@@ -2174,7 +2233,7 @@ createGroupBtn.addEventListener("click", () => openGroupActionForm("create"));
 addAnotherGroupBtn?.addEventListener("click", () => openGroupActionForm("join"));
 groupActionSubmitBtn.addEventListener("click", async () => {
   try {
-    await withLoader(groupActionMode === "join" ? "Joining group..." : "Creating group...", async () => {
+    await withLoader(groupActionMode === "join" ? tx("joining_group") : tx("creating_group"), async () => {
       if (groupActionMode === "join") {
         await joinGroupFromGmail();
       } else {
@@ -2220,19 +2279,19 @@ googleLoginBtn.addEventListener("click", async () => {
     loginProgress = true;
     googleLoginBtn.disabled = true;
     googleLoginBtn.style.opacity = "0.7";
-    showLoader("Signing in with Google...");
+    showLoader(tx("signing_in"));
     await auth.signInWithPopup(googleProvider);
   } catch (error) {
     finalizeLoginFlow();
-    appAlert(error?.message || "Google login failed.");
+    appAlert(error?.message || tx("google_login_failed"));
   }
 });
 
 logoutBtn?.addEventListener("click", async () => {
-  const ok = await appConfirm("You will be logged out only. Your data will stay saved.", "Log Out?");
+  const ok = await appConfirm(tx("logout_confirm"), tx("logout_title"));
   if (!ok) return;
   try {
-    await withLoader("Logging out...", async () => {
+    await withLoader(tx("logging_out"), async () => {
       if (auth && auth.currentUser) {
         await auth.signOut();
       } else {
@@ -2241,18 +2300,17 @@ logoutBtn?.addEventListener("click", async () => {
         applyAuthState();
       }
     });
-    appAlert("Logged out successfully.");
+    appAlert(tx("logout_success"));
   } catch (e) {
-    appAlert(e.message || "Logout failed");
+    appAlert(e.message || tx("logout_failed"));
   }
 });
 
 clearDataBtn.addEventListener("click", async () => {
-  const promptText = "This will permanently delete your data. If you own any group account, that group and related data will also be deleted. Continue?";
-  const ok = await appConfirm(promptText, "Clear Data");
+  const ok = await appConfirm(tx("clear_data_confirm"), t("clear_data_title") || t("clear_all_data"));
   if (!ok) return;
   let remoteClearError = "";
-  showLoader("Resetting data...");
+  showLoader(tx("resetting_data"));
   try {
     try {
       if (db && firebaseUser?.uid) {
@@ -2340,9 +2398,9 @@ clearDataBtn.addEventListener("click", async () => {
     if (groupActionFormCard) groupActionFormCard.classList.add("hidden");
     if (inviteStatusText) inviteStatusText.innerText = "";
     if (remoteClearError) {
-      appAlert(`Local reset complete, but cloud data delete failed: ${remoteClearError}`);
+      appAlert(tx("local_reset_remote_failed", { error: remoteClearError }));
     } else {
-      appAlert("Clear all data complete. Logged out successfully.");
+      appAlert(tx("clear_all_data_complete"));
     }
   } finally {
     hideLoader();

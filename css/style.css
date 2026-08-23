@@ -312,9 +312,9 @@ body {
     gap: 6px;
     min-width: 240px;
     width: min(320px, calc(100vw - 32px));
-    position: fixed;
-    top: 16px;
-    right: 16px;
+    position: absolute;
+    top: 18px;
+    right: 18px;
     z-index: 2600;
     pointer-events: auto;
     perspective: 1200px;
@@ -587,7 +587,7 @@ html[dir="rtl"] .lang-picker-wrap {
     margin-left: 0;
     margin-right: auto;
     right: auto;
-    left: 16px;
+    left: 18px;
 }
 
 html[dir="rtl"] .lang-switcher {
