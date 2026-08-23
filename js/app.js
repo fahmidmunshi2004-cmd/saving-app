@@ -30,6 +30,9 @@ const i18n = {
     danger_zone: "Danger Zone", log_out: "Log Out", clear_all_data: "Clear All Data", please_wait: "Please wait...", notice: "Notice", cancel: "Cancel", ok: "OK",
     save: "Save", group_account: "Group Account", gmail_account: "Gmail Account", role_viewer: "viewer", role_editor: "editor", role_admin: "admin", role_personal: "personal",
     join_group: "Join Group", top_category: "Top Category", top_expense: "Top Expense", categories: "Categories", total_income_label: "Total Income:", total_expense_label: "Total Expense:",
+    group_action_help_join: "Use the exact group username and password from the admin.",
+    group_action_help_create: "Choose a new group username and password for your admin account.",
+    group_action_permission_tip: "If permission errors appear, sign out and sign in again, then try the exact username and password.",
     fixed_light_mode: "App fixed light mode is active.", session_lock_note: "This session has login lock active. Refreshing the page requires login again.",
     storage_note: "Data is saved in local browser storage.", reset_note: "Need reset? Clear browser local storage to reset app data.",
     danger_desc: "Pressing the button below will clear all data.", no_deleted_transactions: "No deleted transactions"
@@ -51,6 +54,9 @@ const i18n = {
     danger_zone: "ডেঞ্জার জোন", log_out: "লগ আউট", clear_all_data: "সব ডেটা মুছুন", please_wait: "অপেক্ষা করুন...", notice: "নোটিশ", cancel: "বাতিল", ok: "ঠিক আছে",
     save: "সেভ", group_account: "গ্রুপ অ্যাকাউন্ট", gmail_account: "জিমেইল অ্যাকাউন্ট", role_viewer: "ভিউয়ার", role_editor: "এডিটর", role_admin: "অ্যাডমিন", role_personal: "পার্সোনাল",
     join_group: "গ্রুপে যোগ দিন", top_category: "শীর্ষ ক্যাটাগরি", top_expense: "সর্বোচ্চ খরচ", categories: "ক্যাটাগরি", total_income_label: "মোট আয়:", total_expense_label: "মোট খরচ:",
+    group_action_help_join: "Admin-এর দেয়া exact group username আর password ব্যবহার করুন।",
+    group_action_help_create: "Admin account-এর জন্য নতুন group username আর password দিন।",
+    group_action_permission_tip: "Permission error এলে logout করে আবার login করুন, তারপর exact username/password দিয়ে try করুন।",
     fixed_light_mode: "অ্যাপ fixed light mode-এ চলছে।", session_lock_note: "এই session-এ login lock active আছে। page refresh করলে পুনরায় login লাগবে।",
     storage_note: "Data local browser storage-এ save হয়।", reset_note: "Need reset? Browser local storage clear করলে app data reset হবে।",
     danger_desc: "নিচের button চাপলে সব data clear হয়ে যাবে।", no_deleted_transactions: "কোনো deleted transaction নেই"
@@ -72,6 +78,9 @@ const i18n = {
     danger_zone: "منطقة الخطر", log_out: "تسجيل الخروج", clear_all_data: "مسح كل البيانات", please_wait: "يرجى الانتظار...", notice: "تنبيه", cancel: "إلغاء", ok: "موافق",
     save: "حفظ", group_account: "حساب مجموعة", gmail_account: "حساب Gmail", role_viewer: "مشاهد", role_editor: "محرر", role_admin: "مسؤول", role_personal: "شخصي",
     join_group: "الانضمام إلى المجموعة", top_category: "أعلى فئة", top_expense: "أعلى مصروف", categories: "الفئات", total_income_label: "إجمالي الدخل:", total_expense_label: "إجمالي المصروف:",
+    group_action_help_join: "استخدم اسم المستخدم وكلمة المرور الدقيقة من المسؤول.",
+    group_action_help_create: "اختر اسم مستخدم وكلمة مرور جديدين لحساب المسؤول.",
+    group_action_permission_tip: "إذا ظهر خطأ صلاحيات، سجّل الخروج ثم سجّل الدخول مرة أخرى وجرب اسم المستخدم وكلمة المرور نفسها.",
     fixed_light_mode: "التطبيق يعمل بوضع الإضاءة الثابت.", session_lock_note: "هذه الجلسة بها قفل تسجيل دخول نشط. تحديث الصفحة يتطلب تسجيل الدخول مرة أخرى.",
     storage_note: "يتم حفظ البيانات في التخزين المحلي للمتصفح.", reset_note: "تحتاج إعادة ضبط؟ امسح التخزين المحلي للمتصفح لإعادة ضبط بيانات التطبيق.",
     danger_desc: "الضغط على الزر أدناه سيمسح كل البيانات.", no_deleted_transactions: "لا توجد معاملات محذوفة"
@@ -106,6 +115,21 @@ function applyLanguage(lang = "en") {
     openGroupActionForm(groupActionMode);
   }
   localStorage.setItem(LANG_STORAGE_KEY, currentLang);
+}
+
+function setGroupActionHelpText(mode = "create") {
+  if (!groupActionHelpText) return;
+  const helpKey = mode === "join" ? "group_action_help_join" : "group_action_help_create";
+  groupActionHelpText.setAttribute("data-i18n", helpKey);
+  groupActionHelpText.textContent = t(helpKey);
+}
+
+function getFriendlyGroupError(error, fallback = "Group action failed") {
+  const message = String(error?.message || error || "").toLowerCase();
+  if (message.includes("permission")) {
+    return t("group_action_permission_tip");
+  }
+  return error?.message || fallback;
 }
 
 function canManageHistory() {
@@ -583,6 +607,7 @@ function openGroupActionForm(mode = "create") {
     groupActionTitle.innerText = t("create_group_account");
     groupActionSubmitBtn.innerHTML = `<i class="fa-solid fa-people-group"></i> ${t("create_group_account")}`;
   }
+  setGroupActionHelpText(groupActionMode);
 }
 
 async function createGroupFromGmail() {
@@ -1811,7 +1836,7 @@ groupActionSubmitBtn.addEventListener("click", async () => {
       }
     });
   } catch (e) {
-    appAlert(e.message || "Group action failed");
+    appAlert(getFriendlyGroupError(e));
   }
 });
 

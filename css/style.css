@@ -1079,12 +1079,23 @@ input:not(:placeholder-shown)+.floating-label {
 }
 
 #groupMembersList li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
     background: linear-gradient(145deg, #ffffff, #f2f6fd);
-    border: 1px solid #e8edf7;
+    border: 1px solid color-mix(in srgb, var(--brand) 22%, #e8edf7);
     border-radius: 12px;
     padding: 10px;
     font-size: 15px;
     font-weight: 600;
+    box-shadow: 0 8px 20px rgba(255, 1, 79, 0.06);
+}
+
+#groupMembersList li > div {
+    flex: 1;
+    min-width: 0;
+    word-break: break-word;
 }
 
 #groupMembersList .btn {
@@ -1092,7 +1103,9 @@ input:not(:placeholder-shown)+.floating-label {
     min-width: 96px;
     padding: 8px 12px;
     font-size: 0.82rem;
-    margin-top: 8px;
+    margin-top: 0;
+    margin-left: auto;
+    flex-shrink: 0;
 }
 
 #deletedTransactionsList .deleted-actions {

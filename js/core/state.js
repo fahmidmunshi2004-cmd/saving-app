@@ -70,6 +70,7 @@ const groupActionTitle = document.getElementById("groupActionTitle");
 const groupActionUsername = document.getElementById("groupActionUsername");
 const groupActionPassword = document.getElementById("groupActionPassword");
 const groupActionSubmitBtn = document.getElementById("groupActionSubmitBtn");
+const groupActionHelpText = document.getElementById("groupActionHelpText");
 
 const firebaseConfig = {
   apiKey: "AIzaSyDDGb1bNysz2Vszt116K2a3GGL9Rzsx9II",

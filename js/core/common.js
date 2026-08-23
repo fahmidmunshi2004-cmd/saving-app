@@ -26,7 +26,8 @@ function saveData() {
   localStorage.setItem("transactions", JSON.stringify(transactions));
   localStorage.setItem("deletedTransactions", JSON.stringify(deletedTransactions));
 
-  if (currentSession?.groupId && db) {
+  const canSyncGroupFinance = currentSession?.groupId && db && (isCurrentAdmin() || !!currentSession?.canEdit);
+  if (canSyncGroupFinance) {
     db.collection("groupFinance").doc(currentSession.groupId).set({
       income,
       expense,
@@ -97,6 +98,18 @@ async function loadGroupSharedData() {
   deletedTransactions.length = 0;
   for (const t of (data.deletedTransactions || [])) {
     deletedTransactions.push(t);
+  }
+
+  if (!snap.exists && (isCurrentAdmin() || !!currentSession?.canEdit)) {
+    await ref.set({
+      income,
+      expense,
+      breakdown,
+      transactions,
+      deletedTransactions,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    }, { merge: true }).catch(() => { });
   }
 }
 
