@@ -24,9 +24,11 @@ const LANGUAGE_OPTIONS = [
   { code: "tr", name: "Turkish", native: "Türkçe", flag: "🇹🇷", locale: "tr-TR", dir: "ltr" },
   { code: "ru", name: "Russian", native: "Русский", flag: "🇷🇺", locale: "ru-RU", dir: "ltr" }
 ];
+let langSearchQuery = "";
+
 const i18n = {
   en: {
-    app_title: "Vault Budget Prime", app_subtitle: "Clean finance tracker with secure visual identity", language_label: "Language",
+    app_title: "Vault Budget Prime", app_subtitle: "Clean finance tracker with secure visual identity", language_label: "Language", language_search: "Search languages", language_no_match: "No language found",
     income: "Income", expense: "Expense", balance: "Balance", add_income: "Add Income", income_amount: "Income amount", income_source: "Income source (Salary/Freelance...)",
     save_income: "Save Income", add_expense: "Add Expense", expense_amount: "Expense amount", category: "Category (Food, Travel...)", save_expense: "Save Expense",
     category_overview: "Category Overview", no_expense_category: "No expense category yet.", expense_column_chart: "Expense Column Chart", income_pie_chart: "Income Pie Chart",
@@ -50,7 +52,7 @@ const i18n = {
     danger_desc: "Pressing the button below will clear all data.", no_deleted_transactions: "No deleted transactions"
   },
   bn: {
-    app_title: "ভল্ট বাজেট প্রাইম", app_subtitle: "নিরাপদ ভিজ্যুয়াল আইডেন্টিটি সহ পরিষ্কার ফাইন্যান্স ট্র্যাকার", language_label: "ভাষা",
+    app_title: "ভল্ট বাজেট প্রাইম", app_subtitle: "নিরাপদ ভিজ্যুয়াল আইডেন্টিটি সহ পরিষ্কার ফাইন্যান্স ট্র্যাকার", language_label: "ভাষা", language_search: "ভাষা খুঁজুন", language_no_match: "কোনো ভাষা পাওয়া যায়নি",
     income: "আয়", expense: "খরচ", balance: "ব্যালেন্স", add_income: "আয় যোগ করুন", income_amount: "আয়ের পরিমাণ", income_source: "আয়ের উৎস (বেতন/ফ্রিল্যান্স...)",
     save_income: "আয় সংরক্ষণ", add_expense: "খরচ যোগ করুন", expense_amount: "খরচের পরিমাণ", category: "ক্যাটাগরি (খাবার, ভ্রমণ...)", save_expense: "খরচ সংরক্ষণ",
     category_overview: "ক্যাটাগরি ওভারভিউ", no_expense_category: "এখনও কোনো খরচের ক্যাটাগরি নেই।", expense_column_chart: "খরচ কলাম চার্ট", income_pie_chart: "আয় পাই চার্ট",
@@ -74,7 +76,7 @@ const i18n = {
     danger_desc: "নিচের button চাপলে সব data clear হয়ে যাবে।", no_deleted_transactions: "কোনো deleted transaction নেই"
   },
   ar: {
-    app_title: "فولت بدجت برايم", app_subtitle: "متتبع مالي نظيف مع هوية بصرية آمنة", language_label: "اللغة",
+    app_title: "فولت بدجت برايم", app_subtitle: "متتبع مالي نظيف مع هوية بصرية آمنة", language_label: "اللغة", language_search: "ابحث عن اللغات", language_no_match: "لم يتم العثور على لغة",
     income: "الدخل", expense: "المصروف", balance: "الرصيد", add_income: "إضافة دخل", income_amount: "مبلغ الدخل", income_source: "مصدر الدخل (راتب/عمل حر...)",
     save_income: "حفظ الدخل", add_expense: "إضافة مصروف", expense_amount: "مبلغ المصروف", category: "الفئة (طعام، سفر...)", save_expense: "حفظ المصروف",
     category_overview: "نظرة الفئات", no_expense_category: "لا توجد فئة مصروفات بعد.", expense_column_chart: "مخطط أعمدة المصروفات", income_pie_chart: "مخطط دائري للدخل",
@@ -98,7 +100,7 @@ const i18n = {
     danger_desc: "الضغط على الزر أدناه سيمسح كل البيانات.", no_deleted_transactions: "لا توجد معاملات محذوفة"
   },
   hi: {
-    app_title: "वॉल्ट बजट प्राइम", app_subtitle: "सुरक्षित दृश्य पहचान के साथ साफ़ वित्त ट्रैकर", language_label: "भाषा",
+    app_title: "वॉल्ट बजट प्राइम", app_subtitle: "सुरक्षित दृश्य पहचान के साथ साफ़ वित्त ट्रैकर", language_label: "भाषा", language_search: "भाषा खोजें", language_no_match: "कोई भाषा नहीं मिली",
     income: "आय", expense: "खर्च", balance: "बैलेंस", add_income: "आय जोड़ें", income_amount: "आय राशि", income_source: "आय का स्रोत (वेतन/फ्रीलांस...)",
     save_income: "आय सहेजें", add_expense: "खर्च जोड़ें", expense_amount: "खर्च राशि", category: "श्रेणी (भोजन, यात्रा...)", save_expense: "खर्च सहेजें",
     category_overview: "श्रेणी अवलोकन", no_expense_category: "अभी कोई खर्च श्रेणी नहीं।", expense_column_chart: "खर्च कॉलम चार्ट", income_pie_chart: "आय पाई चार्ट",
@@ -122,7 +124,7 @@ const i18n = {
     danger_desc: "नीचे दिया गया button दबाने से सभी data clear हो जाएंगे।", no_deleted_transactions: "कोई deleted transaction नहीं"
   },
   ur: {
-    app_title: "والٹ بجٹ پرائم", app_subtitle: "محفوظ بصری شناخت کے ساتھ صاف مالی ٹریکر", language_label: "زبان",
+    app_title: "والٹ بجٹ پرائم", app_subtitle: "محفوظ بصری شناخت کے ساتھ صاف مالی ٹریکر", language_label: "زبان", language_search: "زبانیں تلاش کریں", language_no_match: "کوئی زبان نہیں ملی",
     income: "آمدن", expense: "خرچ", balance: "بیلنس", add_income: "آمدن شامل کریں", income_amount: "آمدن کی رقم", income_source: "آمدن کا ذریعہ (تنخواہ/فری لانس...)",
     save_income: "آمدن محفوظ کریں", add_expense: "خرچ شامل کریں", expense_amount: "خرچ کی رقم", category: "زمرہ (کھانا، سفر...)", save_expense: "خرچ محفوظ کریں",
     category_overview: "زمرہ جائزہ", no_expense_category: "ابھی کوئی خرچ زمرہ نہیں۔", expense_column_chart: "خرچ کالم چارٹ", income_pie_chart: "آمدن پائی چارٹ",
@@ -146,7 +148,7 @@ const i18n = {
     danger_desc: "نیچے والا button دبانے سے تمام data clear ہو جائیں گے۔", no_deleted_transactions: "کوئی deleted transaction نہیں"
   },
   es: {
-    app_title: "Vault Budget Prime", app_subtitle: "Rastreador financiero limpio con identidad visual segura", language_label: "Idioma",
+    app_title: "Vault Budget Prime", app_subtitle: "Rastreador financiero limpio con identidad visual segura", language_label: "Idioma", language_search: "Buscar idiomas", language_no_match: "No se encontró ningún idioma",
     income: "Ingresos", expense: "Gastos", balance: "Saldo", add_income: "Agregar ingreso", income_amount: "Monto de ingreso", income_source: "Fuente de ingreso (salario/freelance...)",
     save_income: "Guardar ingreso", add_expense: "Agregar gasto", expense_amount: "Monto de gasto", category: "Categoría (comida, viaje...)", save_expense: "Guardar gasto",
     category_overview: "Resumen por categoría", no_expense_category: "Aún no hay categorías de gasto.", expense_column_chart: "Gráfico de columnas de gastos", income_pie_chart: "Gráfico circular de ingresos",
@@ -170,7 +172,7 @@ const i18n = {
     danger_desc: "Pulsar el botón de abajo borrará todos los datos.", no_deleted_transactions: "No hay transacciones eliminadas"
   },
   fr: {
-    app_title: "Vault Budget Prime", app_subtitle: "Suivi financier épuré avec identité visuelle sécurisée", language_label: "Langue",
+    app_title: "Vault Budget Prime", app_subtitle: "Suivi financier épuré avec identité visuelle sécurisée", language_label: "Langue", language_search: "Rechercher des langues", language_no_match: "Aucune langue trouvée",
     income: "Revenu", expense: "Dépense", balance: "Solde", add_income: "Ajouter un revenu", income_amount: "Montant du revenu", income_source: "Source du revenu (salaire/freelance...)",
     save_income: "Enregistrer le revenu", add_expense: "Ajouter une dépense", expense_amount: "Montant de la dépense", category: "Catégorie (nourriture, voyage...)", save_expense: "Enregistrer la dépense",
     category_overview: "Aperçu par catégorie", no_expense_category: "Aucune catégorie de dépense pour le moment.", expense_column_chart: "Graphique en colonnes des dépenses", income_pie_chart: "Graphique circulaire des revenus",
@@ -194,7 +196,7 @@ const i18n = {
     danger_desc: "Appuyer sur le bouton ci-dessous effacera toutes les données.", no_deleted_transactions: "Aucune transaction supprimée"
   },
   de: {
-    app_title: "Vault Budget Prime", app_subtitle: "Übersichtlicher Finanz-Tracker mit sicherer visueller Identität", language_label: "Sprache",
+    app_title: "Vault Budget Prime", app_subtitle: "Übersichtlicher Finanz-Tracker mit sicherer visueller Identität", language_label: "Sprache", language_search: "Sprachen suchen", language_no_match: "Keine Sprache gefunden",
     income: "Einnahmen", expense: "Ausgaben", balance: "Saldo", add_income: "Einnahme hinzufügen", income_amount: "Einnahmebetrag", income_source: "Einnahmequelle (Gehalt/Freelance...)",
     save_income: "Einnahme speichern", add_expense: "Ausgabe hinzufügen", expense_amount: "Ausgabebetrag", category: "Kategorie (Essen, Reise...)", save_expense: "Ausgabe speichern",
     category_overview: "Kategorieübersicht", no_expense_category: "Noch keine Ausgabenkategorie.", expense_column_chart: "Ausgaben-Spaltendiagramm", income_pie_chart: "Einnahmen-Kreisdiagramm",
@@ -218,7 +220,7 @@ const i18n = {
     danger_desc: "Das Drücken der Schaltfläche unten löscht alle Daten.", no_deleted_transactions: "Keine gelöschten Transaktionen"
   },
   tr: {
-    app_title: "Vault Budget Prime", app_subtitle: "Güvenli görsel kimlikle temiz finans takipçisi", language_label: "Dil",
+    app_title: "Vault Budget Prime", app_subtitle: "Güvenli görsel kimlikle temiz finans takipçisi", language_label: "Dil", language_search: "Dilleri ara", language_no_match: "Dil bulunamadı",
     income: "Gelir", expense: "Gider", balance: "Bakiye", add_income: "Gelir ekle", income_amount: "Gelir tutarı", income_source: "Gelir kaynağı (Maaş/Freelance...)",
     save_income: "Geliri kaydet", add_expense: "Gider ekle", expense_amount: "Gider tutarı", category: "Kategori (Yemek, Seyahat...)", save_expense: "Gideri kaydet",
     category_overview: "Kategori özeti", no_expense_category: "Henüz gider kategorisi yok.", expense_column_chart: "Gider sütun grafiği", income_pie_chart: "Gelir pasta grafiği",
@@ -242,7 +244,7 @@ const i18n = {
     danger_desc: "Aşağıdaki düğmeye basmak tüm verileri siler.", no_deleted_transactions: "Silinmiş işlem yok"
   },
   ru: {
-    app_title: "Vault Budget Prime", app_subtitle: "Чистый финансовый трекер с безопасной визуальной идентичностью", language_label: "Язык",
+    app_title: "Vault Budget Prime", app_subtitle: "Чистый финансовый трекер с безопасной визуальной идентичностью", language_label: "Язык", language_search: "Поиск языков", language_no_match: "Язык не найден",
     income: "Доход", expense: "Расход", balance: "Баланс", add_income: "Добавить доход", income_amount: "Сумма дохода", income_source: "Источник дохода (зарплата/фриланс...)",
     save_income: "Сохранить доход", add_expense: "Добавить расход", expense_amount: "Сумма расхода", category: "Категория (еда, поездка...)", save_expense: "Сохранить расход",
     category_overview: "Обзор категорий", no_expense_category: "Пока нет категории расходов.", expense_column_chart: "Столбчатая диаграмма расходов", income_pie_chart: "Круговая диаграмма доходов",
@@ -284,11 +286,60 @@ function isRtlLanguage(code) {
   return ["ar", "ur"].includes(code);
 }
 
+function getLangMenuRefs() {
+  if (!langMenu) return {};
+  return {
+    search: langMenu.querySelector(".lang-search"),
+    list: langMenu.querySelector(".lang-menu-list"),
+    empty: langMenu.querySelector(".lang-menu-empty")
+  };
+}
+
+function filterLanguageOptions(query = "") {
+  const normalized = String(query || "").trim().toLowerCase();
+  if (!normalized) return LANGUAGE_OPTIONS;
+  return LANGUAGE_OPTIONS.filter((option) => {
+    const haystack = [option.code, option.name, option.native].join(" ").toLowerCase();
+    return haystack.includes(normalized);
+  });
+}
+
 function renderLanguageMenu() {
   if (!langMenu) return;
-  langMenu.innerHTML = "";
+  const currentQuery = langSearchQuery || getLangMenuRefs().search?.value || "";
+  const options = filterLanguageOptions(currentQuery);
+  langMenu.innerHTML = `
+    <div class="lang-menu-head">
+      <div class="lang-menu-title">${t("language_label")}</div>
+      <div class="lang-search-wrap">
+        <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+        <input class="lang-search" type="search" autocomplete="off" spellcheck="false" placeholder="${t("language_search")}" aria-label="${t("language_search")}" />
+      </div>
+    </div>
+    <div class="lang-menu-list" role="listbox" aria-label="${t("language_label")}"></div>
+    <div class="lang-menu-empty${options.length ? " hidden" : ""}">${t("language_no_match")}</div>
+  `;
 
-  for (const option of LANGUAGE_OPTIONS) {
+  const { search, list, empty } = getLangMenuRefs();
+  if (search) {
+    search.value = currentQuery;
+    search.addEventListener("input", () => {
+      langSearchQuery = search.value;
+      renderLanguageMenu();
+      updateLanguagePickerUI();
+      openLanguageMenu();
+      search.focus({ preventScroll: true });
+      const refreshedSearch = getLangMenuRefs().search;
+      if (refreshedSearch) {
+        refreshedSearch.setSelectionRange(refreshedSearch.value.length, refreshedSearch.value.length);
+      }
+    });
+  }
+
+  if (!list || !empty) return;
+  list.innerHTML = "";
+
+  for (const option of options) {
     const btn = document.createElement("button");
     btn.type = "button";
     btn.className = "lang-option";
@@ -296,7 +347,7 @@ function renderLanguageMenu() {
     btn.setAttribute("data-lang", option.code);
     btn.setAttribute("aria-selected", String(option.code === currentLang));
     btn.innerHTML = `
-      <span class="lang-flag" aria-hidden="true">${option.flag}</span>
+      <span class="lang-option-flag" aria-hidden="true">${option.flag}</span>
       <span class="lang-option-main">
         <span class="lang-option-name">${option.native}</span>
         <span class="lang-option-meta">${option.name}</span>
@@ -304,19 +355,31 @@ function renderLanguageMenu() {
     `;
     btn.addEventListener("click", () => {
       applyLanguage(option.code);
+      langSearchQuery = "";
       closeLanguageMenu();
     });
-    langMenu.appendChild(btn);
+    list.appendChild(btn);
   }
+
+  empty.classList.toggle("hidden", options.length > 0);
 }
 
 function updateLanguagePickerUI() {
   const option = getLanguageOption(currentLang);
+  const previousLang = langSwitcher?.getAttribute("data-current-lang");
   if (langCurrentLabel) langCurrentLabel.textContent = option.native;
   if (langCurrentFlag) langCurrentFlag.textContent = option.flag;
   if (langSwitcher) {
     langSwitcher.setAttribute("aria-expanded", langMenu ? String(!langMenu.classList.contains("hidden")) : "false");
     langSwitcher.classList.toggle("is-open", !!langMenu && !langMenu.classList.contains("hidden"));
+    if (previousLang !== option.code) {
+      langSwitcher.setAttribute("data-current-lang", option.code);
+      langSwitcher.classList.remove("pop");
+      window.requestAnimationFrame(() => {
+        langSwitcher.classList.add("pop");
+        window.setTimeout(() => langSwitcher?.classList.remove("pop"), 480);
+      });
+    }
   }
   if (langMenu) {
     langMenu.querySelectorAll(".lang-option").forEach((btn) => {
@@ -324,6 +387,12 @@ function updateLanguagePickerUI() {
       btn.classList.toggle("is-active", active);
       btn.setAttribute("aria-selected", String(active));
     });
+    const { search, list, empty } = getLangMenuRefs();
+    if (search && langSearchQuery !== search.value) {
+      search.value = langSearchQuery;
+    }
+    const hasOptions = !!list?.children.length;
+    if (empty) empty.classList.toggle("hidden", hasOptions);
   }
 }
 
