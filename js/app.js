@@ -1177,7 +1177,9 @@ function renderDeletedTransactions() {
     permanentDeleteBtn.className = "btn danger-btn";
     permanentDeleteBtn.innerHTML = `<i class="fa-solid fa-trash-can"></i> ${tx("delete_transaction_title")}`;
     permanentDeleteBtn.onclick = () => {
-      permanentDeleteDeletedTransaction(txn.id).catch((e) => appAlert(e.message || tx("delete_failed")));
+      permanentDeleteDeletedTransaction(txn.id).catch((e) =>
+        appAlert(e.message || tx("permanent_delete_failed"))
+      );
     };
 
     actionRow.appendChild(restoreBtn);
@@ -1326,7 +1328,7 @@ async function permanentDeleteDeletedTransaction(txnId) {
 
   const ok = await appConfirm(
     tx("permanent_delete_confirm"),
-    tx("admin_only_permanent_delete")
+    tx("permanent_delete_title")
   );
   if (!ok) return;
 
