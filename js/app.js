@@ -11,7 +11,7 @@
 }
 
 const LANG_STORAGE_KEY = "vault_lang";
-let currentLang = localStorage.getItem(LANG_STORAGE_KEY) || "en";
+let currentLang = "en";
 const LANGUAGE_OPTIONS = [
   { code: "en", name: "English", native: "English", flag: "🇺🇸", locale: "en-US", dir: "ltr" },
   { code: "bn", name: "Bengali", native: "বাংলা", flag: "🇧🇩", locale: "bn-BD", dir: "ltr" },
@@ -2148,8 +2148,10 @@ clearDataBtn.addEventListener("click", async () => {
 
 async function bootApp() {
   await loadI18n();
+  localStorage.setItem(LANG_STORAGE_KEY, "en");
+  currentLang = "en";
   applyTheme();
-  applyLanguage(currentLang);
+  applyLanguage("en");
   renderLanguageMenu();
   loadData();
   syncTransactionState();
