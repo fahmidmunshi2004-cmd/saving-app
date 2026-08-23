@@ -144,7 +144,7 @@ const i18n = {
     account_type: "نوع الحساب", role: "الدور", group_credentials_admin: "بيانات المجموعة (المسؤول)", copy_credentials: "نسخ البيانات", group_members: "أعضاء المجموعة",
     invite_member_admin: "دعوة عضو (مسؤول)", friend_gmail: "Gmail الصديق", send_invite: "إرسال دعوة", request_edit_access: "طلب صلاحية التعديل",
     admin_gmail: "Gmail المسؤول", request_access: "طلب صلاحية", pending_access_requests: "طلبات الصلاحية المعلقة", deleted_transactions_admin: "المعاملات المحذوفة (مسؤول)",
-    danger_zone: "منطقة الخطر", log_out: "تسجيل الخروج", clear_all_data: "مسح كل البيانات", please_wait: "يرجى الانتظار...", notice: "تنبيه", cancel: "إلغاء", ok: "موافق",
+    danger_zone: "منطقة الخطر", log_out: "تسجيل الخروج", clear_all_data: "مسح كل البيانات", clear_data_title: "مسح البيانات", clear_data_confirm: "سيؤدي هذا إلى حذف بياناتك نهائيًا. إذا كان لديك أي حساب مجموعة، فسيتم حذف تلك المجموعة وبياناتها أيضًا. هل تريد المتابعة؟", please_wait: "يرجى الانتظار...", notice: "تنبيه", cancel: "إلغاء", ok: "موافق",
     save: "حفظ", group_account: "حساب مجموعة", gmail_account: "حساب Gmail", role_viewer: "مشاهد", role_editor: "محرر", role_admin: "مسؤول", role_personal: "شخصي",
     join_group: "الانضمام إلى المجموعة", top_category: "أعلى فئة", top_expense: "أعلى مصروف", categories: "الفئات", total_income_label: "إجمالي الدخل:", total_expense_label: "إجمالي المصروف:",
     group_action_help_join: "استخدم اسم المستخدم وكلمة المرور الدقيقة من المسؤول.",
@@ -152,7 +152,7 @@ const i18n = {
     group_action_permission_tip: "إذا ظهر خطأ صلاحيات، سجّل الخروج ثم سجّل الدخول مرة أخرى وجرب اسم المستخدم وكلمة المرور نفسها.",
     fixed_light_mode: "التطبيق يعمل بوضع الإضاءة الثابت.", session_lock_note: "هذه الجلسة بها قفل تسجيل دخول نشط. تحديث الصفحة يتطلب تسجيل الدخول مرة أخرى.",
     storage_note: "يتم حفظ البيانات في التخزين المحلي للمتصفح.", reset_note: "تحتاج إعادة ضبط؟ امسح التخزين المحلي للمتصفح لإعادة ضبط بيانات التطبيق.",
-    danger_desc: "الضغط على الزر أدناه سيمسح كل البيانات.", no_deleted_transactions: "لا توجد معاملات محذوفة"
+    danger_desc: "الضغط على الزر أدناه سيمسح كل البيانات.", no_deleted_transactions: "لا توجد معاملات محذوفة", delete_transaction_title: "حذف المعاملة"
   },
   hi: {
     app_title: "वॉल्ट बजट प्राइम", app_subtitle: "सुरक्षित दृश्य पहचान के साथ साफ़ वित्त ट्रैकर", language_label: "भाषा", language_search: "भाषा खोजें", language_no_match: "कोई भाषा नहीं मिली",
@@ -168,7 +168,7 @@ const i18n = {
     account_type: "खाता प्रकार", role: "भूमिका", group_credentials_admin: "समूह क्रेडेंशियल (एडमिन)", copy_credentials: "क्रेडेंशियल कॉपी करें", group_members: "समूह सदस्य",
     invite_member_admin: "सदस्य आमंत्रित करें (एडमिन)", friend_gmail: "दोस्त का Gmail", send_invite: "आमंत्रण भेजें", request_edit_access: "एडिट एक्सेस अनुरोध",
     admin_gmail: "एडमिन Gmail", request_access: "एक्सेस अनुरोध", pending_access_requests: "लंबित एक्सेस अनुरोध", deleted_transactions_admin: "हटाए गए लेनदेन (एडमिन)",
-    danger_zone: "खतरनाक क्षेत्र", log_out: "लॉग आउट", clear_all_data: "सभी डेटा साफ़ करें", please_wait: "कृपया प्रतीक्षा करें...", notice: "सूचना", cancel: "रद्द करें", ok: "ठीक है",
+    danger_zone: "खतरनाक क्षेत्र", log_out: "लॉग आउट", clear_all_data: "सभी डेटा साफ़ करें", clear_data_title: "डेटा साफ़ करें", clear_data_confirm: "यह आपके सभी डेटा को स्थायी रूप से हटा देगा। यदि आपका कोई समूह खाता है, तो वह समूह और उसका डेटा भी हट जाएगा। जारी रखें?", please_wait: "कृपया प्रतीक्षा करें...", notice: "सूचना", cancel: "रद्द करें", ok: "ठीक है",
     save: "सहेजें", group_account: "समूह खाता", gmail_account: "Gmail खाता", role_viewer: "दर्शक", role_editor: "संपादक", role_admin: "प्रशासक", role_personal: "व्यक्तिगत",
     join_group: "समूह में जुड़ें", top_category: "शीर्ष श्रेणी", top_expense: "शीर्ष खर्च", categories: "श्रेणियाँ", total_income_label: "कुल आय:", total_expense_label: "कुल खर्च:",
     group_action_help_join: "एडमिन से मिला exact group username और password इस्तेमाल करें।",
@@ -176,7 +176,7 @@ const i18n = {
     group_action_permission_tip: "अगर permission error दिखे, logout करके फिर login करें, फिर exact username/password से try करें।",
     fixed_light_mode: "ऐप fixed light mode में चल रहा है।", session_lock_note: "इस session में login lock active है। page refresh करने पर फिर से login करना होगा।",
     storage_note: "डेटा local browser storage में save होता है।", reset_note: "Reset चाहिए? app data reset करने के लिए browser local storage clear करें।",
-    danger_desc: "नीचे दिया गया button दबाने से सभी data clear हो जाएंगे।", no_deleted_transactions: "कोई deleted transaction नहीं"
+    danger_desc: "नीचे दिया गया बटन दबाने से सभी डेटा साफ़ हो जाएंगे।", no_deleted_transactions: "कोई deleted transaction नहीं", delete_transaction_title: "लेनदेन हटाएँ"
   },
   ur: {
     app_title: "والٹ بجٹ پرائم", app_subtitle: "محفوظ بصری شناخت کے ساتھ صاف مالی ٹریکر", language_label: "زبان", language_search: "زبانیں تلاش کریں", language_no_match: "کوئی زبان نہیں ملی",
@@ -192,7 +192,7 @@ const i18n = {
     account_type: "اکاؤنٹ کی قسم", role: "کردار", group_credentials_admin: "گروپ اسناد (ایڈمن)", copy_credentials: "اسناد کاپی کریں", group_members: "گروپ ممبران",
     invite_member_admin: "رکن مدعو کریں (ایڈمن)", friend_gmail: "دوست کا Gmail", send_invite: "دعوت بھیجیں", request_edit_access: "ایڈٹ رسائی کی درخواست",
     admin_gmail: "ایڈمن Gmail", request_access: "رسائی کی درخواست", pending_access_requests: "زیر التواء رسائی درخواستیں", deleted_transactions_admin: "حذف شدہ لین دین (ایڈمن)",
-    danger_zone: "خطرناک زون", log_out: "لاگ آؤٹ", clear_all_data: "تمام ڈیٹا صاف کریں", please_wait: "براہ کرم انتظار کریں...", notice: "نوٹس", cancel: "منسوخ", ok: "ٹھیک ہے",
+    danger_zone: "خطرناک زون", log_out: "لاگ آؤٹ", clear_all_data: "تمام ڈیٹا صاف کریں", clear_data_title: "ڈیٹا صاف کریں", clear_data_confirm: "اس سے آپ کا تمام ڈیٹا مستقل طور پر حذف ہو جائے گا۔ اگر آپ کا کوئی گروپ اکاؤنٹ ہے تو وہ گروپ اور اس کا ڈیٹا بھی حذف ہو جائے گا۔ جاری رکھیں؟", please_wait: "براہ کرم انتظار کریں...", notice: "نوٹس", cancel: "منسوخ", ok: "ٹھیک ہے",
     save: "محفوظ کریں", group_account: "گروپ اکاؤنٹ", gmail_account: "Gmail اکاؤنٹ", role_viewer: "ناظر", role_editor: "مدیر", role_admin: "ایڈمن", role_personal: "ذاتی",
     join_group: "گروپ میں شامل ہوں", top_category: "اعلیٰ زمرہ", top_expense: "اعلیٰ خرچ", categories: "زمرے", total_income_label: "کل آمدن:", total_expense_label: "کل خرچ:",
     group_action_help_join: "ایڈمن سے ملا ہوا exact group username اور password استعمال کریں۔",
@@ -200,7 +200,7 @@ const i18n = {
     group_action_permission_tip: "اگر permission error آئے تو logout کر کے دوبارہ login کریں، پھر exact username/password کے ساتھ try کریں۔",
     fixed_light_mode: "ایپ fixed light mode میں چل رہی ہے۔", session_lock_note: "اس session میں login lock active ہے۔ page refresh کرنے پر دوبارہ login کرنا ہوگا۔",
     storage_note: "ڈیٹا local browser storage میں محفوظ ہوتا ہے۔", reset_note: "Reset چاہیے؟ app data reset کرنے کے لیے browser local storage clear کریں۔",
-    danger_desc: "نیچے والا button دبانے سے تمام data clear ہو جائیں گے۔", no_deleted_transactions: "کوئی deleted transaction نہیں"
+    danger_desc: "نیچے والا بٹن دبانے سے تمام ڈیٹا صاف ہو جائے گا۔", no_deleted_transactions: "کوئی deleted transaction نہیں", delete_transaction_title: "معاملہ حذف کریں"
   },
   es: {
     app_title: "Vault Budget Prime", app_subtitle: "Rastreador financiero limpio con identidad visual segura", language_label: "Idioma", language_search: "Buscar idiomas", language_no_match: "No se encontró ningún idioma",
@@ -216,7 +216,7 @@ const i18n = {
     account_type: "Tipo de cuenta", role: "Rol", group_credentials_admin: "Credenciales del grupo (admin)", copy_credentials: "Copiar credenciales", group_members: "Miembros del grupo",
     invite_member_admin: "Invitar miembro (admin)", friend_gmail: "Gmail del amigo", send_invite: "Enviar invitación", request_edit_access: "Solicitar acceso de edición",
     admin_gmail: "Gmail del admin", request_access: "Solicitar acceso", pending_access_requests: "Solicitudes pendientes", deleted_transactions_admin: "Transacciones eliminadas (admin)",
-    danger_zone: "Zona de peligro", log_out: "Cerrar sesión", clear_all_data: "Borrar todos los datos", please_wait: "Por favor espera...", notice: "Aviso", cancel: "Cancelar", ok: "OK",
+    danger_zone: "Zona de peligro", log_out: "Cerrar sesión", clear_all_data: "Borrar todos los datos", clear_data_title: "Borrar datos", clear_data_confirm: "Esto eliminará tus datos de forma permanente. Si tienes alguna cuenta de grupo, ese grupo y sus datos también se borrarán. ¿Continuar?", please_wait: "Por favor espera...", notice: "Aviso", cancel: "Cancelar", ok: "OK",
     save: "Guardar", group_account: "Cuenta de grupo", gmail_account: "Cuenta de Gmail", role_viewer: "espectador", role_editor: "editor", role_admin: "admin", role_personal: "personal",
     join_group: "Unirse al grupo", top_category: "Categoría principal", top_expense: "Gasto principal", categories: "Categorías", total_income_label: "Ingresos totales:", total_expense_label: "Gastos totales:",
     group_action_help_join: "Usa el nombre de usuario y la contraseña exactos del admin.",
@@ -224,7 +224,7 @@ const i18n = {
     group_action_permission_tip: "Si aparece un error de permisos, cierra sesión y vuelve a entrar, luego prueba con el usuario y contraseña exactos.",
     fixed_light_mode: "La app usa modo claro fijo.", session_lock_note: "Esta sesión tiene bloqueo de inicio activo. Al refrescar la página tendrás que iniciar sesión otra vez.",
     storage_note: "Los datos se guardan en el almacenamiento local del navegador.", reset_note: "¿Necesitas reiniciar? Borra el almacenamiento local del navegador para reiniciar los datos.",
-    danger_desc: "Pulsar el botón de abajo borrará todos los datos.", no_deleted_transactions: "No hay transacciones eliminadas"
+    danger_desc: "Pulsar el botón de abajo borrará todos los datos.", no_deleted_transactions: "No hay transacciones eliminadas", delete_transaction_title: "Eliminar transacción"
   },
   fr: {
     app_title: "Vault Budget Prime", app_subtitle: "Suivi financier épuré avec identité visuelle sécurisée", language_label: "Langue", language_search: "Rechercher des langues", language_no_match: "Aucune langue trouvée",
@@ -240,7 +240,7 @@ const i18n = {
     account_type: "Type de compte", role: "Rôle", group_credentials_admin: "Identifiants du groupe (admin)", copy_credentials: "Copier les identifiants", group_members: "Membres du groupe",
     invite_member_admin: "Inviter un membre (admin)", friend_gmail: "Gmail de l’ami", send_invite: "Envoyer l’invitation", request_edit_access: "Demander l’accès d’édition",
     admin_gmail: "Gmail de l’admin", request_access: "Demander l’accès", pending_access_requests: "Demandes d’accès en attente", deleted_transactions_admin: "Transactions supprimées (admin)",
-    danger_zone: "Zone de danger", log_out: "Déconnexion", clear_all_data: "Effacer toutes les données", please_wait: "Veuillez patienter...", notice: "Avis", cancel: "Annuler", ok: "OK",
+    danger_zone: "Zone de danger", log_out: "Déconnexion", clear_all_data: "Effacer toutes les données", clear_data_title: "Effacer les données", clear_data_confirm: "Cela supprimera définitivement vos données. Si vous possédez un compte de groupe, ce groupe et ses données seront également supprimés. Continuer ?", please_wait: "Veuillez patienter...", notice: "Avis", cancel: "Annuler", ok: "OK",
     save: "Enregistrer", group_account: "Compte de groupe", gmail_account: "Compte Gmail", role_viewer: "observateur", role_editor: "éditeur", role_admin: "admin", role_personal: "personnel",
     join_group: "Rejoindre le groupe", top_category: "Catégorie principale", top_expense: "Dépense principale", categories: "Catégories", total_income_label: "Revenu total :", total_expense_label: "Dépense totale :",
     group_action_help_join: "Utilisez exactement le nom d’utilisateur et le mot de passe fournis par l’admin.",
@@ -248,7 +248,7 @@ const i18n = {
     group_action_permission_tip: "Si une erreur de permission apparaît, déconnectez-vous puis reconnectez-vous et réessayez avec le nom d’utilisateur et le mot de passe exacts.",
     fixed_light_mode: "L’application est en mode clair fixe.", session_lock_note: "Cette session a un verrou de connexion actif. Au rafraîchissement, il faudra se reconnecter.",
     storage_note: "Les données sont enregistrées dans le stockage local du navigateur.", reset_note: "Besoin de réinitialiser ? Effacez le stockage local du navigateur pour réinitialiser les données.",
-    danger_desc: "Appuyer sur le bouton ci-dessous effacera toutes les données.", no_deleted_transactions: "Aucune transaction supprimée"
+    danger_desc: "Appuyer sur le bouton ci-dessous effacera toutes les données.", no_deleted_transactions: "Aucune transaction supprimée", delete_transaction_title: "Supprimer la transaction"
   },
   de: {
     app_title: "Vault Budget Prime", app_subtitle: "Übersichtlicher Finanz-Tracker mit sicherer visueller Identität", language_label: "Sprache", language_search: "Sprachen suchen", language_no_match: "Keine Sprache gefunden",
@@ -264,7 +264,7 @@ const i18n = {
     account_type: "Kontotyp", role: "Rolle", group_credentials_admin: "Gruppen-Zugangsdaten (Admin)", copy_credentials: "Zugangsdaten kopieren", group_members: "Gruppenmitglieder",
     invite_member_admin: "Mitglied einladen (Admin)", friend_gmail: "Gmail des Freundes", send_invite: "Einladung senden", request_edit_access: "Bearbeitungszugriff anfordern",
     admin_gmail: "Admin-Gmail", request_access: "Zugriff anfordern", pending_access_requests: "Ausstehende Zugriffe", deleted_transactions_admin: "Gelöschte Transaktionen (Admin)",
-    danger_zone: "Gefahrenbereich", log_out: "Abmelden", clear_all_data: "Alle Daten löschen", please_wait: "Bitte warten...", notice: "Hinweis", cancel: "Abbrechen", ok: "OK",
+    danger_zone: "Gefahrenbereich", log_out: "Abmelden", clear_all_data: "Alle Daten löschen", clear_data_title: "Daten löschen", clear_data_confirm: "Dadurch werden deine Daten dauerhaft gelöscht. Wenn du ein Gruppenkonto besitzt, werden diese Gruppe und die zugehörigen Daten ebenfalls gelöscht. Fortfahren?", please_wait: "Bitte warten...", notice: "Hinweis", cancel: "Abbrechen", ok: "OK",
     save: "Speichern", group_account: "Gruppenkonto", gmail_account: "Gmail-Konto", role_viewer: "Betrachter", role_editor: "Editor", role_admin: "Admin", role_personal: "persönlich",
     join_group: "Gruppe beitreten", top_category: "Top-Kategorie", top_expense: "Top-Ausgabe", categories: "Kategorien", total_income_label: "Gesamteinnahmen:", total_expense_label: "Gesamtausgaben:",
     group_action_help_join: "Verwende genau den Gruppen-Nutzernamen und das Passwort vom Admin.",
@@ -272,7 +272,7 @@ const i18n = {
     group_action_permission_tip: "Wenn ein Berechtigungsfehler erscheint, abmelden und erneut anmelden, dann mit exakt demselben Nutzernamen und Passwort versuchen.",
     fixed_light_mode: "Die App läuft im festen Hellmodus.", session_lock_note: "Diese Sitzung hat eine aktive Login-Sperre. Beim Aktualisieren muss man sich erneut anmelden.",
     storage_note: "Daten werden im lokalen Browser-Speicher gespeichert.", reset_note: "Zurücksetzen nötig? Browser-Lokalspeicher löschen, um App-Daten zurückzusetzen.",
-    danger_desc: "Das Drücken der Schaltfläche unten löscht alle Daten.", no_deleted_transactions: "Keine gelöschten Transaktionen"
+    danger_desc: "Das Drücken der Schaltfläche unten löscht alle Daten.", no_deleted_transactions: "Keine gelöschten Transaktionen", delete_transaction_title: "Transaktion löschen"
   },
   tr: {
     app_title: "Vault Budget Prime", app_subtitle: "Güvenli görsel kimlikle temiz finans takipçisi", language_label: "Dil", language_search: "Dilleri ara", language_no_match: "Dil bulunamadı",
@@ -288,7 +288,7 @@ const i18n = {
     account_type: "Hesap türü", role: "Rol", group_credentials_admin: "Grup kimlik bilgileri (Yönetici)", copy_credentials: "Kimlik bilgilerini kopyala", group_members: "Grup üyeleri",
     invite_member_admin: "Üye davet et (Yönetici)", friend_gmail: "Arkadaşın Gmail'i", send_invite: "Davet gönder", request_edit_access: "Düzenleme erişimi iste",
     admin_gmail: "Yönetici Gmail", request_access: "Erişim iste", pending_access_requests: "Bekleyen erişim istekleri", deleted_transactions_admin: "Silinen işlemler (Yönetici)",
-    danger_zone: "Tehlikeli alan", log_out: "Çıkış yap", clear_all_data: "Tüm verileri sil", please_wait: "Lütfen bekleyin...", notice: "Uyarı", cancel: "İptal", ok: "Tamam",
+    danger_zone: "Tehlikeli alan", log_out: "Çıkış yap", clear_all_data: "Tüm verileri sil", clear_data_title: "Verileri sil", clear_data_confirm: "Bu, tüm verilerinizi kalıcı olarak silecek. Bir grup hesabınız varsa, o grup ve verileri de silinecek. Devam edilsin mi?", please_wait: "Lütfen bekleyin...", notice: "Uyarı", cancel: "İptal", ok: "Tamam",
     save: "Kaydet", group_account: "Grup hesabı", gmail_account: "Gmail hesabı", role_viewer: "izleyici", role_editor: "editör", role_admin: "yönetici", role_personal: "kişisel",
     join_group: "Gruba katıl", top_category: "En yüksek kategori", top_expense: "En yüksek gider", categories: "Kategoriler", total_income_label: "Toplam gelir:", total_expense_label: "Toplam gider:",
     group_action_help_join: "Yöneticiden aldığınız tam grup kullanıcı adını ve parolayı kullanın.",
@@ -296,7 +296,7 @@ const i18n = {
     group_action_permission_tip: "İzin hatası görünürse çıkış yapıp yeniden giriş yapın, sonra aynı kullanıcı adı ve parola ile tekrar deneyin.",
     fixed_light_mode: "Uygulama sabit açık modda çalışıyor.", session_lock_note: "Bu oturumda giriş kilidi aktif. Sayfayı yenilerseniz yeniden giriş gerekir.",
     storage_note: "Veriler yerel tarayıcı depolamasında saklanır.", reset_note: "Sıfırlamak mı istiyorsunuz? Uygulama verilerini sıfırlamak için tarayıcı yerel depolamasını temizleyin.",
-    danger_desc: "Aşağıdaki düğmeye basmak tüm verileri siler.", no_deleted_transactions: "Silinmiş işlem yok"
+    danger_desc: "Aşağıdaki düğmeye basmak tüm verileri siler.", no_deleted_transactions: "Silinmiş işlem yok", delete_transaction_title: "İşlemi sil"
   },
   ru: {
     app_title: "Vault Budget Prime", app_subtitle: "Чистый финансовый трекер с безопасной визуальной идентичностью", language_label: "Язык", language_search: "Поиск языков", language_no_match: "Язык не найден",
@@ -312,7 +312,7 @@ const i18n = {
     account_type: "Тип аккаунта", role: "Роль", group_credentials_admin: "Учётные данные группы (админ)", copy_credentials: "Скопировать учётные данные", group_members: "Участники группы",
     invite_member_admin: "Пригласить участника (админ)", friend_gmail: "Gmail друга", send_invite: "Отправить приглашение", request_edit_access: "Запросить доступ к редактированию",
     admin_gmail: "Gmail администратора", request_access: "Запросить доступ", pending_access_requests: "Ожидающие запросы", deleted_transactions_admin: "Удалённые транзакции (админ)",
-    danger_zone: "Опасная зона", log_out: "Выйти", clear_all_data: "Очистить все данные", please_wait: "Пожалуйста, подождите...", notice: "Уведомление", cancel: "Отмена", ok: "ОК",
+    danger_zone: "Опасная зона", log_out: "Выйти", clear_all_data: "Очистить все данные", clear_data_title: "Очистить данные", clear_data_confirm: "Это навсегда удалит все ваши данные. Если у вас есть групповая учётная запись, эта группа и её данные тоже будут удалены. Продолжить?", please_wait: "Пожалуйста, подождите...", notice: "Уведомление", cancel: "Отмена", ok: "ОК",
     save: "Сохранить", group_account: "Групповая учётная запись", gmail_account: "Аккаунт Gmail", role_viewer: "наблюдатель", role_editor: "редактор", role_admin: "админ", role_personal: "личный",
     join_group: "Присоединиться к группе", top_category: "Основная категория", top_expense: "Основной расход", categories: "Категории", total_income_label: "Общий доход:", total_expense_label: "Общий расход:",
     group_action_help_join: "Используйте точное имя пользователя группы и пароль от администратора.",
@@ -320,7 +320,7 @@ const i18n = {
     group_action_permission_tip: "Если появляется ошибка прав, выйдите и войдите снова, затем попробуйте точные имя пользователя и пароль.",
     fixed_light_mode: "Приложение работает в фиксированном светлом режиме.", session_lock_note: "В этой сессии включена блокировка входа. После обновления страницы нужно войти снова.",
     storage_note: "Данные сохраняются в локальном хранилище браузера.", reset_note: "Нужно сбросить? Очистите локальное хранилище браузера, чтобы сбросить данные приложения.",
-    danger_desc: "Нажатие кнопки ниже удалит все данные.", no_deleted_transactions: "Удалённых транзакций нет"
+    danger_desc: "Нажатие кнопки ниже удалит все данные.", no_deleted_transactions: "Удалённых транзакций нет", delete_transaction_title: "Удалить транзакцию"
   }
 };
 
@@ -1375,7 +1375,7 @@ async function deleteTransaction(txnId) {
   if (idx < 0) return;
 
   const txn = transactions[idx];
-  const ok = await appConfirm(tx("delete_transaction_confirm"), tx("delete_transaction_confirm"));
+  const ok = await appConfirm(tx("delete_transaction_confirm"), tx("delete_transaction_title"));
   if (!ok) return;
 
   transactions.splice(idx, 1);
@@ -1661,7 +1661,7 @@ function renderTransactions() {
       deleteBtn.title = tx("delete_transaction_title");
       deleteBtn.innerHTML = '<i class="fa-solid fa-trash"></i>';
       deleteBtn.onclick = () => {
-        withLoader("Deleting transaction...", async () => {
+        withLoader(tx("deleting_transaction"), async () => {
           await deleteTransaction(txn.id);
         }).catch((e) => appAlert(e.message || tx("delete_failed")));
       };
@@ -2307,7 +2307,7 @@ logoutBtn?.addEventListener("click", async () => {
 });
 
 clearDataBtn.addEventListener("click", async () => {
-  const ok = await appConfirm(tx("clear_data_confirm"), t("clear_data_title") || t("clear_all_data"));
+  const ok = await appConfirm(tx("clear_data_confirm"), tx("clear_data_title"));
   if (!ok) return;
   let remoteClearError = "";
   showLoader(tx("resetting_data"));
