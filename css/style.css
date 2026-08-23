@@ -296,7 +296,7 @@ body {
 .hero {
     background: var(--hero-grad);
     border-radius: 18px;
-    padding: 64px 16px 16px;
+    padding: 20px 16px 16px;
     color: var(--text);
     position: relative;
     display: flex;
@@ -1232,7 +1232,7 @@ input:not(:placeholder-shown)+.floating-label {
     box-shadow: 0 8px 20px rgba(255, 1, 79, 0.06);
 }
 
-#groupMembersList li > div {
+#groupMembersList li>div {
     flex: 1;
     min-width: 0;
     word-break: break-word;
