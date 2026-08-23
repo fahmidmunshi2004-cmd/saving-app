@@ -72,13 +72,18 @@ async function loadGroupSharedData() {
   const snap = await ref.get();
 
   if (!snap.exists) {
-    await ref.set({
-      income: 0,
-      expense: 0,
-      breakdown: {},
-      transactions: [],
-      createdAt: firebase.firestore.FieldValue.serverTimestamp()
-    }, { merge: true });
+    const canCreateSharedFinance = isCurrentAdmin() || !!currentSession?.canEdit;
+    if (canCreateSharedFinance) {
+      await ref.set({
+        income: 0,
+        expense: 0,
+        breakdown: {},
+        transactions: [],
+        deletedTransactions: [],
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      }, { merge: true });
+    }
   }
 
   const data = snap.exists ? snap.data() : { income: 0, expense: 0, breakdown: {}, transactions: [], deletedTransactions: [] };
