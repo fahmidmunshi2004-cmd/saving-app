@@ -815,17 +815,13 @@ async function joinGroupFromGmail() {
   const memberId = `gmail_${firebaseUser.uid}`;
   const memberDocId = `${groupId}__${memberId}`;
   const memberRef = db.collection("groupMembers").doc(memberDocId);
-  const memberSnap = await memberRef.get();
-  const existing = memberSnap.exists ? (memberSnap.data() || {}) : null;
   const isCredentialOwner = userData.memberId === memberId;
   const resolvedRole = isCredentialOwner
-    ? (userData.role || existing?.role || "viewer")
-    : (existing?.role || "viewer");
-  const resolvedCanEdit = typeof existing?.canEdit === "boolean"
-    ? existing.canEdit
-    : (isCredentialOwner
-      ? (typeof userData.canEdit === "boolean" ? userData.canEdit : resolvedRole !== "viewer")
-      : false);
+    ? (userData.role || "viewer")
+    : "viewer";
+  const resolvedCanEdit = isCredentialOwner
+    ? (typeof userData.canEdit === "boolean" ? userData.canEdit : resolvedRole !== "viewer")
+    : false;
 
   await memberRef.set({
     groupId,
