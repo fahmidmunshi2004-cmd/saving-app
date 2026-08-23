@@ -359,6 +359,7 @@ async function requestEditAccess() {
 
 function applyAuthState() {
   if (!currentSession) {
+    stopGroupRealtimeSync();
     authInfo.innerText = "Private mode is enabled. Login first.";
     views.forEach((view) => view.classList.remove("active"));
     document.querySelector(".bottom-nav").classList.add("hidden");
@@ -384,6 +385,7 @@ function applyAuthState() {
 
   const editable = isCurrentAdmin() || !!currentSession.canEdit || (!currentSession.groupId && currentSession.type === "gmail");
   setEditAccess(editable);
+  startGroupRealtimeSync();
   if (lastView === "walletView") {
     renderSavingsRateChart(true);
   }
@@ -1561,7 +1563,7 @@ function renderSavingsRateChart(animate = true) {
   walletRateChart.update();
 }
 
-function updateUI() {
+function updateUI(shouldSave = true) {
   document.getElementById("income").innerText = formatMoney(income);
   document.getElementById("expense").innerText = formatMoney(expense);
   document.getElementById("balance").innerText = formatMoney(income - expense);
@@ -1611,7 +1613,11 @@ function updateUI() {
   if (activeViewId === "walletView") {
     renderSavingsRateChart(true);
   }
-  saveData();
+  if (shouldSave) {
+    saveData(true);
+  } else {
+    saveData(false);
+  }
 }
 
 function addIncome() {

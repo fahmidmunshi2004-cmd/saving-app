@@ -19,14 +19,160 @@ function formatMoney(value) {
   return `${value.toLocaleString("en-BD")} BDT`;
 }
 
-function saveData() {
+function stopGroupRealtimeSync() {
+  if (typeof groupFinanceUnsub === "function") {
+    groupFinanceUnsub();
+  }
+  if (typeof groupMembersUnsub === "function") {
+    groupMembersUnsub();
+  }
+  if (typeof pendingRequestsUnsub === "function") {
+    pendingRequestsUnsub();
+  }
+  groupFinanceUnsub = null;
+  groupMembersUnsub = null;
+  pendingRequestsUnsub = null;
+  activeRealtimeGroupId = "";
+  activeRealtimeIsAdmin = false;
+}
+
+function applyGroupFinanceSnapshot(data = {}) {
+  income = Number(data.income) || 0;
+  expense = Number(data.expense) || 0;
+
+  Object.keys(breakdown).forEach((k) => delete breakdown[k]);
+  Object.entries(data.breakdown || {}).forEach(([k, v]) => {
+    breakdown[k] = Number(v) || 0;
+  });
+
+  transactions.length = 0;
+  for (const t of (data.transactions || [])) {
+    transactions.push(t);
+  }
+
+  deletedTransactions.length = 0;
+  for (const t of (data.deletedTransactions || [])) {
+    deletedTransactions.push(t);
+  }
+}
+
+function syncCurrentSessionFromGroupMembers(docs = []) {
+  if (!currentSession?.groupId || !firebaseUser) return;
+  const myMemberId = currentSession.memberId || `gmail_${firebaseUser.uid}`;
+  const selfDoc = docs.find((doc) => {
+    const data = typeof doc.data === "function" ? doc.data() : doc;
+    return data?.memberId === myMemberId;
+  });
+
+  if (!selfDoc) {
+    if (currentSession.type === "gmail") {
+      currentSession = {
+        type: "gmail",
+        uid: firebaseUser.uid,
+        email: firebaseUser.email,
+        role: "personal",
+        canEdit: true
+      };
+      saveSession();
+      stopGroupRealtimeSync();
+      loadData();
+      updateUI(false);
+      applyAuthState();
+    }
+    return;
+  }
+
+  const selfData = typeof selfDoc.data === "function" ? selfDoc.data() : selfDoc;
+  const nextRole = selfData.role || currentSession.role || "viewer";
+  const nextCanEdit = !!selfData.canEdit;
+  let changed = false;
+
+  if (currentSession.role !== nextRole) {
+    currentSession.role = nextRole;
+    changed = true;
+  }
+  if (currentSession.canEdit !== nextCanEdit) {
+    currentSession.canEdit = nextCanEdit;
+    changed = true;
+  }
+
+  if (changed) {
+    saveSession();
+    setEditAccess(isCurrentAdmin() || !!currentSession.canEdit || (!currentSession.groupId && currentSession.type === "gmail"));
+    updateUI(false);
+    applyAuthState();
+  }
+}
+
+function startGroupRealtimeSync() {
+  if (!db || !currentSession?.groupId) {
+    stopGroupRealtimeSync();
+    return;
+  }
+
+  const isAdminNow = isCurrentAdmin();
+  if (
+    activeRealtimeGroupId === currentSession.groupId
+    && activeRealtimeIsAdmin === isAdminNow
+    && groupFinanceUnsub
+    && groupMembersUnsub
+    && (!isAdminNow || pendingRequestsUnsub)
+  ) {
+    return;
+  }
+
+  stopGroupRealtimeSync();
+  activeRealtimeGroupId = currentSession.groupId;
+  activeRealtimeIsAdmin = isAdminNow;
+  const groupId = currentSession.groupId;
+
+  groupFinanceUnsub = db.collection("groupFinance").doc(groupId).onSnapshot((snap) => {
+    if (!currentSession?.groupId || currentSession.groupId !== groupId) return;
+    if (!snap.exists) {
+      applyGroupFinanceSnapshot({ income: 0, expense: 0, breakdown: {}, transactions: [], deletedTransactions: [] });
+      updateUI(false);
+      if (typeof forceHistoryManagerPanel === "function") {
+        forceHistoryManagerPanel();
+      }
+      return;
+    }
+
+    applyGroupFinanceSnapshot(snap.data() || {});
+    updateUI(false);
+    if (typeof forceHistoryManagerPanel === "function") {
+      forceHistoryManagerPanel();
+    }
+  }, () => { });
+
+  groupMembersUnsub = db.collection("groupMembers").where("groupId", "==", groupId).onSnapshot((snap) => {
+    if (!currentSession?.groupId || currentSession.groupId !== groupId) return;
+    syncCurrentSessionFromGroupMembers(snap.docs || []);
+    if (typeof refreshSettingsPanels === "function") {
+      refreshSettingsPanels().catch(() => { });
+    }
+  }, () => { });
+
+  if (isAdminNow) {
+    pendingRequestsUnsub = db.collection("accessRequests")
+      .where("groupId", "==", groupId)
+      .where("status", "==", "pending")
+      .onSnapshot(() => {
+        if (!currentSession?.groupId || currentSession.groupId !== groupId) return;
+        if (typeof refreshSettingsPanels === "function") {
+          refreshSettingsPanels().catch(() => { });
+        }
+      }, () => { });
+  }
+}
+
+function saveData(syncRemote = true) {
   localStorage.setItem("income", income);
   localStorage.setItem("expense", expense);
   localStorage.setItem("breakdown", JSON.stringify(breakdown));
   localStorage.setItem("transactions", JSON.stringify(transactions));
   localStorage.setItem("deletedTransactions", JSON.stringify(deletedTransactions));
 
-  const canSyncGroupFinance = currentSession?.groupId && db && (isCurrentAdmin() || !!currentSession?.canEdit);
+  const canSyncGroupFinance = syncRemote && currentSession?.groupId && db && (isCurrentAdmin() || !!currentSession?.canEdit);
   if (canSyncGroupFinance) {
     db.collection("groupFinance").doc(currentSession.groupId).set({
       income,
@@ -87,23 +233,7 @@ async function loadGroupSharedData() {
   }
 
   const data = snap.exists ? snap.data() : { income: 0, expense: 0, breakdown: {}, transactions: [], deletedTransactions: [] };
-  income = Number(data.income) || 0;
-  expense = Number(data.expense) || 0;
-
-  Object.keys(breakdown).forEach((k) => delete breakdown[k]);
-  Object.entries(data.breakdown || {}).forEach(([k, v]) => {
-    breakdown[k] = Number(v) || 0;
-  });
-
-  transactions.length = 0;
-  for (const t of (data.transactions || [])) {
-    transactions.push(t);
-  }
-
-  deletedTransactions.length = 0;
-  for (const t of (data.deletedTransactions || [])) {
-    deletedTransactions.push(t);
-  }
+  applyGroupFinanceSnapshot(data);
 
   if (!snap.exists && (isCurrentAdmin() || !!currentSession?.canEdit)) {
     await ref.set({
