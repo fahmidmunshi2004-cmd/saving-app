@@ -2150,10 +2150,10 @@ clearDataBtn.addEventListener("click", async () => {
 
 async function bootApp() {
   await loadI18n();
-  localStorage.setItem(LANG_STORAGE_KEY, "en");
-  currentLang = "en";
+  const savedLang = localStorage.getItem(LANG_STORAGE_KEY);
+  currentLang = getLanguageOption(savedLang || "en").code;
   applyTheme();
-  applyLanguage("en");
+  applyLanguage(currentLang);
   renderLanguageMenu();
   loadData();
   syncTransactionState();
