@@ -1,4 +1,4 @@
-const CACHE_NAME = "vaultbudget-v9";
+const CACHE_NAME = "vaultbudget-v10";
 const ASSETS = [
   "./",
   "./index.html",
@@ -6,6 +6,7 @@ const ASSETS = [
   "./js/core/state.js",
   "./js/core/common.js",
   "./js/app.js",
+  "./assets/i18n.json",
   "./manifest.webmanifest",
   "./assets/icons/icon-192.svg",
   "./assets/icons/icon-512.svg"
