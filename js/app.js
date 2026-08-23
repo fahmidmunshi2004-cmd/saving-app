@@ -540,9 +540,16 @@ async function handleGoogleAuthUser(user) {
       return;
     }
 
+    const previousSession = currentSession ? { ...currentSession } : null;
+    const sameGoogleAccount = previousSession?.type === "gmail" && previousSession.uid === firebaseUser.uid;
+    if (!sameGoogleAccount && currentSession) {
+      currentSession = null;
+      saveSession();
+    }
+
     await processInviteLink();
 
-    if (currentSession?.type === "gmail" && currentSession.uid === firebaseUser.uid) {
+    if (sameGoogleAccount && currentSession?.type === "gmail" && currentSession.uid === firebaseUser.uid) {
       if (currentSession.groupId) {
         const latestMember = await resolveMembershipForUser(`gmail_${firebaseUser.uid}`, currentSession.groupId);
         if (latestMember) {
@@ -565,7 +572,8 @@ async function handleGoogleAuthUser(user) {
     }
 
     const memberId = `gmail_${firebaseUser.uid}`;
-    const m = await resolveMembershipForUser(memberId, currentSession?.groupId || "");
+    const preferredGroupId = sameGoogleAccount ? (previousSession?.groupId || "") : "";
+    const m = await resolveMembershipForUser(memberId, preferredGroupId);
     if (m) {
       currentSession = {
         type: "gmail",
@@ -577,11 +585,11 @@ async function handleGoogleAuthUser(user) {
         canEdit: !!m.canEdit
       };
     } else {
-      currentSession = {
-        type: "gmail",
-        uid: firebaseUser.uid,
-        email: firebaseUser.email,
-        role: "personal",
+        currentSession = {
+          type: "gmail",
+          uid: firebaseUser.uid,
+          email: firebaseUser.email,
+          role: "personal",
         canEdit: true
       };
     }
