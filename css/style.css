@@ -296,8 +296,9 @@ body {
 .hero {
     background: var(--hero-grad);
     border-radius: 18px;
-    padding: 16px;
+    padding: 64px 16px 16px;
     color: var(--text);
+    position: relative;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -310,7 +311,10 @@ body {
     flex-direction: column;
     gap: 6px;
     min-width: 220px;
-    position: relative;
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    z-index: 4;
 }
 
 .lang-label {
@@ -488,6 +492,8 @@ html[dir="rtl"] .wallet-head {
 html[dir="rtl"] .lang-picker-wrap {
     margin-left: 0;
     margin-right: auto;
+    right: auto;
+    left: 14px;
 }
 
 html[dir="rtl"] .lang-switcher {
@@ -2026,8 +2032,21 @@ input:not(:placeholder-shown)+.floating-label {
     }
 
     .hero {
-        padding: 12px;
+        padding: 58px 12px 12px;
         border-radius: 14px;
+    }
+
+    .lang-picker-wrap {
+        top: 10px;
+        right: 10px;
+        left: 10px;
+        min-width: 0;
+        width: auto;
+    }
+
+    html[dir="rtl"] .lang-picker-wrap {
+        right: 10px;
+        left: 10px;
     }
 
     .logo {
