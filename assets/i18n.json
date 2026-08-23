@@ -292,7 +292,7 @@
     "popup_blocked": "Popup blocked. Please allow popups and try again.",
     "auth_error": "Authentication error.",
     "google_login_failed": "Google login failed.",
-    "logout_confirm": "আপনি শুধু logout হবেন। আপনার data সেভ থাকবে।",
+    "logout_confirm": "???? ???? logout ????? ????? data ??? ??????",
     "logout_title": "Log Out?",
     "clear_data_title": "ডেটা মুছুন",
     "logout_success": "সফলভাবে লগ out হয়েছে।",
@@ -438,7 +438,9 @@
     "reset_note": "تحتاج إعادة ضبط؟ امسح التخزين المحلي للمتصفح لإعادة ضبط بيانات التطبيق.",
     "danger_desc": "الضغط على الزر أدناه سيمسح كل البيانات.",
     "no_deleted_transactions": "لا توجد معاملات محذوفة",
-    "delete_transaction_title": "حذف المعاملة"
+    "delete_transaction_title": "حذف المعاملة",
+    "logout_confirm": "???? ????? ????? ???. ????? ??????? ??????.",
+    "logout_title": "????? ???????"
   },
   "hi": {
     "app_title": "वॉल्ट बजट प्राइम",
@@ -539,7 +541,9 @@
     "reset_note": "Reset चाहिए? app data reset करने के लिए browser local storage clear करें।",
     "danger_desc": "नीचे दिया गया बटन दबाने से सभी डेटा साफ़ हो जाएंगे।",
     "no_deleted_transactions": "कोई deleted transaction नहीं",
-    "delete_transaction_title": "लेनदेन हटाएँ"
+    "delete_transaction_title": "लेनदेन हटाएँ",
+    "logout_confirm": "?? ???? ??? ??? ?????? ???? ???? ???????? ??????",
+    "logout_title": "??? ????"
   },
   "ur": {
     "app_title": "والٹ بجٹ پرائم",
@@ -640,7 +644,9 @@
     "reset_note": "Reset چاہیے؟ app data reset کرنے کے لیے browser local storage clear کریں۔",
     "danger_desc": "نیچے والا بٹن دبانے سے تمام ڈیٹا صاف ہو جائے گا۔",
     "no_deleted_transactions": "کوئی deleted transaction نہیں",
-    "delete_transaction_title": "معاملہ حذف کریں"
+    "delete_transaction_title": "معاملہ حذف کریں",
+    "logout_confirm": "?? ??? ??? ??? ??? ??? ?? ?? ???? ????? ??? ???",
+    "logout_title": "??? ????"
   },
   "es": {
     "app_title": "Vault Budget Prime",
@@ -741,7 +747,9 @@
     "reset_note": "¿Necesitas reiniciar? Borra el almacenamiento local del navegador para reiniciar los datos.",
     "danger_desc": "Pulsar el botón de abajo borrará todos los datos.",
     "no_deleted_transactions": "No hay transacciones eliminadas",
-    "delete_transaction_title": "Eliminar transacción"
+    "delete_transaction_title": "Eliminar transacción",
+    "logout_confirm": "Solo cerrar?s sesi?n. Tus datos permanecer?n guardados.",
+    "logout_title": "?Cerrar sesi?n?"
   },
   "fr": {
     "app_title": "Vault Budget Prime",
@@ -842,7 +850,9 @@
     "reset_note": "Besoin de réinitialiser ? Effacez le stockage local du navigateur pour réinitialiser les données.",
     "danger_desc": "Appuyer sur le bouton ci-dessous effacera toutes les données.",
     "no_deleted_transactions": "Aucune transaction supprimée",
-    "delete_transaction_title": "Supprimer la transaction"
+    "delete_transaction_title": "Supprimer la transaction",
+    "logout_confirm": "Vous serez uniquement d?connect?. Vos donn?es resteront enregistr?es.",
+    "logout_title": "D?connexion ?"
   },
   "de": {
     "app_title": "Vault Budget Prime",
@@ -943,7 +953,9 @@
     "reset_note": "Zurücksetzen nötig? Browser-Lokalspeicher löschen, um App-Daten zurückzusetzen.",
     "danger_desc": "Das Drücken der Schaltfläche unten löscht alle Daten.",
     "no_deleted_transactions": "Keine gelöschten Transaktionen",
-    "delete_transaction_title": "Transaktion löschen"
+    "delete_transaction_title": "Transaktion löschen",
+    "logout_confirm": "Sie werden nur abgemeldet. Ihre Daten bleiben gespeichert.",
+    "logout_title": "Abmelden?"
   },
   "tr": {
     "app_title": "Vault Budget Prime",
@@ -1044,7 +1056,9 @@
     "reset_note": "Sıfırlamak mı istiyorsunuz? Uygulama verilerini sıfırlamak için tarayıcı yerel depolamasını temizleyin.",
     "danger_desc": "Aşağıdaki düğmeye basmak tüm verileri siler.",
     "no_deleted_transactions": "Silinmiş işlem yok",
-    "delete_transaction_title": "İşlemi sil"
+    "delete_transaction_title": "İşlemi sil",
+    "logout_confirm": "Sadece ??k?? yapacaks?n?z. Verileriniz kaydedilmi? olarak kalacak.",
+    "logout_title": "??k?? yap?ls?n m??"
   },
   "ru": {
     "app_title": "Vault Budget Prime",
@@ -1145,6 +1159,8 @@
     "reset_note": "Нужно сбросить? Очистите локальное хранилище браузера, чтобы сбросить данные приложения.",
     "danger_desc": "Нажатие кнопки ниже удалит все данные.",
     "no_deleted_transactions": "Удалённых транзакций нет",
-    "delete_transaction_title": "Удалить транзакцию"
+    "delete_transaction_title": "Удалить транзакцию",
+    "logout_confirm": "?? ?????? ??????? ?? ???????. ???? ?????? ????????? ????????????.",
+    "logout_title": "??????"
   }
 }
