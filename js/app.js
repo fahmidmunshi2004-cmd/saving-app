@@ -787,10 +787,12 @@ async function joinGroupFromGmail() {
   const isCredentialOwner = userData.memberId === memberId;
   const resolvedRole = isCredentialOwner
     ? (userData.role || existing?.role || "viewer")
-    : (existing?.role || userData.role || "viewer");
+    : (existing?.role || "viewer");
   const resolvedCanEdit = typeof existing?.canEdit === "boolean"
     ? existing.canEdit
-    : (typeof userData.canEdit === "boolean" ? userData.canEdit : resolvedRole !== "viewer");
+    : (isCredentialOwner
+      ? (typeof userData.canEdit === "boolean" ? userData.canEdit : resolvedRole !== "viewer")
+      : false);
 
   await memberRef.set({
     groupId,
