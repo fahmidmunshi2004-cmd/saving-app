@@ -64,12 +64,16 @@
                 </div>
             </div>
             <div class="lang-picker-wrap">
-                <label for="langSwitcher" class="lang-label" data-i18n="language_label">Language</label>
-                <select id="langSwitcher" class="lang-switcher" aria-label="Language selector">
-                    <option value="en">English</option>
-                    <option value="bn">বাংলা</option>
-                    <option value="ar">العربية</option>
-                </select>
+                <span class="lang-label" data-i18n="language_label">Language</span>
+                <button id="langSwitcher" class="lang-switcher" type="button" aria-haspopup="listbox"
+                    aria-expanded="false" aria-controls="langMenu" aria-label="Language selector">
+                    <span class="lang-switcher-main">
+                        <span id="langCurrentFlag" class="lang-flag" aria-hidden="true">EN</span>
+                        <span id="langCurrentLabel" class="lang-switcher-label">English</span>
+                    </span>
+                    <i class="fa-solid fa-chevron-down lang-switcher-icon" aria-hidden="true"></i>
+                </button>
+                <div id="langMenu" class="lang-menu hidden" role="listbox" aria-label="Language options"></div>
             </div>
         </div>
 

@@ -12,6 +12,18 @@
 
 const LANG_STORAGE_KEY = "vault_lang";
 let currentLang = localStorage.getItem(LANG_STORAGE_KEY) || "en";
+const LANGUAGE_OPTIONS = [
+  { code: "en", name: "English", native: "English", flag: "EN", locale: "en-US", dir: "ltr" },
+  { code: "bn", name: "Bengali", native: "বাংলা", flag: "BN", locale: "bn-BD", dir: "ltr" },
+  { code: "ar", name: "Arabic", native: "العربية", flag: "AR", locale: "ar-SA", dir: "rtl" },
+  { code: "hi", name: "Hindi", native: "हिन्दी", flag: "HI", locale: "hi-IN", dir: "ltr" },
+  { code: "ur", name: "Urdu", native: "اردو", flag: "UR", locale: "ur-PK", dir: "rtl" },
+  { code: "es", name: "Spanish", native: "Español", flag: "ES", locale: "es-ES", dir: "ltr" },
+  { code: "fr", name: "French", native: "Français", flag: "FR", locale: "fr-FR", dir: "ltr" },
+  { code: "de", name: "German", native: "Deutsch", flag: "DE", locale: "de-DE", dir: "ltr" },
+  { code: "tr", name: "Turkish", native: "Türkçe", flag: "TR", locale: "tr-TR", dir: "ltr" },
+  { code: "ru", name: "Russian", native: "Русский", flag: "RU", locale: "ru-RU", dir: "ltr" }
+];
 const i18n = {
   en: {
     app_title: "Vault Budget Prime", app_subtitle: "Clean finance tracker with secure visual identity", language_label: "Language",
@@ -92,21 +104,91 @@ function t(key) {
 }
 
 function getLocaleForLang() {
-  if (currentLang === "bn") return "bn-BD";
-  if (currentLang === "ar") return "ar-SA";
-  return "en-BD";
+  const option = LANGUAGE_OPTIONS.find((item) => item.code === currentLang);
+  return option?.locale || "en-US";
+}
+
+function getLanguageOption(code) {
+  return LANGUAGE_OPTIONS.find((item) => item.code === code) || LANGUAGE_OPTIONS[0];
+}
+
+function isRtlLanguage(code) {
+  return ["ar", "ur"].includes(code);
+}
+
+function renderLanguageMenu() {
+  if (!langMenu) return;
+  langMenu.innerHTML = "";
+
+  for (const option of LANGUAGE_OPTIONS) {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "lang-option";
+    btn.setAttribute("role", "option");
+    btn.setAttribute("data-lang", option.code);
+    btn.setAttribute("aria-selected", String(option.code === currentLang));
+    btn.innerHTML = `
+      <span class="lang-flag" aria-hidden="true">${option.flag}</span>
+      <span class="lang-option-main">
+        <span class="lang-option-name">${option.native}</span>
+        <span class="lang-option-meta">${option.name}</span>
+      </span>
+    `;
+    btn.addEventListener("click", () => {
+      applyLanguage(option.code);
+      closeLanguageMenu();
+    });
+    langMenu.appendChild(btn);
+  }
+}
+
+function updateLanguagePickerUI() {
+  const option = getLanguageOption(currentLang);
+  if (langCurrentLabel) langCurrentLabel.textContent = option.native;
+  if (langCurrentFlag) langCurrentFlag.textContent = option.flag;
+  if (langSwitcher) {
+    langSwitcher.setAttribute("aria-expanded", langMenu ? String(!langMenu.classList.contains("hidden")) : "false");
+    langSwitcher.classList.toggle("is-open", !!langMenu && !langMenu.classList.contains("hidden"));
+  }
+  if (langMenu) {
+    langMenu.querySelectorAll(".lang-option").forEach((btn) => {
+      const active = btn.getAttribute("data-lang") === currentLang;
+      btn.classList.toggle("is-active", active);
+      btn.setAttribute("aria-selected", String(active));
+    });
+  }
+}
+
+function openLanguageMenu() {
+  if (!langMenu || !langSwitcher) return;
+  langMenu.classList.remove("hidden");
+  updateLanguagePickerUI();
+}
+
+function closeLanguageMenu() {
+  if (!langMenu || !langSwitcher) return;
+  langMenu.classList.add("hidden");
+  updateLanguagePickerUI();
+}
+
+function toggleLanguageMenu() {
+  if (!langMenu || !langSwitcher) return;
+  if (langMenu.classList.contains("hidden")) {
+    openLanguageMenu();
+  } else {
+    closeLanguageMenu();
+  }
 }
 
 function applyLanguage(lang = "en") {
-  currentLang = i18n[lang] ? lang : "en";
+  const supported = LANGUAGE_OPTIONS.some((item) => item.code === lang);
+  currentLang = supported ? lang : "en";
   document.documentElement.lang = currentLang;
-  document.documentElement.dir = currentLang === "ar" ? "rtl" : "ltr";
+  document.documentElement.dir = isRtlLanguage(currentLang) ? "rtl" : "ltr";
   document.querySelectorAll("[data-i18n]").forEach((el) => {
     const key = el.getAttribute("data-i18n");
     if (key) el.textContent = t(key);
   });
-  const langSwitcher = document.getElementById("langSwitcher");
-  if (langSwitcher) langSwitcher.value = currentLang;
   if (currentSession && accountTypeText && accountRoleText) {
     accountTypeText.innerText = currentSession.type === "group" ? t("group_account") : t("gmail_account");
     accountRoleText.innerText = t(`role_${currentSession.role || "viewer"}`);
@@ -114,6 +196,8 @@ function applyLanguage(lang = "en") {
   if (!groupActionFormCard?.classList.contains("hidden")) {
     openGroupActionForm(groupActionMode);
   }
+  renderLanguageMenu();
+  updateLanguagePickerUI();
   localStorage.setItem(LANG_STORAGE_KEY, currentLang);
 }
 
@@ -1850,6 +1934,28 @@ groupActionSubmitBtn.addEventListener("click", async () => {
   }
 });
 
+langSwitcher?.addEventListener("click", (event) => {
+  event.stopPropagation();
+  toggleLanguageMenu();
+});
+
+langMenu?.addEventListener("click", (event) => {
+  event.stopPropagation();
+});
+
+document.addEventListener("click", (event) => {
+  if (!langMenu || !langSwitcher) return;
+  if (!langSwitcher.contains(event.target) && !langMenu.contains(event.target)) {
+    closeLanguageMenu();
+  }
+});
+
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape") {
+    closeLanguageMenu();
+  }
+});
+
 googleLoginBtn.addEventListener("click", async () => {
   if (loginProgress) return;
   try {
@@ -1987,6 +2093,7 @@ clearDataBtn.addEventListener("click", async () => {
 
 applyTheme();
 applyLanguage(currentLang);
+renderLanguageMenu();
 loadData();
 syncTransactionState();
 updateUI();
@@ -1998,11 +2105,6 @@ registerServiceWorker();
 if (document.querySelector(".view.active")?.id === "walletView") {
   renderSavingsRateChart(false);
 }
-
-document.getElementById("langSwitcher")?.addEventListener("change", (event) => {
-  applyLanguage(event.target.value);
-  updateUI();
-});
 
 window.addIncome = addIncome;
 window.addExpense = addExpense;

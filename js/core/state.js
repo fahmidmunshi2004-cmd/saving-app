@@ -71,6 +71,10 @@ const groupActionUsername = document.getElementById("groupActionUsername");
 const groupActionPassword = document.getElementById("groupActionPassword");
 const groupActionSubmitBtn = document.getElementById("groupActionSubmitBtn");
 const groupActionHelpText = document.getElementById("groupActionHelpText");
+const langSwitcher = document.getElementById("langSwitcher");
+const langCurrentLabel = document.getElementById("langCurrentLabel");
+const langCurrentFlag = document.getElementById("langCurrentFlag");
+const langMenu = document.getElementById("langMenu");
 
 const firebaseConfig = {
   apiKey: "AIzaSyDDGb1bNysz2Vszt116K2a3GGL9Rzsx9II",
