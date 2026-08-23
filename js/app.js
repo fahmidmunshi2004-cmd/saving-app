@@ -13,16 +13,16 @@
 const LANG_STORAGE_KEY = "vault_lang";
 let currentLang = "en";
 const LANGUAGE_OPTIONS = [
-  { code: "en", name: "English", native: "English", flag: "🇺🇸", locale: "en-US", dir: "ltr" },
-  { code: "bn", name: "Bengali", native: "বাংলা", flag: "🇧🇩", locale: "bn-BD", dir: "ltr" },
-  { code: "ar", name: "Arabic", native: "العربية", flag: "🇸🇦", locale: "ar-SA", dir: "rtl" },
-  { code: "hi", name: "Hindi", native: "हिन्दी", flag: "🇮🇳", locale: "hi-IN", dir: "ltr" },
-  { code: "ur", name: "Urdu", native: "اردو", flag: "🇵🇰", locale: "ur-PK", dir: "rtl" },
-  { code: "es", name: "Spanish", native: "Español", flag: "🇪🇸", locale: "es-ES", dir: "ltr" },
-  { code: "fr", name: "French", native: "Français", flag: "🇫🇷", locale: "fr-FR", dir: "ltr" },
-  { code: "de", name: "German", native: "Deutsch", flag: "🇩🇪", locale: "de-DE", dir: "ltr" },
-  { code: "tr", name: "Turkish", native: "Türkçe", flag: "🇹🇷", locale: "tr-TR", dir: "ltr" },
-  { code: "ru", name: "Russian", native: "Русский", flag: "🇷🇺", locale: "ru-RU", dir: "ltr" }
+  { code: "en", name: "English", native: "English", flagCode: "us", locale: "en-US", dir: "ltr" },
+  { code: "bn", name: "Bengali", native: "বাংলা", flagCode: "bd", locale: "bn-BD", dir: "ltr" },
+  { code: "ar", name: "Arabic", native: "العربية", flagCode: "sa", locale: "ar-SA", dir: "rtl" },
+  { code: "hi", name: "Hindi", native: "हिन्दी", flagCode: "in", locale: "hi-IN", dir: "ltr" },
+  { code: "ur", name: "Urdu", native: "اردو", flagCode: "pk", locale: "ur-PK", dir: "rtl" },
+  { code: "es", name: "Spanish", native: "Español", flagCode: "es", locale: "es-ES", dir: "ltr" },
+  { code: "fr", name: "French", native: "Français", flagCode: "fr", locale: "fr-FR", dir: "ltr" },
+  { code: "de", name: "German", native: "Deutsch", flagCode: "de", locale: "de-DE", dir: "ltr" },
+  { code: "tr", name: "Turkish", native: "Türkçe", flagCode: "tr", locale: "tr-TR", dir: "ltr" },
+  { code: "ru", name: "Russian", native: "Русский", flagCode: "ru", locale: "ru-RU", dir: "ltr" }
 ];
 let langSearchQuery = "";
 let i18n = {};
@@ -66,6 +66,26 @@ function getLocaleForLang() {
 
 function getLanguageOption(code) {
   return LANGUAGE_OPTIONS.find((item) => item.code === code) || LANGUAGE_OPTIONS[0];
+}
+
+function getFlagUrl(code, size = "w80") {
+  return `https://flagcdn.com/${size}/${String(code || "").toLowerCase()}.png`;
+}
+
+function renderFlag(option, className = "lang-flag") {
+  const alt = `${option?.name || "Language"} flag`;
+  const countryCode = option?.flagCode || option?.code || "us";
+  return `
+    <img
+      class="${className}__img"
+      src="${getFlagUrl(countryCode)}"
+      srcset="${getFlagUrl(countryCode, "w160")} 2x, ${getFlagUrl(countryCode, "w320")} 3x"
+      alt="${alt}"
+      loading="lazy"
+      referrerpolicy="no-referrer"
+      onerror="this.remove(); this.parentElement?.classList.add('flag-fallback'); this.parentElement && (this.parentElement.textContent='${(option?.code || "en").toUpperCase()}');"
+    />
+  `;
 }
 
 function isRtlLanguage(code) {
@@ -133,7 +153,7 @@ function renderLanguageMenu() {
     btn.setAttribute("data-lang", option.code);
     btn.setAttribute("aria-selected", String(option.code === currentLang));
     btn.innerHTML = `
-      <span class="lang-option-flag" aria-hidden="true">${option.flag}</span>
+      <span class="lang-option-flag" aria-hidden="true">${renderFlag(option, "lang-option-flag")}</span>
       <span class="lang-option-main">
         <span class="lang-option-name">${option.native}</span>
         <span class="lang-option-meta">${option.name}</span>
@@ -154,7 +174,10 @@ function updateLanguagePickerUI() {
   const option = getLanguageOption(currentLang);
   const previousLang = langSwitcher?.getAttribute("data-current-lang");
   if (langCurrentLabel) langCurrentLabel.textContent = option.native;
-  if (langCurrentFlag) langCurrentFlag.textContent = option.flag;
+  if (langCurrentFlag) {
+    langCurrentFlag.classList.remove("flag-fallback");
+    langCurrentFlag.innerHTML = renderFlag(option, "lang-flag");
+  }
   if (langSwitcher) {
     langSwitcher.setAttribute("aria-expanded", langMenu ? String(!langMenu.classList.contains("hidden")) : "false");
     langSwitcher.classList.toggle("is-open", !!langMenu && !langMenu.classList.contains("hidden"));
