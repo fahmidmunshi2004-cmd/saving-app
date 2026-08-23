@@ -1,4 +1,4 @@
-const CACHE_NAME = "vaultbudget-v7";
+const CACHE_NAME = "vaultbudget-v8";
 const ASSETS = [
   "./",
   "./index.html",
@@ -49,7 +49,9 @@ self.addEventListener("fetch", (event) => {
       fetch(req)
         .then((response) => {
           const clone = response.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(req, clone));
+          if (response.ok && response.status === 200) {
+            caches.open(CACHE_NAME).then((cache) => cache.put(req, clone)).catch(() => { });
+          }
           return response;
         })
         .catch(() => caches.match(req).then((cached) => cached || caches.match("./index.html")))
@@ -63,7 +65,9 @@ self.addEventListener("fetch", (event) => {
       return fetch(req)
         .then((response) => {
           const clone = response.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(req, clone));
+          if (response.ok && response.status === 200) {
+            caches.open(CACHE_NAME).then((cache) => cache.put(req, clone)).catch(() => { });
+          }
           return response;
         })
         .catch(() => caches.match("./index.html"));

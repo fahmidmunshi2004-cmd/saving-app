@@ -13,16 +13,16 @@
 const LANG_STORAGE_KEY = "vault_lang";
 let currentLang = localStorage.getItem(LANG_STORAGE_KEY) || "en";
 const LANGUAGE_OPTIONS = [
-  { code: "en", name: "English", native: "English", flag: "EN", locale: "en-US", dir: "ltr" },
-  { code: "bn", name: "Bengali", native: "বাংলা", flag: "BN", locale: "bn-BD", dir: "ltr" },
-  { code: "ar", name: "Arabic", native: "العربية", flag: "AR", locale: "ar-SA", dir: "rtl" },
-  { code: "hi", name: "Hindi", native: "हिन्दी", flag: "HI", locale: "hi-IN", dir: "ltr" },
-  { code: "ur", name: "Urdu", native: "اردو", flag: "UR", locale: "ur-PK", dir: "rtl" },
-  { code: "es", name: "Spanish", native: "Español", flag: "ES", locale: "es-ES", dir: "ltr" },
-  { code: "fr", name: "French", native: "Français", flag: "FR", locale: "fr-FR", dir: "ltr" },
-  { code: "de", name: "German", native: "Deutsch", flag: "DE", locale: "de-DE", dir: "ltr" },
-  { code: "tr", name: "Turkish", native: "Türkçe", flag: "TR", locale: "tr-TR", dir: "ltr" },
-  { code: "ru", name: "Russian", native: "Русский", flag: "RU", locale: "ru-RU", dir: "ltr" }
+  { code: "en", name: "English", native: "English", flag: "🇺🇸", locale: "en-US", dir: "ltr" },
+  { code: "bn", name: "Bengali", native: "বাংলা", flag: "🇧🇩", locale: "bn-BD", dir: "ltr" },
+  { code: "ar", name: "Arabic", native: "العربية", flag: "🇸🇦", locale: "ar-SA", dir: "rtl" },
+  { code: "hi", name: "Hindi", native: "हिन्दी", flag: "🇮🇳", locale: "hi-IN", dir: "ltr" },
+  { code: "ur", name: "Urdu", native: "اردو", flag: "🇵🇰", locale: "ur-PK", dir: "rtl" },
+  { code: "es", name: "Spanish", native: "Español", flag: "🇪🇸", locale: "es-ES", dir: "ltr" },
+  { code: "fr", name: "French", native: "Français", flag: "🇫🇷", locale: "fr-FR", dir: "ltr" },
+  { code: "de", name: "German", native: "Deutsch", flag: "🇩🇪", locale: "de-DE", dir: "ltr" },
+  { code: "tr", name: "Turkish", native: "Türkçe", flag: "🇹🇷", locale: "tr-TR", dir: "ltr" },
+  { code: "ru", name: "Russian", native: "Русский", flag: "🇷🇺", locale: "ru-RU", dir: "ltr" }
 ];
 const i18n = {
   en: {
@@ -181,10 +181,10 @@ function toggleLanguageMenu() {
 }
 
 function applyLanguage(lang = "en") {
-  const supported = LANGUAGE_OPTIONS.some((item) => item.code === lang);
-  currentLang = supported ? lang : "en";
+  const option = getLanguageOption(lang);
+  currentLang = option?.code || "en";
   document.documentElement.lang = currentLang;
-  document.documentElement.dir = isRtlLanguage(currentLang) ? "rtl" : "ltr";
+  document.documentElement.dir = option?.dir || (isRtlLanguage(currentLang) ? "rtl" : "ltr");
   document.querySelectorAll("[data-i18n]").forEach((el) => {
     const key = el.getAttribute("data-i18n");
     if (key) el.textContent = t(key);
