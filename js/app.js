@@ -27,23 +27,28 @@ const LANGUAGE_OPTIONS = [
 let langSearchQuery = "";
 let i18n = {};
 let i18nLoadPromise = null;
+const I18N_DIR = "./assets/i18n";
 
 async function loadI18n() {
   if (i18nLoadPromise) return i18nLoadPromise;
-  i18nLoadPromise = fetch("./assets/i18n.json?v=10", { cache: "no-store" })
-    .then((response) => {
-      if (!response.ok) throw new Error("Failed to load i18n JSON (" + response.status + ")");
-      return response.json();
+  const langCodes = LANGUAGE_OPTIONS.map((option) => option.code);
+  i18nLoadPromise = Promise.all(
+    langCodes.map(async (code) => {
+      try {
+        const response = await fetch(`${I18N_DIR}/${code}.json?v=11`, { cache: "no-store" });
+        if (!response.ok) {
+          throw new Error(`Failed to load ${code} i18n JSON (${response.status})`);
+        }
+        return [code, await response.json()];
+      } catch (error) {
+        console.error(`Failed to load ${code} i18n JSON`, error);
+        return [code, {}];
+      }
     })
-    .then((data) => {
-      i18n = data || {};
-      return i18n;
-    })
-    .catch((error) => {
-      console.error("Failed to load i18n JSON", error);
-      i18n = {};
-      return i18n;
-    });
+  ).then((entries) => {
+    i18n = Object.fromEntries(entries);
+    return i18n;
+  });
   return i18nLoadPromise;
 }
 function t(key) {
