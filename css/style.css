@@ -640,15 +640,31 @@ html[dir="rtl"] .lang-menu {
 }
 
 @keyframes langSwitchPop {
-    0% { transform: scale(0.98); }
-    40% { transform: scale(1.04); }
-    100% { transform: scale(1); }
+    0% {
+        transform: scale(0.98);
+    }
+
+    40% {
+        transform: scale(1.04);
+    }
+
+    100% {
+        transform: scale(1);
+    }
 }
 
 @keyframes langFlagPulse {
-    0% { transform: scale(1); }
-    35% { transform: scale(1.14) rotate(-4deg); }
-    100% { transform: scale(1); }
+    0% {
+        transform: scale(1);
+    }
+
+    35% {
+        transform: scale(1.14) rotate(-4deg);
+    }
+
+    100% {
+        transform: scale(1);
+    }
 }
 
 .brand {
@@ -2501,4 +2517,10 @@ input:not(:placeholder-shown)+.floating-label {
 
 #txnEmpty {
     text-align: center;
+}
+
+#authBar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
