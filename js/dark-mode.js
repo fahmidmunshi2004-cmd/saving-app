@@ -64,41 +64,98 @@ function applyTheme(theme, persist = true) {
     syncThemeButton(nextTheme);
 }
 
+function getRevealPoint(event) {
+    if (event && Number.isFinite(event.clientX) && Number.isFinite(event.clientY)) {
+        return { x: event.clientX, y: event.clientY };
+    }
+
+    if (modeBtn) {
+        const rect = modeBtn.getBoundingClientRect();
+        return {
+            x: rect.left + rect.width / 2,
+            y: rect.top + rect.height / 2
+        };
+    }
+
+    return { x: window.innerWidth / 2, y: 48 };
+}
+
+function getRevealBackground(theme) {
+    if (theme === "dark") {
+        return `
+            radial-gradient(620px 260px at 0% 0%, rgba(57, 83, 143, 0.24) 0%, transparent 62%),
+            radial-gradient(620px 260px at 100% 0%, rgba(120, 51, 112, 0.18) 0%, transparent 60%),
+            linear-gradient(160deg, #08111f, #111b2f)
+        `;
+    }
+
+    return `
+        radial-gradient(600px 220px at 0% 0%, #d8e7ff 0%, transparent 60%),
+        radial-gradient(600px 260px at 100% 0%, #d9f2ff 0%, transparent 62%),
+        linear-gradient(160deg, #ffffff, #f6f6f6)
+    `;
+}
+
+function createRevealOverlay(theme, x, y) {
+    const overlay = document.createElement("div");
+    overlay.className = "theme-reveal-overlay";
+    overlay.style.setProperty("--reveal-x", `${x}px`);
+    overlay.style.setProperty("--reveal-y", `${y}px`);
+    overlay.style.background = getRevealBackground(theme);
+    document.body.appendChild(overlay);
+    return overlay;
+}
+
 function toggleTheme(event) {
     const currentTheme = themeRoot.dataset.theme === "dark" ? "dark" : readPreferredTheme();
     const nextTheme = currentTheme === "dark" ? "light" : "dark";
 
-    if (!document.startViewTransition || reducedMotion) {
+    if (reducedMotion || typeof Element.prototype.animate !== "function") {
         applyTheme(nextTheme);
         return;
     }
 
-    const x = Number.isFinite(event?.clientX) ? event.clientX : window.innerWidth / 2;
-    const y = Number.isFinite(event?.clientY) ? event.clientY : 48;
+    const { x, y } = getRevealPoint(event);
     const endRadius = Math.hypot(
         Math.max(x, window.innerWidth - x),
         Math.max(y, window.innerHeight - y)
     );
 
-    const transition = document.startViewTransition(() => {
-        applyTheme(nextTheme);
+    const overlay = createRevealOverlay(nextTheme, x, y);
+    applyTheme(nextTheme);
+
+    const animation = overlay.animate(
+        {
+            clipPath: [
+                `circle(0px at ${x}px ${y}px)`,
+                `circle(${endRadius}px at ${x}px ${y}px)`
+            ]
+        },
+        {
+            duration: 620,
+            easing: "cubic-bezier(0.2, 0.85, 0.2, 1)",
+            fill: "forwards"
+        }
+    );
+
+    animation.finished.catch(() => { }).finally(() => {
+        overlay.remove();
     });
 
-    transition.ready.then(() => {
-        document.documentElement.animate(
+    if (themeRoot.animate) {
+        themeRoot.animate(
             {
-                clipPath: [
-                    `circle(0px at ${x}px ${y}px)`,
-                    `circle(${endRadius}px at ${x}px ${y}px)`
+                filter: [
+                    "brightness(1.02) saturate(1.02)",
+                    "brightness(1) saturate(1)"
                 ]
             },
             {
-                duration: 560,
-                easing: "ease-in-out",
-                pseudoElement: "::view-transition-new(root)"
+                duration: 220,
+                easing: "ease-out"
             }
         );
-    });
+    }
 }
 
 function initTheme() {
