@@ -48,8 +48,9 @@
     <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore-compat.js"></script>
 
-    <link rel="stylesheet" href="css/style.css?v=13" />
-    <link rel="stylesheet" href="css/dark-mode.css?v=4" />
+    <link rel="stylesheet" href="css/style.css?v=14" />
+    <link rel="stylesheet" href="css/modal.css?v=1" />
+    <link rel="stylesheet" href="css/dark-mode.css?v=5" />
 </head>
 
 <body>
@@ -372,16 +373,20 @@
             <div class="settings-item" data-theme-copy="mode-status">Theme is active.</div>
             <div class="settings-item">
                 <strong>Modal animation</strong><br />
-                <select id="modalAnimationSelect" class="settings-select">
-                    <option value="meep">Meep Meep</option>
-                    <option value="simple">Simple</option>
-                    <option value="unfolding">Unfolding</option>
-                    <option value="revealing">Revealing</option>
-                    <option value="uncovering">Uncovering</option>
-                    <option value="blow-up">Blow Up</option>
-                    <option value="sketch">Sketch</option>
-                    <option value="bond">Bond</option>
-                </select>
+                <div class="settings-select-wrap">
+                    <span class="settings-select-icon" aria-hidden="true"><i class="fa-solid fa-clapperboard"></i></span>
+                    <select id="modalAnimationSelect" class="settings-select">
+                        <option value="meep">Meep Meep</option>
+                        <option value="simple">Simple</option>
+                        <option value="unfolding">Unfolding</option>
+                        <option value="revealing">Revealing</option>
+                        <option value="uncovering">Uncovering</option>
+                        <option value="blow-up">Blow Up</option>
+                        <option value="sketch">Sketch</option>
+                        <option value="bond">Bond</option>
+                    </select>
+                    <i class="fa-solid fa-chevron-down settings-select-arrow" aria-hidden="true"></i>
+                </div>
                 <div class="login-help" style="margin-top:8px;">Choose how every popup opens.</div>
             </div>
             <div class="settings-item" data-i18n="session_lock_note">This session has login lock active. Refreshing the
