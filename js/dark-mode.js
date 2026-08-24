@@ -44,13 +44,8 @@ function syncThemeButton(theme) {
     }
 }
 
-function setUserTheme(theme, persist = true) {
+function previewTheme(theme, persist = true) {
     const nextTheme = theme === "dark" ? "dark" : "light";
-
-    themeRoot.dataset.theme = nextTheme;
-    document.body.dataset.theme = nextTheme;
-    document.body.classList.toggle("theme-dark", nextTheme === "dark");
-    document.body.classList.toggle("theme-light", nextTheme === "light");
 
     if (persist) {
         try {
@@ -64,45 +59,96 @@ function setUserTheme(theme, persist = true) {
     syncThemeButton(nextTheme);
 }
 
-function toggleTheme(event) {
-    const currentTheme = themeRoot.dataset.theme === "dark" ? "dark" : readPreferredTheme();
-    const nextTheme = currentTheme === "dark" ? "light" : "dark";
+function commitTheme(theme) {
+    const nextTheme = theme === "dark" ? "dark" : "light";
 
-    if (!document.startViewTransition || reducedMotion || !event) {
-        setUserTheme(nextTheme);
-        return;
+    themeRoot.dataset.theme = nextTheme;
+    document.body.dataset.theme = nextTheme;
+    document.body.classList.toggle("theme-dark", nextTheme === "dark");
+    document.body.classList.toggle("theme-light", nextTheme === "light");
+
+    updateThemeMeta(nextTheme);
+    syncThemeButton(nextTheme);
+}
+
+function getRevealPoint(event) {
+    if (event && Number.isFinite(event.clientX) && Number.isFinite(event.clientY)) {
+        return { x: event.clientX, y: event.clientY };
     }
 
-    const x = Number.isFinite(event.clientX) ? event.clientX : window.innerWidth / 2;
-    const y = Number.isFinite(event.clientY) ? event.clientY : 48;
+    if (modeBtn) {
+        const rect = modeBtn.getBoundingClientRect();
+        return {
+            x: rect.left + rect.width / 2,
+            y: rect.top + rect.height / 2
+        };
+    }
+
+    return { x: window.innerWidth / 2, y: 48 };
+}
+
+function createRevealOverlay(theme, x, y) {
+    const overlay = document.createElement("div");
+    overlay.className = `theme-reveal theme-reveal--${theme}`;
+    overlay.style.setProperty("--reveal-x", `${x}px`);
+    overlay.style.setProperty("--reveal-y", `${y}px`);
+    document.body.appendChild(overlay);
+    return overlay;
+}
+
+function animateReveal(theme, event) {
+    const { x, y } = getRevealPoint(event);
     const endRadius = Math.hypot(
         Math.max(x, window.innerWidth - x),
         Math.max(y, window.innerHeight - y)
     );
 
-    const transition = document.startViewTransition(() => {
-        setUserTheme(nextTheme);
-    });
+    const overlay = createRevealOverlay(theme, x, y);
+    if (typeof overlay.animate !== "function") {
+        overlay.remove();
+        return Promise.resolve();
+    }
 
-    transition.ready.then(() => {
-        document.documentElement.animate(
-            {
-                clipPath: [
-                    `circle(0px at ${x}px ${y}px)`,
-                    `circle(${endRadius}px at ${x}px ${y}px)`
-                ]
-            },
-            {
-                duration: 560,
-                easing: "ease-in-out",
-                pseudoElement: "::view-transition-new(root)"
-            }
-        );
+    const animation = overlay.animate(
+        {
+            clipPath: [
+                `circle(0px at ${x}px ${y}px)`,
+                `circle(${endRadius}px at ${x}px ${y}px)`
+            ]
+        },
+        {
+            duration: 620,
+            easing: "cubic-bezier(0.2, 0.85, 0.2, 1)",
+            fill: "forwards"
+        }
+    );
+
+    return animation.finished.finally(() => {
+        overlay.remove();
     });
 }
 
+function toggleTheme(event) {
+    const currentTheme = themeRoot.dataset.theme === "dark" ? "dark" : readPreferredTheme();
+    const nextTheme = currentTheme === "dark" ? "light" : "dark";
+
+    if (reducedMotion) {
+        previewTheme(nextTheme);
+        commitTheme(nextTheme);
+        return;
+    }
+
+    previewTheme(nextTheme);
+    animateReveal(nextTheme, event)
+        .catch(() => { })
+        .finally(() => {
+            commitTheme(nextTheme);
+        });
+}
+
 function initTheme() {
-    setUserTheme(readPreferredTheme(), false);
+    previewTheme(readPreferredTheme(), false);
+    commitTheme(readPreferredTheme());
 }
 
 if (modeBtn) {
