@@ -5,7 +5,7 @@ const modeBtn = document.getElementById("modeBtn");
 const themeLabel = modeBtn?.querySelector(".theme-switcher-label");
 const themeIcon = modeBtn?.querySelector(".theme-switcher-icon");
 const themeMeta = document.querySelector('meta[name="theme-color"]');
-const root = document.documentElement;
+const themeRoot = document.documentElement;
 const prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
 const reducedMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -47,7 +47,7 @@ function syncThemeButton(theme) {
 function setUserTheme(theme, persist = true) {
     const nextTheme = theme === "dark" ? "dark" : "light";
 
-    root.dataset.theme = nextTheme;
+    themeRoot.dataset.theme = nextTheme;
     document.body.dataset.theme = nextTheme;
     document.body.classList.toggle("theme-dark", nextTheme === "dark");
     document.body.classList.toggle("theme-light", nextTheme === "light");
@@ -65,7 +65,7 @@ function setUserTheme(theme, persist = true) {
 }
 
 function toggleTheme(event) {
-    const currentTheme = root.dataset.theme === "dark" ? "dark" : readPreferredTheme();
+    const currentTheme = themeRoot.dataset.theme === "dark" ? "dark" : readPreferredTheme();
     const nextTheme = currentTheme === "dark" ? "light" : "dark";
 
     if (!document.startViewTransition || reducedMotion || !event) {
