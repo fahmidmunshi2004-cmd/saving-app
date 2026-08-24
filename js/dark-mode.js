@@ -37,6 +37,20 @@ function syncThemeButton(isDark) {
     }
 }
 
+function refreshThemeCopy(theme = themeRoot.dataset.theme === "dark" ? "dark" : "light") {
+    const isDark = theme === "dark";
+    const key = isDark ? "theme_dark_mode_active" : "theme_light_mode_active";
+    const fallback = isDark ? "Dark mode is active." : "Light mode is active.";
+
+    document.querySelectorAll('[data-theme-copy="mode-status"]').forEach((el) => {
+        if (typeof tx === "function") {
+            el.textContent = tx(key);
+        } else {
+            el.textContent = fallback;
+        }
+    });
+}
+
 function setTheme(theme, persist = true) {
     const isDark = theme === "dark";
 
@@ -59,6 +73,7 @@ function setTheme(theme, persist = true) {
     }
 
     syncThemeButton(isDark);
+    refreshThemeCopy(isDark ? "dark" : "light");
 }
 
 function toggleTheme(event) {
@@ -102,6 +117,8 @@ function toggleTheme(event) {
 function initTheme() {
     setTheme(readPreferredTheme(), false);
 }
+
+window.refreshThemeCopy = refreshThemeCopy;
 
 if (modeBtn) {
     modeBtn.addEventListener("click", toggleTheme);

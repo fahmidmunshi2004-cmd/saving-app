@@ -490,6 +490,59 @@ html[data-theme="dark"] .mini-btn {
     border-color: rgba(255, 255, 255, 0.08);
 }
 
+html[data-theme="dark"] .btn,
+html[data-theme="dark"] .mini-btn,
+html[data-theme="dark"] .income-btn,
+html[data-theme="dark"] .expense-btn,
+html[data-theme="dark"] .danger-btn,
+html[data-theme="dark"] .txn-edit-btn,
+html[data-theme="dark"] .txn-delete-btn,
+html[data-theme="dark"] .modal-actions .btn,
+html[data-theme="dark"] #logoutBtn,
+html[data-theme="dark"] #groupMembersList .btn,
+html[data-theme="dark"] #deletedTransactionsList .deleted-actions .btn {
+    color: #ffffff !important;
+}
+
+html[data-theme="dark"] .income-btn {
+    background: linear-gradient(120deg, #24bf87, #18a86f);
+}
+
+html[data-theme="dark"] .expense-btn {
+    background: linear-gradient(120deg, #ff4d79, #d61f49);
+}
+
+html[data-theme="dark"] .danger-btn,
+html[data-theme="dark"] #logoutBtn {
+    background: linear-gradient(120deg, #b91c1c, #ef4444) !important;
+}
+
+html[data-theme="dark"] .txn-edit-btn {
+    background: linear-gradient(120deg, #2f8dff, #1e5bff);
+}
+
+html[data-theme="dark"] .txn-delete-btn {
+    background: linear-gradient(120deg, #ff5d79, #d61f49);
+}
+
+html[data-theme="dark"] .toggle-pass {
+    color: #d8e0ea;
+}
+
+html[data-theme="dark"] .toggle-pass:hover {
+    background: rgba(255, 255, 255, 0.06);
+    color: #ffffff;
+}
+
+html[data-theme="dark"] [data-theme-copy="mode-status"] {
+    color: #f5f7fa;
+    background: linear-gradient(180deg, #0b0f14, #080b10);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    box-shadow:
+        0 10px 24px rgba(0, 0, 0, 0.26),
+        inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
 html[data-theme="dark"] .btn:hover,
 html[data-theme="dark"] .mini-btn:hover {
     transform: translateY(-1px);

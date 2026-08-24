@@ -244,6 +244,7 @@ function applyLanguage(lang = "en") {
   }
   renderLanguageMenu();
   updateLanguagePickerUI();
+  window.refreshThemeCopy?.(document.documentElement.dataset.theme === "dark" ? "dark" : "light");
   localStorage.setItem(LANG_STORAGE_KEY, currentLang);
 }
 
