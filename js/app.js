@@ -35,7 +35,7 @@ async function loadI18n() {
   i18nLoadPromise = Promise.all(
     langCodes.map(async (code) => {
       try {
-        const response = await fetch(`${I18N_DIR}/${code}.json?v=11`, { cache: "no-store" });
+        const response = await fetch(`${I18N_DIR}/${code}.json?v=12`, { cache: "no-store" });
         if (!response.ok) {
           throw new Error(`Failed to load ${code} i18n JSON (${response.status})`);
         }
@@ -1285,7 +1285,6 @@ function openTransactionEditModal(txnId) {
     `;
 
     prepareModalMotion?.();
-    appModal.classList.remove("hidden");
 
     const amountInput = document.getElementById("editTxnAmount");
     const categoryInputEl = document.getElementById("editTxnCategory");
@@ -1935,7 +1934,7 @@ function initFirebase() {
 function registerServiceWorker() {
   if (!("serviceWorker" in navigator)) return;
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("./sw.js").catch(() => { });
+    navigator.serviceWorker.register("./sw.js?v=12").catch(() => { });
   });
 }
 

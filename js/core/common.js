@@ -325,8 +325,13 @@ function clearModalCloseTimer() {
 function prepareModalMotion() {
   if (!appModal) return;
   clearModalCloseTimer();
+  appModal.classList.remove("hidden");
   appModal.classList.remove("closing");
-  appModal.classList.add("modal-meep");
+  appModal.classList.remove("modal-meep");
+  void appModal.offsetWidth;
+  window.requestAnimationFrame(() => {
+    appModal.classList.add("modal-meep");
+  });
 }
 
 function closeModalMotion(onDone) {
@@ -443,7 +448,6 @@ function appAlert(message, title = "Notice") {
     modalMessage.innerHTML = buildModalMessageHtml(title, message, false);
     modalCancelBtn.classList.add("hidden");
     prepareModalMotion();
-    appModal.classList.remove("hidden");
 
     const close = () => {
       modalOkBtn.removeEventListener("click", onOk);
@@ -473,7 +477,6 @@ function appConfirm(message, title = "Confirm") {
     modalMessage.innerHTML = buildModalMessageHtml(title, message, true);
     modalCancelBtn.classList.remove("hidden");
     prepareModalMotion();
-    appModal.classList.remove("hidden");
 
     const close = (result) => {
       modalOkBtn.removeEventListener("click", onOk);

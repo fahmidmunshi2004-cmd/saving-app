@@ -263,7 +263,10 @@ body {
 }
 
 .login-help {
-    margin: 0 0 8px;
+    margin: 8px auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     color: var(--muted);
     font-size: 0.85rem;
 }
