@@ -44,7 +44,7 @@ function syncThemeButton(theme) {
     }
 }
 
-function applyTheme(theme, persist = true) {
+function setUserTheme(theme, persist = true) {
     const nextTheme = theme === "dark" ? "dark" : "light";
 
     root.dataset.theme = nextTheme;
@@ -69,7 +69,7 @@ function toggleTheme(event) {
     const nextTheme = currentTheme === "dark" ? "light" : "dark";
 
     if (!document.startViewTransition || reducedMotion || !event) {
-        applyTheme(nextTheme);
+        setUserTheme(nextTheme);
         return;
     }
 
@@ -81,7 +81,7 @@ function toggleTheme(event) {
     );
 
     const transition = document.startViewTransition(() => {
-        applyTheme(nextTheme);
+        setUserTheme(nextTheme);
     });
 
     transition.ready.then(() => {
@@ -102,7 +102,7 @@ function toggleTheme(event) {
 }
 
 function initTheme() {
-    applyTheme(readPreferredTheme(), false);
+    setUserTheme(readPreferredTheme(), false);
 }
 
 if (modeBtn) {
