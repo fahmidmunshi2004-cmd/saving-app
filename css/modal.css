@@ -14,83 +14,174 @@
     backdrop-filter: blur(8px);
 }
 
+body.modal-active {
+    overflow: hidden;
+}
+
 .app-modal {
     cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='50' height='50' viewBox='0 0 50 50'%3E%3Cpath d='M14 14L36 36M36 14L14 36' stroke='%23ffffff' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E") 25 25, pointer;
 }
 
-.app-modal.modal-motion {
+.app-modal.modal-motion,
+.app-modal.modal-active {
     animation: modalBackdropIn 0.18s ease-out both;
 }
 
-.app-modal.modal-motion.closing {
+.app-modal.modal-motion.closing,
+.app-modal.modal-active.out {
     animation: modalBackdropOut 0.2s ease-in both;
 }
 
-.app-modal.modal-motion .modal-card {
+.app-modal.modal-motion .modal-card,
+.app-modal.modal-active .modal-card {
     animation: meepMeepIn 0.56s cubic-bezier(0.18, 0.9, 0.2, 1) both;
     will-change: transform, opacity;
 }
 
-.app-modal.modal-motion.closing .modal-card {
+.app-modal.modal-motion.closing .modal-card,
+.app-modal.modal-active.out .modal-card {
     animation: meepMeepOut 0.44s cubic-bezier(0.25, 0.7, 0.2, 1) both;
 }
 
-.app-modal.modal-motion[data-modal-animation="simple"] .modal-card {
+.app-modal.modal-motion[data-modal-animation="simple"] .modal-card,
+.app-modal.modal-active.simple .modal-card {
     animation: modalSimpleIn 0.34s cubic-bezier(0.2, 0.85, 0.2, 1) both;
 }
 
-.app-modal.modal-motion.closing[data-modal-animation="simple"] .modal-card {
+.app-modal.modal-motion.closing[data-modal-animation="simple"] .modal-card,
+.app-modal.modal-active.simple.out .modal-card {
     animation: modalSimpleOut 0.26s ease-in both;
 }
 
-.app-modal.modal-motion[data-modal-animation="unfolding"] .modal-card {
+.app-modal.modal-motion[data-modal-animation="unfolding"] .modal-card,
+.app-modal.modal-active.unfolding .modal-card {
     animation: modalUnfoldingIn 0.48s cubic-bezier(0.2, 0.85, 0.18, 1) both;
     transform-origin: center top;
 }
 
-.app-modal.modal-motion.closing[data-modal-animation="unfolding"] .modal-card {
+.app-modal.modal-motion.closing[data-modal-animation="unfolding"] .modal-card,
+.app-modal.modal-active.unfolding.out .modal-card {
     animation: modalUnfoldingOut 0.34s ease-in both;
     transform-origin: center top;
 }
 
-.app-modal.modal-motion[data-modal-animation="revealing"] .modal-card {
+.app-modal.modal-motion[data-modal-animation="revealing"] .modal-card,
+.app-modal.modal-active.revealing .modal-card {
     animation: modalRevealingIn 0.5s cubic-bezier(0.15, 0.85, 0.2, 1) both;
 }
 
-.app-modal.modal-motion.closing[data-modal-animation="revealing"] .modal-card {
+.app-modal.modal-motion.closing[data-modal-animation="revealing"] .modal-card,
+.app-modal.modal-active.revealing.out .modal-card {
     animation: modalRevealingOut 0.28s ease-in both;
 }
 
-.app-modal.modal-motion[data-modal-animation="uncovering"] .modal-card {
+.app-modal.modal-motion[data-modal-animation="uncovering"] .modal-card,
+.app-modal.modal-active.uncovering .modal-card {
     animation: modalUncoveringIn 0.44s cubic-bezier(0.2, 0.9, 0.2, 1) both;
 }
 
-.app-modal.modal-motion.closing[data-modal-animation="uncovering"] .modal-card {
+.app-modal.modal-motion.closing[data-modal-animation="uncovering"] .modal-card,
+.app-modal.modal-active.uncovering.out .modal-card {
     animation: modalUncoveringOut 0.28s ease-in both;
 }
 
-.app-modal.modal-motion[data-modal-animation="blow-up"] .modal-card {
+.app-modal.modal-motion[data-modal-animation="blow-up"] .modal-card,
+.app-modal.modal-active.blow-up .modal-card {
     animation: modalBlowUpIn 0.5s cubic-bezier(0.16, 0.9, 0.2, 1) both;
 }
 
-.app-modal.modal-motion.closing[data-modal-animation="blow-up"] .modal-card {
+.app-modal.modal-motion.closing[data-modal-animation="blow-up"] .modal-card,
+.app-modal.modal-active.blow-up.out .modal-card {
     animation: modalBlowUpOut 0.3s ease-in both;
 }
 
-.app-modal.modal-motion[data-modal-animation="sketch"] .modal-card {
+.app-modal.modal-motion[data-modal-animation="sketch"] .modal-card,
+.app-modal.modal-active.sketch .modal-card {
     animation: modalSketchIn 0.52s cubic-bezier(0.18, 0.85, 0.18, 1) both;
 }
 
-.app-modal.modal-motion.closing[data-modal-animation="sketch"] .modal-card {
+.app-modal.modal-motion.closing[data-modal-animation="sketch"] .modal-card,
+.app-modal.modal-active.sketch.out .modal-card {
     animation: modalSketchOut 0.28s ease-in both;
 }
 
-.app-modal.modal-motion[data-modal-animation="bond"] .modal-card {
+.app-modal.modal-motion[data-modal-animation="bond"] .modal-card,
+.app-modal.modal-active.bond .modal-card {
     animation: modalBondIn 0.46s cubic-bezier(0.2, 0.9, 0.18, 1) both;
 }
 
-.app-modal.modal-motion.closing[data-modal-animation="bond"] .modal-card {
+.app-modal.modal-motion.closing[data-modal-animation="bond"] .modal-card,
+.app-modal.modal-active.bond.out .modal-card {
     animation: modalBondOut 0.3s ease-in both;
+}
+
+.loader-card {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 26px 20px 22px;
+}
+
+.loader-spinner {
+    width: 48px;
+    height: 48px;
+    display: inline-grid;
+    place-items: center;
+    position: relative;
+    border-radius: 50%;
+    background: radial-gradient(circle at center, rgba(255, 1, 79, 0.22), rgba(255, 1, 79, 0.02) 66%, transparent 67%);
+    box-shadow:
+        0 0 0 1px rgba(255, 1, 79, 0.12),
+        0 10px 24px rgba(255, 1, 79, 0.2);
+}
+
+.loader-spinner::before,
+.loader-spinner::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+}
+
+.loader-spinner::before {
+    border: 3px solid color-mix(in srgb, var(--brand) 22%, #ffffff);
+    border-top-color: var(--brand);
+    animation: spin 0.9s linear infinite;
+}
+
+.loader-core {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: linear-gradient(140deg, #ffffff, #ffd3df 58%, #ff4b78 100%);
+    box-shadow:
+        0 0 0 6px rgba(255, 1, 79, 0.09),
+        0 0 18px rgba(255, 1, 79, 0.28);
+    animation: pulse-core 1.25s ease-in-out infinite;
+}
+
+#loaderText {
+    margin: 14px 0 0;
+    font-family: var(--font-display);
+    font-size: 0.95rem;
+    font-weight: 700;
+    letter-spacing: 0.28px;
+    color: color-mix(in srgb, var(--text) 86%, #4b5563 14%);
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.72);
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+}
+
+#loaderText .loader-dots {
+    display: inline-block;
+    width: 1.9ch;
+    text-align: left;
+}
+
+#loaderText .loader-suffix-text {
+    margin-left: 0;
 }
 
 .modal-card {
@@ -254,6 +345,24 @@
     font-size: 0.82rem;
     font-weight: 700;
     color: #d11414;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes pulse-core {
+
+    0%,
+    100% {
+        transform: scale(0.82);
+    }
+
+    50% {
+        transform: scale(1);
+    }
 }
 
 @keyframes modalBackdropIn {

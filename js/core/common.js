@@ -309,6 +309,16 @@ function isCurrentAdmin() {
 let loaderCount = 0;
 let loaderDotsTimer = null;
 let modalCloseTimer = null;
+const MODAL_CLOSE_DURATION_MS = {
+  simple: 260,
+  meep: 440,
+  unfolding: 340,
+  revealing: 280,
+  uncovering: 280,
+  "blow-up": 300,
+  sketch: 280,
+  bond: 300
+};
 const MODAL_ANIMATION_STORAGE_KEY = "vault_modal_animation";
 const DEFAULT_MODAL_ANIMATION = "meep";
 const MODAL_ANIMATION_SET = new Set([
@@ -377,179 +387,14 @@ function clearModalCloseTimer() {
   modalCloseTimer = null;
 }
 
-function getModalAnimationPreset(animation, phase) {
-  const isOut = phase === "out";
-  switch (animation) {
-    case "simple":
-      return isOut
-        ? {
-          keyframes: [
-            { opacity: 1, transform: "translateY(0) scale(1)" },
-            { opacity: 0, transform: "translateY(12px) scale(0.96)" }
-          ],
-          options: { duration: 260, easing: "ease-in" }
-        }
-        : {
-          keyframes: [
-            { opacity: 0, transform: "translateY(18px) scale(0.94)" },
-            { opacity: 1, transform: "translateY(0) scale(1)" }
-          ],
-          options: { duration: 340, easing: "cubic-bezier(0.2, 0.85, 0.2, 1)" }
-        };
-    case "unfolding":
-      return isOut
-        ? {
-          keyframes: [
-            { opacity: 1, transform: "perspective(900px) rotateX(0deg) translateY(0) scale(1)" },
-            { opacity: 0, transform: "perspective(900px) rotateX(70deg) translateY(-10px) scale(0.95)" }
-          ],
-          options: { duration: 340, easing: "ease-in" }
-        }
-        : {
-          keyframes: [
-            { opacity: 0, transform: "perspective(900px) rotateX(-76deg) translateY(-14px) scale(0.94)" },
-            { opacity: 1, transform: "perspective(900px) rotateX(0deg) translateY(0) scale(1)" }
-          ],
-          options: { duration: 480, easing: "cubic-bezier(0.2, 0.85, 0.18, 1)" }
-        };
-    case "revealing":
-      return isOut
-        ? {
-          keyframes: [
-            { opacity: 1, transform: "translateY(0) scale(1)", clipPath: "inset(0 0 0 0 round 18px)" },
-            { opacity: 0, transform: "translateY(10px) scale(0.9)", clipPath: "inset(44% 44% 44% 44% round 18px)" }
-          ],
-          options: { duration: 280, easing: "ease-in" }
-        }
-        : {
-          keyframes: [
-            { opacity: 0, transform: "translateY(10px) scale(0.78)", clipPath: "inset(52% 52% 52% 52% round 18px)" },
-            { opacity: 1, transform: "translateY(0) scale(1)", clipPath: "inset(0 0 0 0 round 18px)" }
-          ],
-          options: { duration: 500, easing: "cubic-bezier(0.15, 0.85, 0.2, 1)" }
-        };
-    case "uncovering":
-      return isOut
-        ? {
-          keyframes: [
-            { opacity: 1, transform: "translateY(0) scale(1)", clipPath: "inset(0 0 0 0 round 18px)" },
-            { opacity: 0, transform: "translateY(18px) scale(0.92)", clipPath: "inset(0 0 0 100% round 18px)" }
-          ],
-          options: { duration: 280, easing: "ease-in" }
-        }
-        : {
-          keyframes: [
-            { opacity: 0, transform: "translateY(28px) scale(0.86)", clipPath: "inset(0 100% 0 0 round 18px)" },
-            { opacity: 1, transform: "translateY(0) scale(1)", clipPath: "inset(0 0 0 0 round 18px)" }
-          ],
-          options: { duration: 440, easing: "cubic-bezier(0.2, 0.9, 0.2, 1)" }
-        };
-    case "blow-up":
-      return isOut
-        ? {
-          keyframes: [
-            { opacity: 1, transform: "scale(1) rotate(0deg)", filter: "blur(0)" },
-            { opacity: 0, transform: "scale(0.4) rotate(10deg)", filter: "blur(3px)" }
-          ],
-          options: { duration: 300, easing: "ease-in" }
-        }
-        : {
-          keyframes: [
-            { opacity: 0, transform: "scale(0.22) rotate(-18deg)", filter: "blur(2px)" },
-            { opacity: 1, transform: "scale(1.06) rotate(2deg)", filter: "blur(0)", offset: 0.7 },
-            { opacity: 1, transform: "scale(1) rotate(0deg)", filter: "blur(0)" }
-          ],
-          options: { duration: 500, easing: "cubic-bezier(0.16, 0.9, 0.2, 1)" }
-        };
-    case "sketch":
-      return isOut
-        ? {
-          keyframes: [
-            { opacity: 1, transform: "translateY(0) scale(1)", boxShadow: "0 0 0 0 rgba(255, 1, 79, 0)" },
-            { opacity: 0, transform: "translateY(10px) scale(0.94)", boxShadow: "0 0 0 10px rgba(255, 1, 79, 0.08)" }
-          ],
-          options: { duration: 280, easing: "ease-in" }
-        }
-        : {
-          keyframes: [
-            { opacity: 0, transform: "translateY(10px) scale(0.94)", boxShadow: "0 0 0 0 rgba(255, 1, 79, 0)" },
-            { opacity: 1, transform: "translateY(-2px) scale(1.01)", boxShadow: "0 0 0 8px rgba(255, 1, 79, 0.08)", offset: 0.72 },
-            { opacity: 1, transform: "translateY(0) scale(1)", boxShadow: "0 0 0 0 rgba(255, 1, 79, 0)" }
-          ],
-          options: { duration: 520, easing: "cubic-bezier(0.18, 0.85, 0.18, 1)" }
-        };
-    case "bond":
-      return isOut
-        ? {
-          keyframes: [
-            { opacity: 1, transform: "translateY(0) scale(1)", clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)" },
-            { opacity: 0, transform: "translateY(16px) scale(0.88)", clipPath: "polygon(50% 0%, 50% 0%, 50% 100%, 50% 100%)" }
-          ],
-          options: { duration: 300, easing: "ease-in" }
-        }
-        : {
-          keyframes: [
-            { opacity: 0, transform: "translateY(18px) scale(0.8)", clipPath: "polygon(50% 0%, 50% 0%, 50% 100%, 50% 100%)" },
-            { opacity: 1, transform: "translateY(-4px) scale(1.03)", clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)", offset: 0.55 },
-            { opacity: 1, transform: "translateY(0) scale(1)", clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)" }
-          ],
-          options: { duration: 460, easing: "cubic-bezier(0.2, 0.9, 0.18, 1)" }
-        };
-    case "meep":
-    default:
-      return isOut
-        ? {
-          keyframes: [
-            { opacity: 1, transform: "translateY(0) scale(1) rotate(0deg)" },
-            { opacity: 0, transform: "translateY(18px) scale(0.82) rotate(5deg)" }
-          ],
-          options: { duration: 440, easing: "cubic-bezier(0.25, 0.7, 0.2, 1)" }
-        }
-        : {
-          keyframes: [
-            { opacity: 0, transform: "translateY(28px) scale(0.72) rotate(-6deg)" },
-            { opacity: 1, transform: "translateY(-8px) scale(1.035) rotate(1.5deg)", offset: 0.62 },
-            { opacity: 1, transform: "translateY(0) scale(1) rotate(0deg)" }
-          ],
-          options: { duration: 560, easing: "cubic-bezier(0.18, 0.9, 0.2, 1)" }
-        };
-  }
-}
-
-function playModalCardAnimation(phase) {
-  const card = getModalCardElement();
-  if (!card || typeof card.animate !== "function") return null;
-
-  card.getAnimations().forEach((animation) => animation.cancel());
-  card.style.animation = "none";
-
-  const preset = getModalAnimationPreset(currentModalAnimation, phase);
-  const animation = card.animate(preset.keyframes, {
-    ...preset.options,
-    fill: "both"
-  });
-
-  return {
-    animation,
-    cleanup() {
-      card.style.animation = "";
-    }
-  };
-}
-
 function prepareModalMotion() {
   if (!appModal) return;
   clearModalCloseTimer();
-  appModal.classList.remove("hidden");
-  appModal.classList.remove("closing");
-  appModal.classList.remove("modal-motion");
+  appModal.classList.remove("hidden", "closing", "out");
+  appModal.classList.add("modal-motion", "modal-active", currentModalAnimation);
+  document.body.classList.add("modal-active");
   appModal.dataset.modalAnimation = currentModalAnimation;
   void appModal.offsetWidth;
-  window.requestAnimationFrame(() => {
-    appModal.classList.add("modal-motion");
-    const playback = playModalCardAnimation("in");
-    playback?.animation?.finished.finally(playback.cleanup);
-  });
 }
 
 function closeModalMotion(onDone) {
@@ -559,34 +404,21 @@ function closeModalMotion(onDone) {
   }
 
   clearModalCloseTimer();
-  appModal.classList.add("closing");
-  const playback = playModalCardAnimation("out");
+  appModal.classList.add("closing", "out");
+  const closeDelay = MODAL_CLOSE_DURATION_MS[currentModalAnimation] || 460;
   let finished = false;
   const finishClose = () => {
     if (finished) return;
     finished = true;
+    document.body.classList.remove("modal-active");
     appModal.classList.add("hidden");
-    appModal.classList.remove("closing");
-    appModal.classList.remove("modal-motion");
+    appModal.classList.remove("closing", "out", "modal-motion", "modal-active", currentModalAnimation);
     if (typeof onDone === "function") onDone();
   };
 
-  if (playback?.animation) {
-    modalCloseTimer = setTimeout(() => {
-      finishClose();
-      playback.cleanup();
-    }, 520);
-    playback.animation.finished.finally(() => {
-      clearModalCloseTimer();
-      finishClose();
-      playback.cleanup();
-    });
-    return;
-  }
-
   modalCloseTimer = setTimeout(() => {
     finishClose();
-  }, 460);
+  }, closeDelay);
 }
 
 function showLoader(text = "Please wait...") {
