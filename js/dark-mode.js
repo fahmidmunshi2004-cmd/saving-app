@@ -37,7 +37,7 @@ function syncThemeButton(isDark) {
     }
 }
 
-function applyTheme(theme, persist = true) {
+function setTheme(theme, persist = true) {
     const isDark = theme === "dark";
 
     themeRoot.dataset.theme = isDark ? "dark" : "light";
@@ -66,7 +66,7 @@ function toggleTheme(event) {
     const nextTheme = isDark ? "light" : "dark";
 
     if (!document.startViewTransition) {
-        applyTheme(nextTheme);
+        setTheme(nextTheme);
         return;
     }
 
@@ -79,7 +79,7 @@ function toggleTheme(event) {
     );
 
     const transition = document.startViewTransition(() => {
-        applyTheme(nextTheme);
+        setTheme(nextTheme);
     });
 
     transition.ready.then(() => {
@@ -100,7 +100,7 @@ function toggleTheme(event) {
 }
 
 function initTheme() {
-    applyTheme(readPreferredTheme(), false);
+    setTheme(readPreferredTheme(), false);
 }
 
 if (modeBtn) {
