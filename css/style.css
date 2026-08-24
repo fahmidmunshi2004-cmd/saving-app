@@ -264,6 +264,7 @@ body {
 
 .login-help {
     margin: 8px auto;
+    margin-bottom: 0;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1679,8 +1680,16 @@ input:not(:placeholder-shown)+.floating-label {
     backdrop-filter: blur(8px);
 }
 
+.app-modal.modal-meep {
+    animation: modalBackdropIn 0.18s ease-out both;
+}
+
+.app-modal.modal-meep.closing {
+    animation: modalBackdropOut 0.2s ease-in both;
+}
+
 .app-modal.modal-meep .modal-card {
-    animation: roadRunnerIn 0.42s cubic-bezier(0.165, 0.84, 0.44, 1) both;
+    animation: meepMeepIn 0.56s cubic-bezier(0.18, 0.9, 0.2, 1) both;
     will-change: transform, opacity;
 }
 
@@ -1689,7 +1698,7 @@ input:not(:placeholder-shown)+.floating-label {
 }
 
 .app-modal.modal-meep.closing .modal-card {
-    animation: roadRunnerOut 0.46s cubic-bezier(0.165, 0.84, 0.44, 1) both;
+    animation: meepMeepOut 0.44s cubic-bezier(0.25, 0.7, 0.2, 1) both;
 }
 
 .loader-card,
@@ -2056,36 +2065,56 @@ input:not(:placeholder-shown)+.floating-label {
         linear-gradient(145deg, #ffffff, #f8fbff);
 }
 
-@keyframes roadRunnerIn {
-    0% {
-        transform: translateX(-1500px) skewX(30deg) scaleX(1.15);
+@keyframes modalBackdropIn {
+    from {
         opacity: 0;
     }
 
-    70% {
-        transform: translateX(24px) skewX(0deg) scaleX(0.95);
-        opacity: 1;
-    }
-
-    100% {
-        transform: translateX(0px) skewX(0deg) scaleX(1);
+    to {
         opacity: 1;
     }
 }
 
-@keyframes roadRunnerOut {
+@keyframes modalBackdropOut {
+    from {
+        opacity: 1;
+    }
+
+    to {
+        opacity: 0;
+    }
+}
+
+@keyframes meepMeepIn {
+    0% {
+        transform: translateX(-120vw) skewX(18deg) scale(0.72);
+        opacity: 0;
+    }
+
+    55% {
+        transform: translateX(18px) skewX(0deg) scale(1.04);
+        opacity: 1;
+    }
+
+    100% {
+        transform: translateX(0px) skewX(0deg) scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes meepMeepOut {
     0% {
         transform: translateX(0px) skewX(0deg) scaleX(1);
         opacity: 1;
     }
 
-    35% {
-        transform: translateX(-20px) skewX(-5deg) scaleX(0.96);
+    40% {
+        transform: translateX(-16px) skewX(-4deg) scale(0.98);
         opacity: 1;
     }
 
     100% {
-        transform: translateX(1500px) skewX(30deg) scaleX(1.15);
+        transform: translateX(120vw) skewX(18deg) scale(0.72);
         opacity: 0;
     }
 }
