@@ -171,7 +171,7 @@
     "permanent_delete_failed": "Не удалось удалить навсегда.",
     "theme_dark_mode_active": "Тёмный режим активен.",
     "theme_light_mode_active": "Светлый режим активен.",
-    "kick_button": "???????",
-    "members_count_suffix": "?????????",
-    "removing_member": "???????? ?????????..."
+    "kick_button": "Удалить",
+    "members_count_suffix": "участники",
+    "removing_member": "Участник удаляется..."
 }

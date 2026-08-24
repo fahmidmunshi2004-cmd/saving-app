@@ -171,7 +171,7 @@
     "permanent_delete_failed": "স্থায়ী মোছা ব্যর্থ হয়েছে.",
     "theme_dark_mode_active": "ডার্ক মোড সক্রিয়।",
     "theme_light_mode_active": "লাইট মোড সক্রিয়।",
-    "kick_button": "????",
-    "members_count_suffix": "?????",
-    "removing_member": "????? ????? ?????..."
+    "kick_button": "সরান",
+    "members_count_suffix": "সদস্য",
+    "removing_member": "সদস্য সরানো হচ্ছে..."
 }

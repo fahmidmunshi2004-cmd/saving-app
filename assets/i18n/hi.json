@@ -171,7 +171,7 @@
     "permanent_delete_failed": "स्थायी रूप से हटाना विफल रहा.",
     "theme_dark_mode_active": "डार्क मोड सक्रिय है।",
     "theme_light_mode_active": "लाइट मोड सक्रिय है।",
-    "kick_button": "?????",
-    "members_count_suffix": "?????",
-    "removing_member": "????? ????? ?? ??? ??..."
+    "kick_button": "निकालें",
+    "members_count_suffix": "सदस्य",
+    "removing_member": "सदस्य हटाया जा रहा है..."
 }

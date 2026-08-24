@@ -335,6 +335,7 @@ html[data-theme="dark"] .field input,
 html[data-theme="dark"] .field textarea,
 html[data-theme="dark"] .field select,
 html[data-theme="dark"] .login-card input,
+html[data-theme="dark"] .settings-select,
 html[data-theme="dark"] .settings-item input {
     background: #06090d;
     color: var(--text);
@@ -411,6 +412,7 @@ html[data-theme="dark"] .field input,
 html[data-theme="dark"] .field textarea,
 html[data-theme="dark"] .field select,
 html[data-theme="dark"] .login-card input,
+html[data-theme="dark"] .settings-select,
 html[data-theme="dark"] .settings-item input {
     background: #070b10;
     color: var(--text);

@@ -171,7 +171,7 @@
     "permanent_delete_failed": "Kalıcı silme başarısız oldu.",
     "theme_dark_mode_active": "Koyu mod etkin.",
     "theme_light_mode_active": "Açık mod etkin.",
-    "kick_button": "Kald?r",
-    "members_count_suffix": "?ye",
-    "removing_member": "?ye kald?r?l?yor..."
+    "kick_button": "Kaldır",
+    "members_count_suffix": "üye",
+    "removing_member": "Üye kaldırılıyor..."
 }

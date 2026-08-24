@@ -171,7 +171,7 @@
     "permanent_delete_failed": "Permanent delete failed.",
     "theme_dark_mode_active": "Dark mode is active.",
     "theme_light_mode_active": "Light mode is active.",
-    "kick_button": "Remove",
+    "kick_button": "Kick",
     "members_count_suffix": "Members",
     "removing_member": "Removing member..."
 }
