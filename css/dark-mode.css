@@ -304,6 +304,16 @@ html[data-theme="dark"] .mini-btn:hover {
     transform: translateY(-1px);
 }
 
+::view-transition-old(root),
+::view-transition-new(root) {
+    animation: none;
+    mix-blend-mode: normal;
+}
+
+::view-transition-new(root) {
+    z-index: 9999;
+}
+
 @media (max-width: 620px) {
     .theme-switcher {
         top: 8px;
