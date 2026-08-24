@@ -133,8 +133,8 @@
     "credentials_copied": "শংসাপত্রগুলি অনুলিপি করা হয়েছে৷",
     "copy_failed": "অনুলিপি ব্যর্থ হয়েছে. অনুগ্রহ করে ম্যানুয়ালি অনুলিপি করুন:\n\n{text}",
     "kick_member_confirm": "আপনি কি গ্রুপ থেকে {label} কে সরাতে চান?",
-    "kick_title": "কিক সদস্য",
-    "kick_failed": "কিক ব্যর্থ হয়েছে",
+    "kick_title": "????? ????",
+    "kick_failed": "????? ?????? ??????",
     "invite_failed": "আমন্ত্রণ ব্যর্থ হয়েছে৷",
     "request_failed": "অনুরোধ ব্যর্থ হয়েছে",
     "restore_failed": "পুনরুদ্ধার ব্যর্থ হয়েছে",
@@ -170,5 +170,8 @@
     "permanent_delete_title": "স্থায়ীভাবে মুছে ফেলবেন?",
     "permanent_delete_failed": "স্থায়ী মোছা ব্যর্থ হয়েছে.",
     "theme_dark_mode_active": "ডার্ক মোড সক্রিয়।",
-    "theme_light_mode_active": "লাইট মোড সক্রিয়।"
+    "theme_light_mode_active": "লাইট মোড সক্রিয়।",
+    "kick_button": "????",
+    "members_count_suffix": "?????",
+    "removing_member": "????? ????? ?????..."
 }

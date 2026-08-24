@@ -133,8 +133,8 @@
     "credentials_copied": "اسناد کاپی کر دی گئیں۔",
     "copy_failed": "کاپی ناکام ہو گئی۔ براہ کرم دستی طور پر کاپی کریں:\n\n{text}",
     "kick_member_confirm": "کیا آپ {label} کو گروپ سے ہٹانا چاہتے ہیں؟",
-    "kick_title": "کک ممبر",
-    "kick_failed": "کک ناکام ہوگئی",
+    "kick_title": "??? ??????",
+    "kick_failed": "????? ????? ?????",
     "invite_failed": "دعوت ناکام ہوگئی",
     "request_failed": "درخواست ناکام ہوگئی",
     "restore_failed": "بحالی ناکام ہو گئی۔",
@@ -170,5 +170,8 @@
     "permanent_delete_title": "مستقل طور پر حذف کریں؟",
     "permanent_delete_failed": "مستقل حذف کرنا ناکام ہو گیا۔",
     "theme_dark_mode_active": "ڈارک موڈ فعال ہے۔",
-    "theme_light_mode_active": "لائٹ موڈ فعال ہے۔"
+    "theme_light_mode_active": "لائٹ موڈ فعال ہے۔",
+    "kick_button": "??????",
+    "members_count_suffix": "??????",
+    "removing_member": "??? ????? ?? ??? ??..."
 }

@@ -62,6 +62,7 @@ const pendingRequestsCard = document.getElementById("pendingRequestsCard");
 const pendingRequestsList = document.getElementById("pendingRequestsList");
 const deletedTransactionsCard = document.getElementById("deletedTransactionsCard");
 const deletedTransactionsList = document.getElementById("deletedTransactionsList");
+const modalAnimationSelect = document.getElementById("modalAnimationSelect");
 const groupActionsCard = document.getElementById("groupActionsCard");
 const createGroupBtn = document.getElementById("createGroupBtn");
 const addAnotherGroupBtn = document.getElementById("addAnotherGroupBtn");

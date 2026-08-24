@@ -1389,20 +1389,57 @@ input:not(:placeholder-shown)+.floating-label {
     box-shadow: 0 8px 20px rgba(255, 1, 79, 0.06);
 }
 
-#groupMembersList li>div {
+#groupMembersList li .member-main {
     flex: 1;
     min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
     word-break: break-word;
+}
+
+#groupMembersList .member-label {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.25;
+}
+
+#groupMembersList .member-meta {
+    font-size: 0.84rem;
+    line-height: 1.3;
+    color: var(--muted);
 }
 
 #groupMembersList .btn {
     width: auto;
-    min-width: 96px;
-    padding: 8px 12px;
-    font-size: 0.82rem;
+    min-width: 112px;
+    padding: 10px 14px;
+    font-size: 0.86rem;
     margin-top: 0;
     margin-left: auto;
     flex-shrink: 0;
+    border-radius: 14px;
+    align-self: center;
+    box-shadow: 0 10px 18px rgba(239, 68, 68, 0.18);
+}
+
+.group-members-summary {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 8px;
+    margin: 4px 0 10px;
+}
+
+.group-members-summary #groupMemberCount {
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: var(--brand);
+}
+
+.group-members-summary-label {
+    font-size: 0.92rem;
+    color: var(--muted);
 }
 
 #deletedTransactionsList .deleted-actions {
@@ -1680,15 +1717,15 @@ input:not(:placeholder-shown)+.floating-label {
     backdrop-filter: blur(8px);
 }
 
-.app-modal.modal-meep {
+.app-modal.modal-motion {
     animation: modalBackdropIn 0.18s ease-out both;
 }
 
-.app-modal.modal-meep.closing {
+.app-modal.modal-motion.closing {
     animation: modalBackdropOut 0.2s ease-in both;
 }
 
-.app-modal.modal-meep .modal-card {
+.app-modal.modal-motion .modal-card {
     animation: meepMeepIn 0.56s cubic-bezier(0.18, 0.9, 0.2, 1) both;
     will-change: transform, opacity;
 }
@@ -1697,8 +1734,66 @@ input:not(:placeholder-shown)+.floating-label {
     cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='50' height='50' viewBox='0 0 50 50'%3E%3Cpath d='M14 14L36 36M36 14L14 36' stroke='%23ffffff' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E") 25 25, pointer;
 }
 
-.app-modal.modal-meep.closing .modal-card {
+.app-modal.modal-motion.closing .modal-card {
     animation: meepMeepOut 0.44s cubic-bezier(0.25, 0.7, 0.2, 1) both;
+}
+
+.app-modal.modal-motion[data-modal-animation="simple"] .modal-card {
+    animation: modalSimpleIn 0.34s cubic-bezier(0.2, 0.85, 0.2, 1) both;
+}
+
+.app-modal.modal-motion.closing[data-modal-animation="simple"] .modal-card {
+    animation: modalSimpleOut 0.26s ease-in both;
+}
+
+.app-modal.modal-motion[data-modal-animation="unfolding"] .modal-card {
+    animation: modalUnfoldingIn 0.48s cubic-bezier(0.2, 0.85, 0.18, 1) both;
+    transform-origin: center top;
+}
+
+.app-modal.modal-motion.closing[data-modal-animation="unfolding"] .modal-card {
+    animation: modalUnfoldingOut 0.34s ease-in both;
+    transform-origin: center top;
+}
+
+.app-modal.modal-motion[data-modal-animation="revealing"] .modal-card {
+    animation: modalRevealingIn 0.5s cubic-bezier(0.15, 0.85, 0.2, 1) both;
+}
+
+.app-modal.modal-motion.closing[data-modal-animation="revealing"] .modal-card {
+    animation: modalRevealingOut 0.28s ease-in both;
+}
+
+.app-modal.modal-motion[data-modal-animation="uncovering"] .modal-card {
+    animation: modalUncoveringIn 0.44s cubic-bezier(0.2, 0.9, 0.2, 1) both;
+}
+
+.app-modal.modal-motion.closing[data-modal-animation="uncovering"] .modal-card {
+    animation: modalUncoveringOut 0.28s ease-in both;
+}
+
+.app-modal.modal-motion[data-modal-animation="blow-up"] .modal-card {
+    animation: modalBlowUpIn 0.5s cubic-bezier(0.16, 0.9, 0.2, 1) both;
+}
+
+.app-modal.modal-motion.closing[data-modal-animation="blow-up"] .modal-card {
+    animation: modalBlowUpOut 0.3s ease-in both;
+}
+
+.app-modal.modal-motion[data-modal-animation="sketch"] .modal-card {
+    animation: modalSketchIn 0.52s cubic-bezier(0.18, 0.85, 0.18, 1) both;
+}
+
+.app-modal.modal-motion.closing[data-modal-animation="sketch"] .modal-card {
+    animation: modalSketchOut 0.28s ease-in both;
+}
+
+.app-modal.modal-motion[data-modal-animation="bond"] .modal-card {
+    animation: modalBondIn 0.46s cubic-bezier(0.2, 0.9, 0.18, 1) both;
+}
+
+.app-modal.modal-motion.closing[data-modal-animation="bond"] .modal-card {
+    animation: modalBondOut 0.3s ease-in both;
 }
 
 .loader-card,
@@ -2116,6 +2211,207 @@ input:not(:placeholder-shown)+.floating-label {
     100% {
         transform: translateX(120vw) skewX(18deg) scale(0.72);
         opacity: 0;
+    }
+}
+
+@keyframes modalSimpleIn {
+    0% {
+        opacity: 0;
+        transform: scale(0.94);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes modalSimpleOut {
+    0% {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    100% {
+        opacity: 0;
+        transform: scale(0.94);
+    }
+}
+
+@keyframes modalUnfoldingIn {
+    0% {
+        opacity: 0;
+        transform: perspective(900px) rotateX(-82deg) scaleY(0.2);
+    }
+
+    65% {
+        opacity: 1;
+        transform: perspective(900px) rotateX(8deg) scaleY(1.03);
+    }
+
+    100% {
+        opacity: 1;
+        transform: perspective(900px) rotateX(0deg) scaleY(1);
+    }
+}
+
+@keyframes modalUnfoldingOut {
+    0% {
+        opacity: 1;
+        transform: perspective(900px) rotateX(0deg) scaleY(1);
+    }
+
+    100% {
+        opacity: 0;
+        transform: perspective(900px) rotateX(78deg) scaleY(0.15);
+    }
+}
+
+@keyframes modalRevealingIn {
+    0% {
+        opacity: 0;
+        clip-path: inset(46% 20% 46% 20% round 18px);
+        transform: scale(0.88);
+        filter: blur(8px);
+    }
+
+    100% {
+        opacity: 1;
+        clip-path: inset(0 0 0 0 round 18px);
+        transform: scale(1);
+        filter: blur(0);
+    }
+}
+
+@keyframes modalRevealingOut {
+    0% {
+        opacity: 1;
+        clip-path: inset(0 0 0 0 round 18px);
+        transform: scale(1);
+        filter: blur(0);
+    }
+
+    100% {
+        opacity: 0;
+        clip-path: inset(46% 20% 46% 20% round 18px);
+        transform: scale(0.88);
+        filter: blur(8px);
+    }
+}
+
+@keyframes modalUncoveringIn {
+    0% {
+        opacity: 0;
+        transform: translateY(-28px) scale(0.82);
+        filter: blur(6px);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        filter: blur(0);
+    }
+}
+
+@keyframes modalUncoveringOut {
+    0% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        filter: blur(0);
+    }
+
+    100% {
+        opacity: 0;
+        transform: translateY(24px) scale(0.88);
+        filter: blur(5px);
+    }
+}
+
+@keyframes modalBlowUpIn {
+    0% {
+        opacity: 0;
+        transform: scale(0.16) rotate(10deg);
+    }
+
+    60% {
+        opacity: 1;
+        transform: scale(1.08) rotate(-1deg);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1) rotate(0deg);
+    }
+}
+
+@keyframes modalBlowUpOut {
+    0% {
+        opacity: 1;
+        transform: scale(1) rotate(0deg);
+    }
+
+    100% {
+        opacity: 0;
+        transform: scale(0.18) rotate(-12deg);
+    }
+}
+
+@keyframes modalSketchIn {
+    0% {
+        opacity: 0;
+        transform: translateX(-18px) rotate(-9deg) skewX(10deg) scale(0.9);
+        filter: saturate(1.2);
+    }
+
+    45% {
+        opacity: 1;
+        transform: translateX(12px) rotate(5deg) skewX(-4deg) scale(1.04);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateX(0) rotate(0deg) skewX(0deg) scale(1);
+    }
+}
+
+@keyframes modalSketchOut {
+    0% {
+        opacity: 1;
+        transform: translateX(0) rotate(0deg) skewX(0deg) scale(1);
+    }
+
+    100% {
+        opacity: 0;
+        transform: translateX(18px) rotate(8deg) skewX(-9deg) scale(0.9);
+    }
+}
+
+@keyframes modalBondIn {
+    0% {
+        opacity: 0;
+        transform: translateY(26px) rotate(8deg) scale(0.84);
+    }
+
+    55% {
+        opacity: 1;
+        transform: translateY(-6px) rotate(-2deg) scale(1.03);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0) rotate(0deg) scale(1);
+    }
+}
+
+@keyframes modalBondOut {
+    0% {
+        opacity: 1;
+        transform: translateY(0) rotate(0deg) scale(1);
+    }
+
+    100% {
+        opacity: 0;
+        transform: translateY(20px) rotate(8deg) scale(0.84);
     }
 }
 

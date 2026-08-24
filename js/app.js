@@ -35,7 +35,7 @@ async function loadI18n() {
   i18nLoadPromise = Promise.all(
     langCodes.map(async (code) => {
       try {
-        const response = await fetch(`${I18N_DIR}/${code}.json?v=12`, { cache: "no-store" });
+        const response = await fetch(`${I18N_DIR}/${code}.json?v=13`, { cache: "no-store" });
         if (!response.ok) {
           throw new Error(`Failed to load ${code} i18n JSON (${response.status})`);
         }
@@ -381,9 +381,17 @@ async function refreshSettingsPanels() {
     const m = doc.data();
     const li = document.createElement("li");
     const row = document.createElement("div");
+    const meta = document.createElement("div");
+    const labelEl = document.createElement("span");
     const label = m.label || m.email || m.memberId || "Member";
     const role = m.role || "viewer";
-    row.innerText = `${label} (${role})`;
+    row.className = "member-main";
+    meta.className = "member-meta";
+    labelEl.className = "member-label";
+    labelEl.textContent = label;
+    row.appendChild(labelEl);
+    meta.textContent = t(`role_${role}`) || role;
+    row.appendChild(meta);
     li.appendChild(row);
 
     if (isCurrentAdmin()) {
@@ -392,9 +400,9 @@ async function refreshSettingsPanels() {
       if (!isSelf && !isAdminMember) {
         const kickBtn = document.createElement("button");
         kickBtn.className = "btn danger-btn";
-        kickBtn.innerHTML = '<i class="fa-solid fa-user-minus"></i> Kick';
+        kickBtn.innerHTML = `<i class="fa-solid fa-user-minus"></i> ${tx("kick_button")}`;
         kickBtn.onclick = () => {
-        withLoader(tx("removing_member"), async () => {
+          withLoader(tx("removing_member"), async () => {
             await removeGroupMember(doc.id, label);
           }).catch((e) => appAlert(e.message || tx("kick_failed")));
         };
@@ -1934,7 +1942,7 @@ function initFirebase() {
 function registerServiceWorker() {
   if (!("serviceWorker" in navigator)) return;
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("./sw.js?v=12").catch(() => { });
+    navigator.serviceWorker.register("./sw.js?v=13").catch(() => { });
   });
 }
 

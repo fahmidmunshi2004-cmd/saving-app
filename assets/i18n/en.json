@@ -133,8 +133,8 @@
     "credentials_copied": "Credentials copied.",
     "copy_failed": "Copy failed. Please copy manually:\n\n{text}",
     "kick_member_confirm": "Do you want to remove {label} from the group?",
-    "kick_title": "Kick Member",
-    "kick_failed": "Kick failed",
+    "kick_title": "Remove Member",
+    "kick_failed": "Remove failed",
     "invite_failed": "Invite failed",
     "request_failed": "Request failed",
     "restore_failed": "Restore failed",
@@ -170,5 +170,8 @@
     "permanent_delete_title": "Permanently Delete?",
     "permanent_delete_failed": "Permanent delete failed.",
     "theme_dark_mode_active": "Dark mode is active.",
-    "theme_light_mode_active": "Light mode is active."
+    "theme_light_mode_active": "Light mode is active.",
+    "kick_button": "Remove",
+    "members_count_suffix": "Members",
+    "removing_member": "Removing member..."
 }

@@ -133,8 +133,8 @@
     "credentials_copied": "Anmeldedaten kopiert.",
     "copy_failed": "Der Kopiervorgang ist fehlgeschlagen. Bitte manuell kopieren:\n\n{text}",
     "kick_member_confirm": "Möchten Sie {label} aus der Gruppe entfernen?",
-    "kick_title": "Kick-Mitglied",
-    "kick_failed": "Der Tritt ist fehlgeschlagen",
+    "kick_title": "Mitglied entfernen",
+    "kick_failed": "Entfernen fehlgeschlagen",
     "invite_failed": "Die Einladung ist fehlgeschlagen",
     "request_failed": "Die Anfrage ist fehlgeschlagen",
     "restore_failed": "Wiederherstellung fehlgeschlagen",
@@ -170,5 +170,8 @@
     "permanent_delete_title": "Endgültig löschen?",
     "permanent_delete_failed": "Das dauerhafte Löschen ist fehlgeschlagen.",
     "theme_dark_mode_active": "Der dunkle Modus ist aktiv.",
-    "theme_light_mode_active": "Der helle Modus ist aktiv."
+    "theme_light_mode_active": "Der helle Modus ist aktiv.",
+    "kick_button": "Entfernen",
+    "members_count_suffix": "Mitglieder",
+    "removing_member": "Mitglied wird entfernt..."
 }

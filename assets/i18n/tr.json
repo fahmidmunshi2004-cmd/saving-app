@@ -133,8 +133,8 @@
     "credentials_copied": "Kimlik bilgileri kopyalandı.",
     "copy_failed": "Kopyalama başarısız oldu. Lütfen manuel olarak kopyalayın:\n\n{text}",
     "kick_member_confirm": "{label} adlı kişiyi gruptan çıkarmak istiyor musunuz?",
-    "kick_title": "Üyeyi At",
-    "kick_failed": "Tekme başarısız oldu",
+    "kick_title": "?yeyi kald?r",
+    "kick_failed": "Kald?rma ba?ar?s?z oldu",
     "invite_failed": "Davet başarısız oldu",
     "request_failed": "İstek başarısız oldu",
     "restore_failed": "Geri yükleme başarısız oldu",
@@ -170,5 +170,8 @@
     "permanent_delete_title": "Kalıcı Olarak Silinsin mi?",
     "permanent_delete_failed": "Kalıcı silme başarısız oldu.",
     "theme_dark_mode_active": "Koyu mod etkin.",
-    "theme_light_mode_active": "Açık mod etkin."
+    "theme_light_mode_active": "Açık mod etkin.",
+    "kick_button": "Kald?r",
+    "members_count_suffix": "?ye",
+    "removing_member": "?ye kald?r?l?yor..."
 }

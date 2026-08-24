@@ -133,8 +133,8 @@
     "credentials_copied": "Credenciales copiadas.",
     "copy_failed": "La copia falló. Copie manualmente:\n\n{text}",
     "kick_member_confirm": "¿Quieres eliminar a {label} del grupo?",
-    "kick_title": "Miembro de patada",
-    "kick_failed": "patada fallida",
+    "kick_title": "Quitar miembro",
+    "kick_failed": "No se pudo quitar",
     "invite_failed": "Invitación fallida",
     "request_failed": "Solicitud fallida",
     "restore_failed": "Restauración fallida",
@@ -170,5 +170,8 @@
     "permanent_delete_title": "¿Eliminar permanentemente?",
     "permanent_delete_failed": "Error en la eliminación permanente.",
     "theme_dark_mode_active": "El modo oscuro está activo.",
-    "theme_light_mode_active": "El modo claro está activo."
+    "theme_light_mode_active": "El modo claro está activo.",
+    "kick_button": "Quitar",
+    "members_count_suffix": "miembros",
+    "removing_member": "Quitando miembro..."
 }

@@ -133,8 +133,8 @@
     "credentials_copied": "Informations d'identification copiées.",
     "copy_failed": "La copie a échoué. Veuillez copier manuellement :\n\n{text}",
     "kick_member_confirm": "Voulez-vous supprimer {label} du groupe ?",
-    "kick_title": "Membre de coup de pied",
-    "kick_failed": "Le coup de pied a échoué",
+    "kick_title": "Retirer le membre",
+    "kick_failed": "?chec du retrait",
     "invite_failed": "Échec de l'invitation",
     "request_failed": "La demande a échoué",
     "restore_failed": "La restauration a échoué",
@@ -170,5 +170,8 @@
     "permanent_delete_title": "Supprimer définitivement ?",
     "permanent_delete_failed": "La suppression définitive a échoué.",
     "theme_dark_mode_active": "Le mode sombre est actif.",
-    "theme_light_mode_active": "Le mode clair est actif."
+    "theme_light_mode_active": "Le mode clair est actif.",
+    "kick_button": "Retirer",
+    "members_count_suffix": "membres",
+    "removing_member": "Retrait du membre..."
 }

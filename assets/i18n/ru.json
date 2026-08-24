@@ -133,8 +133,8 @@
     "credentials_copied": "Учетные данные скопированы.",
     "copy_failed": "Копировать не удалось. Пожалуйста, скопируйте вручную:\n\n{text}",
     "kick_member_confirm": "Вы хотите удалить {label} из группы?",
-    "kick_title": "Выгнать участника",
-    "kick_failed": "Кик не удался",
+    "kick_title": "??????? ?????????",
+    "kick_failed": "?? ??????? ???????",
     "invite_failed": "Пригласить не удалось",
     "request_failed": "Запрос не выполнен",
     "restore_failed": "Восстановление не удалось",
@@ -170,5 +170,8 @@
     "permanent_delete_title": "Удалить навсегда?",
     "permanent_delete_failed": "Не удалось удалить навсегда.",
     "theme_dark_mode_active": "Тёмный режим активен.",
-    "theme_light_mode_active": "Светлый режим активен."
+    "theme_light_mode_active": "Светлый режим активен.",
+    "kick_button": "???????",
+    "members_count_suffix": "?????????",
+    "removing_member": "???????? ?????????..."
 }

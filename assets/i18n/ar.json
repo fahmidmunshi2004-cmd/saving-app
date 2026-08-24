@@ -133,8 +133,8 @@
     "credentials_copied": "تم نسخ بيانات الاعتماد.",
     "copy_failed": "فشل النسخ. يرجى النسخ يدويًا:\n\n{text}",
     "kick_member_confirm": "هل تريد إزالة {label} من المجموعة؟",
-    "kick_title": "ركلة العضو",
-    "kick_failed": "فشلت الركلة",
+    "kick_title": "????? ?????",
+    "kick_failed": "???? ???????",
     "invite_failed": "فشلت الدعوة",
     "request_failed": "فشل الطلب",
     "restore_failed": "فشلت عملية الاستعادة",
@@ -170,5 +170,8 @@
     "permanent_delete_title": "هل تريد الحذف نهائيًا؟",
     "permanent_delete_failed": "فشل الحذف الدائم.",
     "theme_dark_mode_active": "الوضع الداكن نشط.",
-    "theme_light_mode_active": "الوضع الفاتح نشط."
+    "theme_light_mode_active": "الوضع الفاتح نشط.",
+    "kick_button": "?????",
+    "members_count_suffix": "???????",
+    "removing_member": "???? ????? ?????..."
 }

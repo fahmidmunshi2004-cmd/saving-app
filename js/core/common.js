@@ -309,6 +309,57 @@ function isCurrentAdmin() {
 let loaderCount = 0;
 let loaderDotsTimer = null;
 let modalCloseTimer = null;
+const MODAL_ANIMATION_STORAGE_KEY = "vault_modal_animation";
+const DEFAULT_MODAL_ANIMATION = "meep";
+const MODAL_ANIMATION_SET = new Set([
+  "simple",
+  "meep",
+  "unfolding",
+  "revealing",
+  "uncovering",
+  "blow-up",
+  "sketch",
+  "bond"
+]);
+let currentModalAnimation = readPreferredModalAnimation();
+
+function normalizeModalAnimation(value) {
+  const next = String(value || "").trim();
+  return MODAL_ANIMATION_SET.has(next) ? next : DEFAULT_MODAL_ANIMATION;
+}
+
+function readPreferredModalAnimation() {
+  try {
+    const stored = localStorage.getItem(MODAL_ANIMATION_STORAGE_KEY);
+    return normalizeModalAnimation(stored);
+  } catch (_) {
+    return DEFAULT_MODAL_ANIMATION;
+  }
+}
+
+function syncModalAnimationSelect(value) {
+  if (modalAnimationSelect) {
+    modalAnimationSelect.value = normalizeModalAnimation(value);
+  }
+}
+
+function applyModalAnimation(value, persist = true) {
+  currentModalAnimation = normalizeModalAnimation(value);
+
+  if (persist) {
+    try {
+      localStorage.setItem(MODAL_ANIMATION_STORAGE_KEY, currentModalAnimation);
+    } catch (_) {
+      // ignore storage errors
+    }
+  }
+
+  syncModalAnimationSelect(currentModalAnimation);
+
+  if (appModal) {
+    appModal.dataset.modalAnimation = currentModalAnimation;
+  }
+}
 
 function clearLoaderDotsTimer() {
   if (!loaderDotsTimer) return;
@@ -327,10 +378,11 @@ function prepareModalMotion() {
   clearModalCloseTimer();
   appModal.classList.remove("hidden");
   appModal.classList.remove("closing");
-  appModal.classList.remove("modal-meep");
+  appModal.classList.remove("modal-motion");
+  appModal.dataset.modalAnimation = currentModalAnimation;
   void appModal.offsetWidth;
   window.requestAnimationFrame(() => {
-    appModal.classList.add("modal-meep");
+    appModal.classList.add("modal-motion");
   });
 }
 
@@ -345,7 +397,7 @@ function closeModalMotion(onDone) {
   modalCloseTimer = setTimeout(() => {
     appModal.classList.add("hidden");
     appModal.classList.remove("closing");
-    appModal.classList.remove("modal-meep");
+    appModal.classList.remove("modal-motion");
     if (typeof onDone === "function") onDone();
   }, 460);
 }
@@ -503,4 +555,14 @@ async function withLoader(text, task) {
     hideLoader();
   }
 }
+
+if (modalAnimationSelect) {
+  modalAnimationSelect.addEventListener("change", () => {
+    applyModalAnimation(modalAnimationSelect.value);
+  });
+}
+
+applyModalAnimation(currentModalAnimation, false);
+window.setModalAnimation = applyModalAnimation;
+window.getModalAnimation = () => currentModalAnimation;
 
