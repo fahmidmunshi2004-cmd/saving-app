@@ -134,7 +134,7 @@
     "copy_failed": "La copie a échoué. Veuillez copier manuellement :\n\n{text}",
     "kick_member_confirm": "Voulez-vous supprimer {label} du groupe ?",
     "kick_title": "Retirer le membre",
-    "kick_failed": "?chec du retrait",
+    "kick_failed": "Échec du retrait",
     "invite_failed": "Échec de l'invitation",
     "request_failed": "La demande a échoué",
     "restore_failed": "La restauration a échoué",
