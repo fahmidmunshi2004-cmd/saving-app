@@ -1,11 +1,34 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en" dir="ltr">
 
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Vault Budget</title>
+    <script>
+        (function () {
+            try {
+                var storedTheme = localStorage.getItem("theme");
+                var prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+                var theme = storedTheme === "dark" || storedTheme === "light"
+                    ? storedTheme
+                    : (prefersDark ? "dark" : "light");
+                document.documentElement.dataset.theme = theme;
+            } catch (_) { }
+        })();
+    </script>
     <meta name="theme-color" content="#ffffff" />
+    <script>
+        (function () {
+            try {
+                var theme = document.documentElement.dataset.theme || "light";
+                var meta = document.querySelector('meta[name="theme-color"]');
+                if (meta) {
+                    meta.setAttribute("content", theme === "dark" ? "#0b1020" : "#ffffff");
+                }
+            } catch (_) { }
+        })();
+    </script>
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
@@ -19,6 +42,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&display=swap"
         rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
+    <link rel="stylesheet" href="css/dark-mode.css?v=1" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
@@ -73,6 +97,10 @@
                         <span id="langCurrentLabel" class="lang-switcher-label">English</span>
                     </span>
                     <i class="fa-solid fa-chevron-down lang-switcher-icon" aria-hidden="true"></i>
+                </button>
+                <button id="modeBtn" class="theme-switcher" type="button" aria-pressed="false" aria-label="Toggle dark mode">
+                    <i class="fa-solid fa-moon theme-switcher-icon" aria-hidden="true"></i>
+                    <span class="theme-switcher-label">Dark mode</span>
                 </button>
                 <div id="langMenu" class="lang-menu hidden" role="listbox" aria-label="Language options"></div>
             </div>
@@ -281,7 +309,7 @@
             </div>
             <div id="groupMembersCard" class="settings-item hidden">
                 <strong data-i18n="group_members">Group Members</strong><br />
-                <span id="groupMemberCount">0</span> জন
+                <span id="groupMemberCount">0</span> ??
                 <ul id="groupMembersList" class="simple-list"></ul>
             </div>
             <div id="inviteCard" class="settings-item hidden">
@@ -364,7 +392,11 @@
 
     <script src="js/core/state.js?v=10"></script>
     <script src="js/core/common.js?v=10"></script>
+    <script src="js/dark-mode.js?v=1"></script>
     <script src="js/app.js?v=11"></script>
 </body>
 
 </html>
+
+
+

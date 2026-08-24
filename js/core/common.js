@@ -1,4 +1,4 @@
-﻿function normalizeUsername(value) {
+function normalizeUsername(value) {
   return value.trim().toLowerCase();
 }
 
@@ -249,7 +249,30 @@ async function loadGroupSharedData() {
 }
 
 function applyTheme() {
-  root.setAttribute("data-theme", "light");
+  let theme = "light";
+
+  try {
+    const storedTheme = localStorage.getItem("theme");
+    if (storedTheme === "dark" || storedTheme === "light") {
+      theme = storedTheme;
+    } else if (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) {
+      theme = "dark";
+    }
+  } catch (_) {
+    // ignore storage errors
+  }
+
+  root.setAttribute("data-theme", theme);
+  if (document.body) {
+    document.body.dataset.theme = theme;
+    document.body.classList.toggle("theme-dark", theme === "dark");
+    document.body.classList.toggle("theme-light", theme === "light");
+  }
+
+  const themeMeta = document.querySelector('meta[name="theme-color"]');
+  if (themeMeta) {
+    themeMeta.setAttribute("content", theme === "dark" ? "#0b1020" : "#ffffff");
+  }
 }
 
 function setEditAccess(enabled) {
@@ -477,3 +500,4 @@ async function withLoader(text, task) {
     hideLoader();
   }
 }
+
