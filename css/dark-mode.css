@@ -106,12 +106,12 @@ html[data-theme="dark"] select {
 }
 
 .theme-switcher {
-    position: fixed;
-    top: 12px;
-    right: 12px;
     z-index: 7000;
-    width: auto;
-    min-width: 118px;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     border: 1px solid color-mix(in srgb, var(--brand) 22%, #dbe3ef);
     border-radius: 999px;
     padding: 8px 11px 8px 10px;
