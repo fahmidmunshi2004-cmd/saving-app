@@ -362,6 +362,13 @@ function isModalOverlayTarget(event) {
   return Boolean(event && (event.target === appModal || event.target?.classList?.contains("modal-background")));
 }
 
+function bindModalCardClickGuard() {
+  const card = getModalCardElement();
+  if (!card || card.dataset.clickGuardBound === "true") return;
+  card.dataset.clickGuardBound = "true";
+  card.addEventListener("click", (event) => event.stopPropagation());
+}
+
 function syncModalGeometry() {
   const card = getModalCardElement();
   const rect = appModal?.querySelector(".modal-svg rect");
@@ -380,6 +387,7 @@ function syncModalGeometry() {
   card.style.setProperty("--modal-h", `${height}px`);
   const sketchLen = Math.max(1, 2 * (width + height));
   card.style.setProperty("--sketch-len", String(sketchLen));
+  appModal.style.setProperty("--sketch-len", String(sketchLen));
   if (rect) {
     rect.setAttribute("width", String(width));
     rect.setAttribute("height", String(height));
@@ -441,6 +449,7 @@ function clearModalCloseTimer() {
 function prepareModalMotion() {
   if (!appModal) return;
   clearModalCloseTimer();
+  bindModalCardClickGuard();
   appModal.classList.remove(...MODAL_CONTAINER_CLASSES);
   appModal.classList.add("app-modal");
   appModal.dataset.modalAnimation = currentModalAnimation;
@@ -630,9 +639,13 @@ async function withLoader(text, task) {
   }
 }
 
+bindModalCardClickGuard();
+
 if (modalAnimationSelect) {
   modalAnimationSelect.addEventListener("change", () => {
     applyModalAnimation(modalAnimationSelect.value);
+    const label = modalAnimationSelect.options[modalAnimationSelect.selectedIndex]?.text || currentModalAnimation;
+    appAlert(`${label} animation is ready.`, "Modal animation");
   });
 }
 
