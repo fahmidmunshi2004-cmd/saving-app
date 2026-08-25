@@ -314,12 +314,41 @@ html[data-theme="dark"] .modal-message {
     color: #a7b1bc;
 }
 
-html[data-theme="dark"] .app-loader,
-html[data-theme="dark"] .app-modal {
+html[data-theme="dark"] .app-loader {
     background:
         radial-gradient(500px 220px at 10% 10%, rgba(255, 77, 121, 0.08), transparent 68%),
         radial-gradient(420px 200px at 88% 88%, rgba(97, 168, 255, 0.06), transparent 70%),
         rgba(0, 0, 0, 0.82);
+}
+
+html[data-theme="dark"] .app-modal.six .modal-card {
+    animation-name: modalFadeInDark;
+}
+
+html[data-theme="dark"] .app-modal.six.out .modal-card {
+    animation-name: modalFadeOutDark;
+}
+
+@keyframes modalFadeInDark {
+    0% {
+        background: transparent;
+    }
+
+    100% {
+        background: linear-gradient(180deg, #0b0f14, #070a0e);
+        box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
+    }
+}
+
+@keyframes modalFadeOutDark {
+    0% {
+        background: linear-gradient(180deg, #0b0f14, #070a0e);
+    }
+
+    100% {
+        background: transparent;
+        box-shadow: none;
+    }
 }
 
 html[data-theme="dark"] .login-card {

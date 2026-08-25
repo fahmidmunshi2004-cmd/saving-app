@@ -1347,7 +1347,7 @@ function openTransactionEditModal(txnId) {
       }
     };
     const onOverlayClick = (event) => {
-      if (event.target === appModal) onCancel();
+      if (isModalOverlayTarget(event)) onCancel();
     };
 
     modalOkBtn.addEventListener("click", onSave);

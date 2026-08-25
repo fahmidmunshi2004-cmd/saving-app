@@ -309,32 +309,83 @@ function isCurrentAdmin() {
 let loaderCount = 0;
 let loaderDotsTimer = null;
 let modalCloseTimer = null;
-const MODAL_CLOSE_DURATION_MS = {
-  simple: 260,
-  meep: 440,
-  unfolding: 340,
-  revealing: 280,
-  uncovering: 280,
-  "blow-up": 300,
-  sketch: 280,
-  bond: 300
+const MODAL_MOTION_CLASS = {
+  simple: "simple",
+  unfolding: "one",
+  revealing: "two",
+  uncovering: "three",
+  "blow-up": "four",
+  meep: "five",
+  sketch: "six",
+  bond: "seven"
 };
+const MODAL_CLOSE_DURATION_MS = {
+  simple: 280,
+  meep: 500,
+  unfolding: 1300,
+  revealing: 500,
+  uncovering: 500,
+  "blow-up": 500,
+  sketch: 500,
+  bond: 2000
+};
+const MODAL_CONTAINER_CLASSES = [
+  "hidden",
+  "out",
+  "closing",
+  "modal-motion",
+  "modal-active",
+  "simple",
+  "one",
+  "two",
+  "three",
+  "four",
+  "five",
+  "six",
+  "seven",
+  ...Object.keys(MODAL_MOTION_CLASS)
+];
 const MODAL_ANIMATION_STORAGE_KEY = "vault_modal_animation";
 const DEFAULT_MODAL_ANIMATION = "meep";
-const MODAL_ANIMATION_SET = new Set([
-  "simple",
-  "meep",
-  "unfolding",
-  "revealing",
-  "uncovering",
-  "blow-up",
-  "sketch",
-  "bond"
-]);
+const MODAL_ANIMATION_SET = new Set(Object.keys(MODAL_MOTION_CLASS));
 let currentModalAnimation = readPreferredModalAnimation();
 
 function getModalCardElement() {
   return appModal ? appModal.querySelector(".modal-card") : null;
+}
+
+function getModalMotionClass() {
+  return MODAL_MOTION_CLASS[currentModalAnimation] || MODAL_MOTION_CLASS[DEFAULT_MODAL_ANIMATION];
+}
+
+function isModalOverlayTarget(event) {
+  return Boolean(event && (event.target === appModal || event.target?.classList?.contains("modal-background")));
+}
+
+function syncModalGeometry() {
+  const card = getModalCardElement();
+  const rect = appModal?.querySelector(".modal-svg rect");
+  if (!card) return;
+
+  const previousVisibility = appModal.style.visibility;
+  const previousTransform = appModal.style.transform;
+  appModal.style.visibility = "hidden";
+  appModal.style.transform = "scale(1)";
+  const width = Math.max(1, Math.round(card.offsetWidth));
+  const height = Math.max(1, Math.round(card.offsetHeight));
+  appModal.style.visibility = previousVisibility;
+  appModal.style.transform = previousTransform;
+
+  card.style.setProperty("--modal-w", `${width}px`);
+  card.style.setProperty("--modal-h", `${height}px`);
+  const sketchLen = Math.max(1, 2 * (width + height));
+  card.style.setProperty("--sketch-len", String(sketchLen));
+  if (rect) {
+    rect.setAttribute("width", String(width));
+    rect.setAttribute("height", String(height));
+    rect.style.strokeDasharray = String(sketchLen);
+    rect.style.strokeDashoffset = String(sketchLen);
+  }
 }
 
 function normalizeModalAnimation(value) {
@@ -390,11 +441,14 @@ function clearModalCloseTimer() {
 function prepareModalMotion() {
   if (!appModal) return;
   clearModalCloseTimer();
-  appModal.classList.remove("hidden", "closing", "out");
-  appModal.classList.add("modal-motion", "modal-active", currentModalAnimation);
-  document.body.classList.add("modal-active");
+  appModal.classList.remove(...MODAL_CONTAINER_CLASSES);
+  appModal.classList.add("app-modal");
   appModal.dataset.modalAnimation = currentModalAnimation;
+  document.body.classList.add("modal-active");
+  document.documentElement.classList.add("modal-active");
+  syncModalGeometry();
   void appModal.offsetWidth;
+  appModal.classList.add(getModalMotionClass());
 }
 
 function closeModalMotion(onDone) {
@@ -404,15 +458,16 @@ function closeModalMotion(onDone) {
   }
 
   clearModalCloseTimer();
-  appModal.classList.add("closing", "out");
-  const closeDelay = MODAL_CLOSE_DURATION_MS[currentModalAnimation] || 460;
+  appModal.classList.add("out");
+  const closeDelay = MODAL_CLOSE_DURATION_MS[currentModalAnimation] || 500;
   let finished = false;
   const finishClose = () => {
     if (finished) return;
     finished = true;
     document.body.classList.remove("modal-active");
+    document.documentElement.classList.remove("modal-active");
+    appModal.classList.remove(...MODAL_CONTAINER_CLASSES.filter((name) => name !== "hidden"));
     appModal.classList.add("hidden");
-    appModal.classList.remove("closing", "out", "modal-motion", "modal-active", currentModalAnimation);
     if (typeof onDone === "function") onDone();
   };
 
@@ -527,7 +582,7 @@ function appAlert(message, title = "Notice") {
     };
     const onOk = () => close();
     const onOverlayClick = (event) => {
-      if (event.target === appModal) close();
+      if (isModalOverlayTarget(event)) close();
     };
     modalOkBtn.addEventListener("click", onOk);
     appModal.addEventListener("click", onOverlayClick);
@@ -558,7 +613,7 @@ function appConfirm(message, title = "Confirm") {
     const onOk = () => close(true);
     const onCancel = () => close(false);
     const onOverlayClick = (event) => {
-      if (event.target === appModal) close(false);
+      if (isModalOverlayTarget(event)) close(false);
     };
     modalOkBtn.addEventListener("click", onOk);
     modalCancelBtn.addEventListener("click", onCancel);
