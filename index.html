@@ -49,7 +49,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore-compat.js"></script>
 
     <link rel="stylesheet" href="css/style.css?v=15" />
-    <link rel="stylesheet" href="css/modal.css?v=4" />
+    <link rel="stylesheet" href="css/modal.css" />
     <link rel="stylesheet" href="css/dark-mode.css?v=6" />
 </head>
 
@@ -67,362 +67,374 @@
     </section>
 
     <div class="app-page">
-    <section id="authBar" class="auth-shell">
-        <div id="authInfo" class="auth-info" data-i18n="private_mode_login_first">Private mode is enabled. Log in first.
-        </div>
-        <button id="modeBtn" class="theme-switcher" type="button" aria-pressed="false" aria-label="Toggle dark mode">
-            <i class="fa-solid fa-moon theme-switcher-icon" aria-hidden="true"></i>
-        </button>
-    </section>
-
-    <section id="loginOverlay" class="login-overlay">
-        <div class="login-card">
-            <h2 data-i18n="login_required">Login Required</h2>
-            <p class="login-help" data-i18n="login_help">Continue with Google (Gmail) to access the app.</p>
-            <div class="login-actions">
-                <button id="googleLoginBtn" class="btn expense-btn" type="button"><i class="fa-brands fa-google"></i>
-                    <span data-i18n="continue_google">Continue with Google</span></button>
+        <section id="authBar" class="auth-shell">
+            <div id="authInfo" class="auth-info" data-i18n="private_mode_login_first">Private mode is enabled. Log in
+                first.
             </div>
-        </div>
-    </section>
+            <button id="modeBtn" class="theme-switcher" type="button" aria-pressed="false"
+                aria-label="Toggle dark mode">
+                <i class="fa-solid fa-moon theme-switcher-icon" aria-hidden="true"></i>
+            </button>
+        </section>
 
-    <section id="homeView" class="view active">
-        <div class="hero">
-            <div class="brand">
-                <div class="logo"><i class="fa-solid fa-vault"></i></div>
-                <div>
-                    <h1 data-i18n="app_title">Vault Budget Prime</h1>
-                    <p class="sub" data-i18n="app_subtitle">Clean finance tracker with secure visual identity</p>
+        <section id="loginOverlay" class="login-overlay">
+            <div class="login-card">
+                <h2 data-i18n="login_required">Login Required</h2>
+                <p class="login-help" data-i18n="login_help">Continue with Google (Gmail) to access the app.</p>
+                <div class="login-actions">
+                    <button id="googleLoginBtn" class="btn expense-btn" type="button"><i
+                            class="fa-brands fa-google"></i>
+                        <span data-i18n="continue_google">Continue with Google</span></button>
                 </div>
             </div>
-            <div class="lang-picker-wrap">
-                <span class="lang-label" data-i18n="language_label">Language</span>
-                <button id="langSwitcher" class="lang-switcher" type="button" aria-haspopup="listbox"
-                    aria-expanded="false" aria-controls="langMenu" aria-label="Language selector">
-                    <span class="lang-switcher-main">
-                        <span id="langCurrentFlag" class="lang-flag" aria-hidden="true"></span>
-                        <span id="langCurrentLabel" class="lang-switcher-label">English</span>
-                    </span>
-                    <i class="fa-solid fa-chevron-down lang-switcher-icon" aria-hidden="true"></i>
-                </button>
+        </section>
 
-                <div id="langMenu" class="lang-menu hidden" role="listbox" aria-label="Language options"></div>
-            </div>
-        </div>
-
-        <div class="stats">
-            <div class="stat income">
-                <div class="label"><i class="fa-solid fa-coins"></i> <span data-i18n="income">Income</span></div>
-                <div class="value" id="income">0 BDT</div>
-            </div>
-            <div class="stat expense">
-                <div class="label"><i class="fa-solid fa-receipt"></i> <span data-i18n="expense">Expense</span></div>
-                <div class="value" id="expense">0 BDT</div>
-            </div>
-            <div class="stat balance">
-                <div class="label"><i class="fa-solid fa-piggy-bank"></i> <span data-i18n="balance">Balance</span></div>
-                <div class="value" id="balance">0 BDT</div>
-            </div>
-        </div>
-
-        <div class="forms">
-            <div class="box">
-                <h3><i class="fa-solid fa-hand-holding-dollar"></i> <span data-i18n="add_income">Add Income</span></h3>
-                <div class="field">
-                    <input type="number" id="incomeInput" placeholder=" " />
-                    <label class="floating-label" for="incomeInput" data-i18n="income_amount">Income amount</label>
+        <section id="homeView" class="view active">
+            <div class="hero">
+                <div class="brand">
+                    <div class="logo"><i class="fa-solid fa-vault"></i></div>
+                    <div>
+                        <h1 data-i18n="app_title">Vault Budget Prime</h1>
+                        <p class="sub" data-i18n="app_subtitle">Clean finance tracker with secure visual identity</p>
+                    </div>
                 </div>
-                <div class="field">
-                    <input type="text" id="incomeSourceInput" placeholder=" " />
-                    <label class="floating-label" for="incomeSourceInput" data-i18n="income_source">Income source
-                        (Salary/Freelance...)</label>
-                </div>
-                <button id="incomeBtn" class="btn income-btn" onclick="addIncome()"><i
-                        class="fa-solid fa-circle-plus"></i> <span data-i18n="save_income">Save Income</span></button>
-            </div>
-            <div class="box">
-                <h3><i class="fa-solid fa-credit-card"></i> <span data-i18n="add_expense">Add Expense</span></h3>
-                <div class="field">
-                    <input type="number" id="expenseInput" placeholder=" " />
-                    <label class="floating-label" for="expenseInput" data-i18n="expense_amount">Expense amount</label>
-                </div>
-                <div class="field">
-                    <input type="text" id="categoryInput" placeholder=" " />
-                    <label class="floating-label" for="categoryInput" data-i18n="category">Category (Food,
-                        Travel...)</label>
-                </div>
-                <button id="expenseBtn" class="btn expense-btn" onclick="addExpense()"><i
-                        class="fa-solid fa-circle-minus"></i> <span data-i18n="save_expense">Save
-                        Expense</span></button>
-            </div>
-        </div>
-    </section>
-
-    <section id="reportView" class="view">
-        <div id="categoryOverviewBlock" class="hidden">
-            <div class="side-head">
-                <h3><i class="fa-solid fa-chart-simple"></i> <span data-i18n="category_overview">Category
-                        Overview</span></h3>
-                <span class="pill">Live</span>
-            </div>
-            <ul id="list" class="list"></ul>
-            <p id="emptyState" class="empty" hidden data-i18n="no_expense_category">No expense category yet.</p>
-        </div>
-
-        <div class="chart-card">
-            <div class="chart-head">
-                <h3><i class="fa-solid fa-chart-column"></i> <span data-i18n="expense_column_chart">Expense Column
-                        Chart</span></h3>
-                <span class="history-count">Category wise</span>
-            </div>
-            <div class="chart-wrap">
-                <canvas id="expenseColumnChart"></canvas>
-            </div>
-            <div class="chart-meta">
-                <div class="meta-chip"><span data-i18n="top_category">Top Category</span><strong
-                        id="topCategory">-</strong></div>
-                <div class="meta-chip"><span data-i18n="top_expense">Top Expense</span><strong id="topExpense">0
-                        BDT</strong></div>
-                <div class="meta-chip"><span data-i18n="categories">Categories</span><strong
-                        id="totalCategory">0</strong></div>
-            </div>
-        </div>
-
-        <div class="chart-card">
-            <div class="chart-head">
-                <h3><i class="fa-solid fa-chart-pie"></i> <span data-i18n="income_pie_chart">Income Pie Chart</span>
-                </h3>
-                <span class="history-count">Source wise</span>
-            </div>
-            <div class="chart-wrap">
-                <canvas id="incomePieChart"></canvas>
-            </div>
-        </div>
-
-        <div class="history">
-            <div class="history-head">
-                <h3><i class="fa-solid fa-timeline"></i> <span data-i18n="transaction_history">Transaction
-                        History</span></h3>
-                <div class="history-actions">
-                    <span id="txnCount" class="history-count">0 records</span>
-                    <button id="downloadPdfBtn" type="button" class="mini-btn"><i class="fa-solid fa-file-pdf"></i>
-                        <span data-i18n="download_pdf">Download PDF</span></button>
-                </div>
-            </div>
-            <div class="table-wrap">
-                <table class="txn-table">
-                    <thead>
-                        <tr>
-                            <th data-i18n="time">Time</th>
-                            <th data-i18n="type">Type</th>
-                            <th data-i18n="category_short">Category</th>
-                            <th data-i18n="amount">Amount</th>
-                            <th data-i18n="action">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody id="txnTableBody"></tbody>
-                    <tfoot>
-                        <tr>
-                            <td colspan="5" class="tfoot">
-                                <div class="txn-footer-stats">
-                                    <span class="foot-income"><i class="fa-solid fa-arrow-trend-up"></i> <span
-                                            data-i18n="total_income_label">Total Income:</span>
-                                        <strong id="txnTotalIncome">0 BDT</strong></span>
-                                    <span class="foot-expense"><i class="fa-solid fa-arrow-trend-down"></i> <span
-                                            data-i18n="total_expense_label">Total Expense:</span>
-                                        <strong id="txnTotalExpense">0 BDT</strong></span>
-                                </div>
-                            </td>
-                        </tr>
-                    </tfoot>
-                </table>
-            </div>
-            <p id="txnEmpty" class="empty" hidden data-i18n="no_transactions">No transactions yet.</p>
-        </div>
-    </section>
-
-    <section id="walletView" class="view">
-        <div class="side-head">
-            <h3><i class="fa-solid fa-building-columns"></i> <span data-i18n="wallet">Wallet</span></h3><span
-                class="pill" data-i18n="summary">Summary</span>
-        </div>
-        <div class="wallet-grid">
-            <div class="wallet-item wallet-balance">
-                <div class="wallet-head"><i class="fa-solid fa-vault"></i><span data-i18n="current_balance">Current
-                        Balance</span></div>
-                <strong id="walletBalance">0 BDT</strong>
-            </div>
-            <div class="wallet-item wallet-income">
-                <div class="wallet-head"><i class="fa-solid fa-coins"></i><span data-i18n="total_income">Total
-                        Income</span></div>
-                <strong id="walletIncome">0 BDT</strong>
-            </div>
-            <div class="wallet-item wallet-expense">
-                <div class="wallet-head"><i class="fa-solid fa-receipt"></i><span data-i18n="total_expense">Total
-                        Expense</span></div>
-                <strong id="walletExpense">0 BDT</strong>
-            </div>
-            <div class="wallet-item wallet-rate">
-                <div class="wallet-head"><i class="fa-solid fa-chart-line"></i><span data-i18n="savings_rate">Savings
-                        Rate</span></div>
-                <strong id="walletRate">0%</strong>
-            </div>
-        </div>
-        <div class="wallet-rate-chart-card">
-            <div class="wallet-rate-head">
-                <h3><i class="fa-solid fa-gauge-high"></i> <span data-i18n="income_vs_expense">Income vs Expense
-                        Range</span></h3>
-                <span class="history-count" data-i18n="animated">Animated</span>
-            </div>
-            <div class="wallet-rate-chart-wrap">
-                <canvas id="walletRateChart"></canvas>
-            </div>
-        </div>
-    </section>
-
-    <section id="settingsView" class="view">
-        <div class="side-head">
-            <h3><i class="fa-solid fa-sliders"></i> <span data-i18n="settings">Settings</span></h3><span class="pill"
-                data-i18n="control">Control</span>
-        </div>
-        <div class="settings-grid">
-            <div id="groupActionsCard" class="settings-item hidden">
-                <strong data-i18n="group_actions">Group Actions</strong><br />
-                <button id="createGroupBtn" class="btn income-btn" type="button"><i
-                        class="fa-solid fa-people-group"></i> <span data-i18n="create_group_account">Create Group
-                        Account</span></button>
-                <button id="addAnotherGroupBtn" class="btn expense-btn" type="button"><i
-                        class="fa-solid fa-right-left"></i> <span data-i18n="add_another_group">Add Another
-                        Group</span></button>
-            </div>
-            <div id="groupActionFormCard" class="settings-item hidden">
-                <strong id="groupActionTitle" data-i18n="group_action">Group Action</strong><br />
-                <div class="field">
-                    <span class="field-icon"><i class="fa-solid fa-user"></i></span>
-                    <input id="groupActionUsername" class="with-icon" type="text" placeholder=" " />
-                    <label class="floating-label" for="groupActionUsername" data-i18n="group_username">Group
-                        Username</label>
-                </div>
-                <div class="field">
-                    <span class="field-icon"><i class="fa-solid fa-lock"></i></span>
-                    <input id="groupActionPassword" class="with-icon with-toggle" type="password" placeholder=" " />
-                    <label class="floating-label" for="groupActionPassword" data-i18n="group_password">Group
-                        Password</label>
-                    <button class="toggle-pass" type="button" data-target="groupActionPassword"
-                        aria-label="Show or hide password">
-                        <i class="fa-regular fa-eye"></i>
+                <div class="lang-picker-wrap">
+                    <span class="lang-label" data-i18n="language_label">Language</span>
+                    <button id="langSwitcher" class="lang-switcher" type="button" aria-haspopup="listbox"
+                        aria-expanded="false" aria-controls="langMenu" aria-label="Language selector">
+                        <span class="lang-switcher-main">
+                            <span id="langCurrentFlag" class="lang-flag" aria-hidden="true"></span>
+                            <span id="langCurrentLabel" class="lang-switcher-label">English</span>
+                        </span>
+                        <i class="fa-solid fa-chevron-down lang-switcher-icon" aria-hidden="true"></i>
                     </button>
-                </div>
-                <button id="groupActionSubmitBtn" class="btn expense-btn" type="button"><i
-                        class="fa-solid fa-paper-plane"></i> <span data-i18n="submit">Submit</span></button>
-                <p id="groupActionHelpText" class="login-help" data-i18n="group_action_help_join">
-                    Use the exact group username and password from the admin.
-                </p>
-            </div>
-            <div class="settings-item">
-                <strong data-i18n="account_type">Account Type</strong><br />
-                <span id="accountTypeText">-</span>
-            </div>
-            <div class="settings-item">
-                <strong data-i18n="role">Role</strong><br />
-                <span id="accountRoleText">-</span>
-            </div>
-            <div id="adminCredentialCard" class="settings-item hidden">
-                <strong data-i18n="group_credentials_admin">Group Credentials (Admin)</strong><br />
-                <div><b>Username:</b> <span id="adminCredentialUsername">-</span></div>
-                <div style="margin-top:6px;"><b>Password:</b> <span id="adminCredentialPassword">-</span></div>
-                <button id="copyAdminCredentialBtn" class="btn income-btn" type="button"><i
-                        class="fa-regular fa-copy"></i> <span data-i18n="copy_credentials">Copy
-                        Credentials</span></button>
-            </div>
-            <div id="groupMembersCard" class="settings-item hidden">
-                <strong data-i18n="group_members">Group Members</strong><br />
-                <div class="group-members-summary">
-                    <span id="groupMemberCount">0</span>
-                    <span class="group-members-summary-label" data-i18n="members_count_suffix">Members</span>
-                </div>
-                <ul id="groupMembersList" class="simple-list"></ul>
-            </div>
-            <div id="inviteCard" class="settings-item hidden">
-                <strong data-i18n="invite_member_admin">Invite Member (Admin)</strong><br />
-                <div class="field">
-                    <input id="inviteEmailInput" type="email" placeholder=" " />
-                    <label class="floating-label" for="inviteEmailInput" data-i18n="friend_gmail">Friend Gmail</label>
-                </div>
-                <button id="sendInviteBtn" class="btn expense-btn" type="button"><i
-                        class="fa-solid fa-envelope-circle-check"></i> <span data-i18n="send_invite">Send
-                        Invite</span></button>
-                <p id="inviteStatusText" class="login-help"></p>
-            </div>
-            <div id="requestAccessCard" class="settings-item hidden">
-                <strong data-i18n="request_edit_access">Request Edit Access</strong><br />
-                <div class="field">
-                    <input id="requestAccessEmailInput" type="email" placeholder=" " />
-                    <label class="floating-label" for="requestAccessEmailInput" data-i18n="admin_gmail">Admin
-                        Gmail</label>
-                </div>
-                <button id="requestAccessBtn" class="btn income-btn" type="button"><i class="fa-solid fa-key"></i>
-                    <span data-i18n="request_access">Request Access</span></button>
-            </div>
-            <div id="pendingRequestsCard" class="settings-item hidden">
-                <strong data-i18n="pending_access_requests">Pending Access Requests</strong><br />
-                <ul id="pendingRequestsList" class="simple-list"></ul>
-            </div>
-            <div id="deletedTransactionsCard" class="settings-item hidden">
-                <strong data-i18n="deleted_transactions_admin">Deleted Transactions (Admin)</strong><br />
-                <ul id="deletedTransactionsList" class="simple-list"></ul>
-            </div>
-            <div class="settings-item" data-theme-copy="mode-status">Theme is active.</div>
-            <div class="settings-item">
-                <strong>Modal animation</strong><br />
-                <div class="settings-select-wrap">
-                    <span class="settings-select-icon" aria-hidden="true"><i
-                            class="fa-solid fa-clapperboard"></i></span>
-                    <select id="modalAnimationSelect" class="settings-select">
-                        <option value="meep">Meep Meep</option>
-                        <option value="simple">Simple</option>
-                        <option value="unfolding">Unfolding</option>
-                        <option value="revealing">Revealing</option>
-                        <option value="uncovering">Uncovering</option>
-                        <option value="blow-up">Blow Up</option>
-                        <option value="sketch">Sketch</option>
-                        <option value="bond">Bond</option>
-                    </select>
-                    <i class="fa-solid fa-chevron-down settings-select-arrow" aria-hidden="true"></i>
-                </div>
-                <div class="login-help" style="margin-top:8px;">Choose how every popup opens.</div>
-            </div>
-            <div class="settings-item" data-i18n="session_lock_note">This session has login lock active. Refreshing the
-                page requires login again.</div>
-            <div class="settings-item" data-i18n="storage_note">Data is saved in local browser storage.</div>
-            <div class="settings-item" data-i18n="reset_note">Need reset? Clear browser local storage to reset app data.
-            </div>
-            <div class="settings-item">
-                <strong data-i18n="danger_zone">Danger Zone</strong><br />
-                <span data-i18n="danger_desc">Pressing the button below will clear all data.</span>
-            </div>
-            <div class="settings-item">
-                <button id="logoutBtn" class="btn income-btn" type="button"><i
-                        class="fa-solid fa-right-from-bracket"></i>
-                    <span data-i18n="log_out">Log Out</span></button>
-            </div>
-            <div class="settings-item">
-                <button id="clearDataBtn" class="btn danger-btn" type="button"><i class="fa-solid fa-trash-can"></i>
-                    <span data-i18n="clear_all_data">Clear All Data</span></button>
-            </div>
-        </div>
-    </section>
 
-    <nav class="bottom-nav" aria-label="Bottom navigation">
-        <button class="nav-btn active" type="button" data-view="homeView"><i class="fa-solid fa-house"></i>
-            <span data-i18n="home">Home</span></button>
-        <button class="nav-btn" type="button" data-view="reportView"><i class="fa-solid fa-chart-line"></i>
-            <span data-i18n="report">Report</span></button>
-        <button class="nav-btn" type="button" data-view="walletView"><i class="fa-solid fa-wallet"></i> <span
-                data-i18n="wallet">Wallet</span></button>
-        <button class="nav-btn" type="button" data-view="settingsView"><i class="fa-solid fa-gear"></i>
-            <span data-i18n="settings">Settings</span></button>
-    </nav>
+                    <div id="langMenu" class="lang-menu hidden" role="listbox" aria-label="Language options"></div>
+                </div>
+            </div>
+
+            <div class="stats">
+                <div class="stat income">
+                    <div class="label"><i class="fa-solid fa-coins"></i> <span data-i18n="income">Income</span></div>
+                    <div class="value" id="income">0 BDT</div>
+                </div>
+                <div class="stat expense">
+                    <div class="label"><i class="fa-solid fa-receipt"></i> <span data-i18n="expense">Expense</span>
+                    </div>
+                    <div class="value" id="expense">0 BDT</div>
+                </div>
+                <div class="stat balance">
+                    <div class="label"><i class="fa-solid fa-piggy-bank"></i> <span data-i18n="balance">Balance</span>
+                    </div>
+                    <div class="value" id="balance">0 BDT</div>
+                </div>
+            </div>
+
+            <div class="forms">
+                <div class="box">
+                    <h3><i class="fa-solid fa-hand-holding-dollar"></i> <span data-i18n="add_income">Add Income</span>
+                    </h3>
+                    <div class="field">
+                        <input type="number" id="incomeInput" placeholder=" " />
+                        <label class="floating-label" for="incomeInput" data-i18n="income_amount">Income amount</label>
+                    </div>
+                    <div class="field">
+                        <input type="text" id="incomeSourceInput" placeholder=" " />
+                        <label class="floating-label" for="incomeSourceInput" data-i18n="income_source">Income source
+                            (Salary/Freelance...)</label>
+                    </div>
+                    <button id="incomeBtn" class="btn income-btn" onclick="addIncome()"><i
+                            class="fa-solid fa-circle-plus"></i> <span data-i18n="save_income">Save
+                            Income</span></button>
+                </div>
+                <div class="box">
+                    <h3><i class="fa-solid fa-credit-card"></i> <span data-i18n="add_expense">Add Expense</span></h3>
+                    <div class="field">
+                        <input type="number" id="expenseInput" placeholder=" " />
+                        <label class="floating-label" for="expenseInput" data-i18n="expense_amount">Expense
+                            amount</label>
+                    </div>
+                    <div class="field">
+                        <input type="text" id="categoryInput" placeholder=" " />
+                        <label class="floating-label" for="categoryInput" data-i18n="category">Category (Food,
+                            Travel...)</label>
+                    </div>
+                    <button id="expenseBtn" class="btn expense-btn" onclick="addExpense()"><i
+                            class="fa-solid fa-circle-minus"></i> <span data-i18n="save_expense">Save
+                            Expense</span></button>
+                </div>
+            </div>
+        </section>
+
+        <section id="reportView" class="view">
+            <div id="categoryOverviewBlock" class="hidden">
+                <div class="side-head">
+                    <h3><i class="fa-solid fa-chart-simple"></i> <span data-i18n="category_overview">Category
+                            Overview</span></h3>
+                    <span class="pill">Live</span>
+                </div>
+                <ul id="list" class="list"></ul>
+                <p id="emptyState" class="empty" hidden data-i18n="no_expense_category">No expense category yet.</p>
+            </div>
+
+            <div class="chart-card">
+                <div class="chart-head">
+                    <h3><i class="fa-solid fa-chart-column"></i> <span data-i18n="expense_column_chart">Expense Column
+                            Chart</span></h3>
+                    <span class="history-count">Category wise</span>
+                </div>
+                <div class="chart-wrap">
+                    <canvas id="expenseColumnChart"></canvas>
+                </div>
+                <div class="chart-meta">
+                    <div class="meta-chip"><span data-i18n="top_category">Top Category</span><strong
+                            id="topCategory">-</strong></div>
+                    <div class="meta-chip"><span data-i18n="top_expense">Top Expense</span><strong id="topExpense">0
+                            BDT</strong></div>
+                    <div class="meta-chip"><span data-i18n="categories">Categories</span><strong
+                            id="totalCategory">0</strong></div>
+                </div>
+            </div>
+
+            <div class="chart-card">
+                <div class="chart-head">
+                    <h3><i class="fa-solid fa-chart-pie"></i> <span data-i18n="income_pie_chart">Income Pie Chart</span>
+                    </h3>
+                    <span class="history-count">Source wise</span>
+                </div>
+                <div class="chart-wrap">
+                    <canvas id="incomePieChart"></canvas>
+                </div>
+            </div>
+
+            <div class="history">
+                <div class="history-head">
+                    <h3><i class="fa-solid fa-timeline"></i> <span data-i18n="transaction_history">Transaction
+                            History</span></h3>
+                    <div class="history-actions">
+                        <span id="txnCount" class="history-count">0 records</span>
+                        <button id="downloadPdfBtn" type="button" class="mini-btn"><i class="fa-solid fa-file-pdf"></i>
+                            <span data-i18n="download_pdf">Download PDF</span></button>
+                    </div>
+                </div>
+                <div class="table-wrap">
+                    <table class="txn-table">
+                        <thead>
+                            <tr>
+                                <th data-i18n="time">Time</th>
+                                <th data-i18n="type">Type</th>
+                                <th data-i18n="category_short">Category</th>
+                                <th data-i18n="amount">Amount</th>
+                                <th data-i18n="action">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="txnTableBody"></tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="5" class="tfoot">
+                                    <div class="txn-footer-stats">
+                                        <span class="foot-income"><i class="fa-solid fa-arrow-trend-up"></i> <span
+                                                data-i18n="total_income_label">Total Income:</span>
+                                            <strong id="txnTotalIncome">0 BDT</strong></span>
+                                        <span class="foot-expense"><i class="fa-solid fa-arrow-trend-down"></i> <span
+                                                data-i18n="total_expense_label">Total Expense:</span>
+                                            <strong id="txnTotalExpense">0 BDT</strong></span>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+                <p id="txnEmpty" class="empty" hidden data-i18n="no_transactions">No transactions yet.</p>
+            </div>
+        </section>
+
+        <section id="walletView" class="view">
+            <div class="side-head">
+                <h3><i class="fa-solid fa-building-columns"></i> <span data-i18n="wallet">Wallet</span></h3><span
+                    class="pill" data-i18n="summary">Summary</span>
+            </div>
+            <div class="wallet-grid">
+                <div class="wallet-item wallet-balance">
+                    <div class="wallet-head"><i class="fa-solid fa-vault"></i><span data-i18n="current_balance">Current
+                            Balance</span></div>
+                    <strong id="walletBalance">0 BDT</strong>
+                </div>
+                <div class="wallet-item wallet-income">
+                    <div class="wallet-head"><i class="fa-solid fa-coins"></i><span data-i18n="total_income">Total
+                            Income</span></div>
+                    <strong id="walletIncome">0 BDT</strong>
+                </div>
+                <div class="wallet-item wallet-expense">
+                    <div class="wallet-head"><i class="fa-solid fa-receipt"></i><span data-i18n="total_expense">Total
+                            Expense</span></div>
+                    <strong id="walletExpense">0 BDT</strong>
+                </div>
+                <div class="wallet-item wallet-rate">
+                    <div class="wallet-head"><i class="fa-solid fa-chart-line"></i><span
+                            data-i18n="savings_rate">Savings
+                            Rate</span></div>
+                    <strong id="walletRate">0%</strong>
+                </div>
+            </div>
+            <div class="wallet-rate-chart-card">
+                <div class="wallet-rate-head">
+                    <h3><i class="fa-solid fa-gauge-high"></i> <span data-i18n="income_vs_expense">Income vs Expense
+                            Range</span></h3>
+                    <span class="history-count" data-i18n="animated">Animated</span>
+                </div>
+                <div class="wallet-rate-chart-wrap">
+                    <canvas id="walletRateChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <section id="settingsView" class="view">
+            <div class="side-head">
+                <h3><i class="fa-solid fa-sliders"></i> <span data-i18n="settings">Settings</span></h3><span
+                    class="pill" data-i18n="control">Control</span>
+            </div>
+            <div class="settings-grid">
+                <div id="groupActionsCard" class="settings-item hidden">
+                    <strong data-i18n="group_actions">Group Actions</strong><br />
+                    <button id="createGroupBtn" class="btn income-btn" type="button"><i
+                            class="fa-solid fa-people-group"></i> <span data-i18n="create_group_account">Create Group
+                            Account</span></button>
+                    <button id="addAnotherGroupBtn" class="btn expense-btn" type="button"><i
+                            class="fa-solid fa-right-left"></i> <span data-i18n="add_another_group">Add Another
+                            Group</span></button>
+                </div>
+                <div id="groupActionFormCard" class="settings-item hidden">
+                    <strong id="groupActionTitle" data-i18n="group_action">Group Action</strong><br />
+                    <div class="field">
+                        <span class="field-icon"><i class="fa-solid fa-user"></i></span>
+                        <input id="groupActionUsername" class="with-icon" type="text" placeholder=" " />
+                        <label class="floating-label" for="groupActionUsername" data-i18n="group_username">Group
+                            Username</label>
+                    </div>
+                    <div class="field">
+                        <span class="field-icon"><i class="fa-solid fa-lock"></i></span>
+                        <input id="groupActionPassword" class="with-icon with-toggle" type="password" placeholder=" " />
+                        <label class="floating-label" for="groupActionPassword" data-i18n="group_password">Group
+                            Password</label>
+                        <button class="toggle-pass" type="button" data-target="groupActionPassword"
+                            aria-label="Show or hide password">
+                            <i class="fa-regular fa-eye"></i>
+                        </button>
+                    </div>
+                    <button id="groupActionSubmitBtn" class="btn expense-btn" type="button"><i
+                            class="fa-solid fa-paper-plane"></i> <span data-i18n="submit">Submit</span></button>
+                    <p id="groupActionHelpText" class="login-help" data-i18n="group_action_help_join">
+                        Use the exact group username and password from the admin.
+                    </p>
+                </div>
+                <div class="settings-item">
+                    <strong data-i18n="account_type">Account Type</strong><br />
+                    <span id="accountTypeText">-</span>
+                </div>
+                <div class="settings-item">
+                    <strong data-i18n="role">Role</strong><br />
+                    <span id="accountRoleText">-</span>
+                </div>
+                <div id="adminCredentialCard" class="settings-item hidden">
+                    <strong data-i18n="group_credentials_admin">Group Credentials (Admin)</strong><br />
+                    <div><b>Username:</b> <span id="adminCredentialUsername">-</span></div>
+                    <div style="margin-top:6px;"><b>Password:</b> <span id="adminCredentialPassword">-</span></div>
+                    <button id="copyAdminCredentialBtn" class="btn income-btn" type="button"><i
+                            class="fa-regular fa-copy"></i> <span data-i18n="copy_credentials">Copy
+                            Credentials</span></button>
+                </div>
+                <div id="groupMembersCard" class="settings-item hidden">
+                    <strong data-i18n="group_members">Group Members</strong><br />
+                    <div class="group-members-summary">
+                        <span id="groupMemberCount">0</span>
+                        <span class="group-members-summary-label" data-i18n="members_count_suffix">Members</span>
+                    </div>
+                    <ul id="groupMembersList" class="simple-list"></ul>
+                </div>
+                <div id="inviteCard" class="settings-item hidden">
+                    <strong data-i18n="invite_member_admin">Invite Member (Admin)</strong><br />
+                    <div class="field">
+                        <input id="inviteEmailInput" type="email" placeholder=" " />
+                        <label class="floating-label" for="inviteEmailInput" data-i18n="friend_gmail">Friend
+                            Gmail</label>
+                    </div>
+                    <button id="sendInviteBtn" class="btn expense-btn" type="button"><i
+                            class="fa-solid fa-envelope-circle-check"></i> <span data-i18n="send_invite">Send
+                            Invite</span></button>
+                    <p id="inviteStatusText" class="login-help"></p>
+                </div>
+                <div id="requestAccessCard" class="settings-item hidden">
+                    <strong data-i18n="request_edit_access">Request Edit Access</strong><br />
+                    <div class="field">
+                        <input id="requestAccessEmailInput" type="email" placeholder=" " />
+                        <label class="floating-label" for="requestAccessEmailInput" data-i18n="admin_gmail">Admin
+                            Gmail</label>
+                    </div>
+                    <button id="requestAccessBtn" class="btn income-btn" type="button"><i class="fa-solid fa-key"></i>
+                        <span data-i18n="request_access">Request Access</span></button>
+                </div>
+                <div id="pendingRequestsCard" class="settings-item hidden">
+                    <strong data-i18n="pending_access_requests">Pending Access Requests</strong><br />
+                    <ul id="pendingRequestsList" class="simple-list"></ul>
+                </div>
+                <div id="deletedTransactionsCard" class="settings-item hidden">
+                    <strong data-i18n="deleted_transactions_admin">Deleted Transactions (Admin)</strong><br />
+                    <ul id="deletedTransactionsList" class="simple-list"></ul>
+                </div>
+                <div class="settings-item" data-theme-copy="mode-status">Theme is active.</div>
+                <div class="settings-item">
+                    <strong>Modal animation</strong><br />
+                    <div class="settings-select-wrap">
+                        <span class="settings-select-icon" aria-hidden="true"><i
+                                class="fa-solid fa-clapperboard"></i></span>
+                        <select id="modalAnimationSelect" class="settings-select">
+                            <option value="meep">Meep Meep</option>
+                            <option value="simple">Simple</option>
+                            <option value="unfolding">Unfolding</option>
+                            <option value="revealing">Revealing</option>
+                            <option value="uncovering">Uncovering</option>
+                            <option value="blow-up">Blow Up</option>
+                            <option value="sketch">Sketch</option>
+                            <option value="bond">Bond</option>
+                        </select>
+                        <i class="fa-solid fa-chevron-down settings-select-arrow" aria-hidden="true"></i>
+                    </div>
+                    <div class="login-help" style="margin-top:8px;">Choose how every popup opens.</div>
+                </div>
+                <div class="settings-item" data-i18n="session_lock_note">This session has login lock active. Refreshing
+                    the
+                    page requires login again.</div>
+                <div class="settings-item" data-i18n="storage_note">Data is saved in local browser storage.</div>
+                <div class="settings-item" data-i18n="reset_note">Need reset? Clear browser local storage to reset app
+                    data.
+                </div>
+                <div class="settings-item">
+                    <strong data-i18n="danger_zone">Danger Zone</strong><br />
+                    <span data-i18n="danger_desc">Pressing the button below will clear all data.</span>
+                </div>
+                <div class="settings-item">
+                    <button id="logoutBtn" class="btn income-btn" type="button"><i
+                            class="fa-solid fa-right-from-bracket"></i>
+                        <span data-i18n="log_out">Log Out</span></button>
+                </div>
+                <div class="settings-item">
+                    <button id="clearDataBtn" class="btn danger-btn" type="button"><i class="fa-solid fa-trash-can"></i>
+                        <span data-i18n="clear_all_data">Clear All Data</span></button>
+                </div>
+            </div>
+        </section>
+
+        <nav class="bottom-nav" aria-label="Bottom navigation">
+            <button class="nav-btn active" type="button" data-view="homeView"><i class="fa-solid fa-house"></i>
+                <span data-i18n="home">Home</span></button>
+            <button class="nav-btn" type="button" data-view="reportView"><i class="fa-solid fa-chart-line"></i>
+                <span data-i18n="report">Report</span></button>
+            <button class="nav-btn" type="button" data-view="walletView"><i class="fa-solid fa-wallet"></i> <span
+                    data-i18n="wallet">Wallet</span></button>
+            <button class="nav-btn" type="button" data-view="settingsView"><i class="fa-solid fa-gear"></i>
+                <span data-i18n="settings">Settings</span></button>
+        </nav>
     </div>
 
     <div id="appLoader" class="app-loader hidden" aria-live="polite" aria-busy="true">
@@ -445,7 +457,8 @@
                     <button id="modalOkBtn" class="btn expense-btn" type="button"><i class="fa-solid fa-check"></i>
                         <span data-i18n="ok">OK</span></button>
                 </div>
-                <svg class="modal-svg" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" preserveAspectRatio="none" aria-hidden="true">
+                <svg class="modal-svg" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%"
+                    preserveAspectRatio="none" aria-hidden="true">
                     <rect x="0" y="0" fill="none" width="226" height="162" rx="18" ry="18"></rect>
                 </svg>
             </div>
