@@ -601,3 +601,205 @@ body.modal-active {
         clip-path: polygon(50% 0%, 50% 0%, 50% 100%, 50% 100%);
     }
 }
+
+.app-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 4000;
+    display: grid;
+    place-items: center;
+    padding: 18px;
+    background: rgba(9, 17, 33, 0.58);
+    backdrop-filter: blur(6px);
+}
+
+.app-modal.hidden {
+    display: none !important;
+}
+
+.app-modal .modal-card {
+    width: min(460px, 100%);
+    transform-origin: center center;
+    will-change: transform, opacity, filter;
+}
+
+.app-modal[data-modal-animation="simple"] .modal-card {
+    animation: modalSimpleIn 0.34s cubic-bezier(0.2, 0.85, 0.2, 1) both;
+}
+
+.app-modal[data-modal-animation="meep"] .modal-card {
+    animation: modalMeepIn 0.42s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.app-modal[data-modal-animation="unfolding"] .modal-card {
+    transform-origin: top center;
+    animation: modalUnfoldingIn 0.46s cubic-bezier(0.2, 0.9, 0.2, 1) both;
+}
+
+.app-modal[data-modal-animation="revealing"] .modal-card {
+    animation: modalRevealingIn 0.42s ease-out both;
+}
+
+.app-modal[data-modal-animation="uncovering"] .modal-card {
+    transform-origin: left center;
+    animation: modalUncoveringIn 0.38s cubic-bezier(0.2, 0.85, 0.25, 1) both;
+}
+
+.app-modal[data-modal-animation="blow-up"] .modal-card {
+    animation: modalBlowUpIn 0.42s cubic-bezier(0.15, 1.2, 0.25, 1) both;
+}
+
+.app-modal[data-modal-animation="sketch"] .modal-card {
+    animation: modalSketchIn 0.4s cubic-bezier(0.18, 0.84, 0.2, 1) both;
+}
+
+.app-modal[data-modal-animation="bond"] .modal-card {
+    animation: modalBondIn 0.58s cubic-bezier(0.2, 1.1, 0.2, 1) both;
+}
+
+@keyframes modalSimpleIn {
+    from {
+        opacity: 0;
+        transform: translateY(16px) scale(0.94);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes modalMeepIn {
+    from {
+        opacity: 0;
+        transform: translate3d(120px, 0, 0) scale(0.72) rotate(7deg);
+    }
+
+    to {
+        opacity: 1;
+        transform: translate3d(0, 0, 0) scale(1) rotate(0deg);
+    }
+}
+
+@keyframes modalUnfoldingIn {
+    from {
+        opacity: 0;
+        transform: perspective(900px) rotateX(-78deg) scaleY(0.2);
+        filter: saturate(0.9);
+    }
+
+    60% {
+        opacity: 1;
+    }
+
+    to {
+        opacity: 1;
+        transform: perspective(900px) rotateX(0deg) scaleY(1);
+        filter: saturate(1);
+    }
+}
+
+@keyframes modalRevealingIn {
+    from {
+        opacity: 0;
+        clip-path: inset(0 0 100% 0 round 18px);
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        clip-path: inset(0 0 0 0 round 18px);
+        transform: translateY(0);
+    }
+}
+
+@keyframes modalUncoveringIn {
+    from {
+        opacity: 0;
+        transform: translateX(-34px) scaleX(0.7);
+        filter: blur(6px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0) scaleX(1);
+        filter: blur(0);
+    }
+}
+
+@keyframes modalBlowUpIn {
+    from {
+        opacity: 0;
+        transform: scale(0.22);
+        filter: blur(12px);
+    }
+
+    65% {
+        opacity: 1;
+        filter: blur(0);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+        filter: blur(0);
+    }
+}
+
+@keyframes modalSketchIn {
+    from {
+        opacity: 0;
+        transform: scale(0.92) rotate(-1.4deg);
+        box-shadow: 0 0 0 0 rgba(255, 1, 79, 0.2);
+    }
+
+    55% {
+        opacity: 1;
+        transform: scale(1.02) rotate(0.8deg);
+        box-shadow: 0 0 0 14px rgba(255, 1, 79, 0.05);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1) rotate(0deg);
+        box-shadow: 0 0 0 0 rgba(255, 1, 79, 0);
+    }
+}
+
+@keyframes modalBondIn {
+    0% {
+        opacity: 0;
+        transform: scale(0.58);
+    }
+
+    48% {
+        opacity: 1;
+        transform: scale(1.08);
+    }
+
+    72% {
+        transform: scale(0.96);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .app-modal .modal-card,
+    .app-modal[data-modal-animation="simple"] .modal-card,
+    .app-modal[data-modal-animation="meep"] .modal-card,
+    .app-modal[data-modal-animation="unfolding"] .modal-card,
+    .app-modal[data-modal-animation="revealing"] .modal-card,
+    .app-modal[data-modal-animation="uncovering"] .modal-card,
+    .app-modal[data-modal-animation="blow-up"] .modal-card,
+    .app-modal[data-modal-animation="sketch"] .modal-card,
+    .app-modal[data-modal-animation="bond"] .modal-card {
+        animation: none !important;
+        transition: none !important;
+        transform: none !important;
+        filter: none !important;
+    }
+}

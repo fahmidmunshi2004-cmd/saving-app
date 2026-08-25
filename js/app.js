@@ -2212,3 +2212,49 @@ window.addIncome = addIncome;
 window.addExpense = addExpense;
 window.renderSavingsRateChart = renderSavingsRateChart;
 
+
+(function initModalAnimationPreference() {
+  const MODAL_ANIMATION_STORAGE_KEY = "vault_modal_animation";
+  const OPTIONS = new Set([
+    "simple",
+    "meep",
+    "unfolding",
+    "revealing",
+    "uncovering",
+    "blow-up",
+    "sketch",
+    "bond"
+  ]);
+
+  const modal = document.getElementById("appModal");
+  const select = document.getElementById("modalAnimationSelect");
+  if (!modal || !select) return;
+  if (select.dataset.modalAnimationBound === "true") return;
+  select.dataset.modalAnimationBound = "true";
+
+  const normalize = (value) => {
+    const next = String(value || "").trim();
+    return OPTIONS.has(next) ? next : "simple";
+  };
+
+  const apply = (value) => {
+    const next = normalize(value);
+    modal.dataset.modalAnimation = next;
+    select.value = next;
+    try {
+      localStorage.setItem(MODAL_ANIMATION_STORAGE_KEY, next);
+    } catch (_) { }
+    return next;
+  };
+
+  const saved = (() => {
+    try {
+      return localStorage.getItem(MODAL_ANIMATION_STORAGE_KEY);
+    } catch (_) {
+      return "simple";
+    }
+  })();
+
+  apply(saved || select.value || "simple");
+  select.addEventListener("change", () => apply(select.value));
+})();
