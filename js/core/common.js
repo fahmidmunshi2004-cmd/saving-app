@@ -309,83 +309,15 @@ function isCurrentAdmin() {
 let loaderCount = 0;
 let loaderDotsTimer = null;
 let modalCloseTimer = null;
-const MODAL_MOTION_CLASS = {
-  "anim-1": "anim-1",
-  "anim-2": "anim-2",
-  "anim-3": "anim-3",
-  "anim-4": "anim-4",
-  "anim-5": "anim-5",
-  "anim-6": "anim-6",
-  "anim-7": "anim-7",
-  "anim-8": "anim-8",
-  "anim-9": "anim-9",
-  "anim-10": "anim-10",
-  "anim-11": "anim-11",
-  "anim-12": "anim-12",
-  "anim-13": "anim-13",
-  "anim-14": "anim-14",
-  "anim-15": "anim-15",
-  "anim-16": "anim-16",
-  "anim-17": "anim-17",
-  "anim-18": "anim-18",
-  "anim-19": "anim-19",
-  "anim-20": "anim-20",
-  normal: "normal"
-};
-const MODAL_CLOSE_DURATION_MS = {
-  "anim-1": 1000,
-  "anim-2": 500,
-  "anim-3": 500,
-  "anim-4": 500,
-  "anim-5": 500,
-  "anim-6": 500,
-  "anim-7": 1500,
-  "anim-8": 500,
-  "anim-9": 500,
-  "anim-10": 400,
-  "anim-11": 400,
-  "anim-12": 500,
-  "anim-13": 500,
-  "anim-14": 500,
-  "anim-15": 500,
-  "anim-16": 500,
-  "anim-17": 600,
-  "anim-18": 500,
-  "anim-19": 600,
-  "anim-20": 500,
-  normal: 250
-};
 const MODAL_CONTAINER_CLASSES = [
   "hidden",
   "out",
   "modal-container",
-  "anim-8",
-  "anim-9",
-  "anim-10",
-  "anim-11",
-  "anim-12",
-  "anim-13",
-  "anim-14",
-  "anim-15",
-  "anim-16",
-  "anim-17",
-  "anim-18",
-  "anim-19",
-  "anim-20",
-  "normal",
-  ...Object.keys(MODAL_MOTION_CLASS)
+  "anim-5"
 ];
-const MODAL_ANIMATION_STORAGE_KEY = "vault_modal_animation";
-const DEFAULT_MODAL_ANIMATION = "anim-5";
-const MODAL_ANIMATION_SET = new Set(Object.keys(MODAL_MOTION_CLASS));
-let currentModalAnimation = readPreferredModalAnimation();
 
 function getModalElement() {
   return appModal ? appModal.querySelector(".modal") : null;
-}
-
-function getModalMotionClass() {
-  return MODAL_MOTION_CLASS[currentModalAnimation] || MODAL_MOTION_CLASS[DEFAULT_MODAL_ANIMATION];
 }
 
 function isModalOverlayTarget(event) {
@@ -397,44 +329,6 @@ function bindModalClickGuard() {
   if (!modal || modal.dataset.clickGuardBound === "true") return;
   modal.dataset.clickGuardBound = "true";
   modal.addEventListener("click", (event) => event.stopPropagation());
-}
-
-function normalizeModalAnimation(value) {
-  const next = String(value || "").trim();
-  return MODAL_ANIMATION_SET.has(next) ? next : DEFAULT_MODAL_ANIMATION;
-}
-
-function readPreferredModalAnimation() {
-  try {
-    const stored = localStorage.getItem(MODAL_ANIMATION_STORAGE_KEY);
-    return normalizeModalAnimation(stored);
-  } catch (_) {
-    return DEFAULT_MODAL_ANIMATION;
-  }
-}
-
-function syncModalAnimationSelect(value) {
-  if (modalAnimationSelect) {
-    modalAnimationSelect.value = normalizeModalAnimation(value);
-  }
-}
-
-function applyModalAnimation(value, persist = true) {
-  currentModalAnimation = normalizeModalAnimation(value);
-
-  if (persist) {
-    try {
-      localStorage.setItem(MODAL_ANIMATION_STORAGE_KEY, currentModalAnimation);
-    } catch (_) {
-      // ignore storage errors
-    }
-  }
-
-  syncModalAnimationSelect(currentModalAnimation);
-
-  if (appModal) {
-    appModal.dataset.modalAnimation = currentModalAnimation;
-  }
 }
 
 function clearLoaderDotsTimer() {
@@ -455,11 +349,10 @@ function prepareModalMotion() {
   bindModalClickGuard();
   appModal.classList.remove(...MODAL_CONTAINER_CLASSES);
   appModal.classList.add("modal-container");
-  appModal.dataset.modalAnimation = currentModalAnimation;
   document.body.classList.add("modal-active");
   document.documentElement.classList.add("modal-active");
   void appModal.offsetWidth;
-  appModal.classList.add(getModalMotionClass());
+  appModal.classList.add("anim-5");
 }
 
 function closeModalMotion(onDone) {
@@ -470,7 +363,7 @@ function closeModalMotion(onDone) {
 
   clearModalCloseTimer();
   appModal.classList.add("out");
-  const closeDelay = MODAL_CLOSE_DURATION_MS[currentModalAnimation] || 500;
+  const closeDelay = 500;
   let finished = false;
   const finishClose = () => {
     if (finished) return;
@@ -643,14 +536,6 @@ async function withLoader(text, task) {
 
 bindModalClickGuard();
 
-if (modalAnimationSelect) {
-  modalAnimationSelect.addEventListener("change", () => {
-    applyModalAnimation(modalAnimationSelect.value);
-    const label = modalAnimationSelect.options[modalAnimationSelect.selectedIndex]?.text || currentModalAnimation;
-    appAlert(`${label} animation is ready.`, "Modal animation");
-  });
-}
-
 if (modalCloseBtn) {
   modalCloseBtn.addEventListener("click", () => {
     if (modalCancelBtn && !modalCancelBtn.classList.contains("hidden")) {
@@ -660,8 +545,3 @@ if (modalCloseBtn) {
     }
   });
 }
-
-applyModalAnimation(currentModalAnimation, false);
-window.setModalAnimation = applyModalAnimation;
-window.getModalAnimation = () => currentModalAnimation;
-

@@ -1,4 +1,3 @@
-/* Modal animations copied into the app's modal shell. */
 html.modal-active,
 body.modal-active {
     overflow: hidden;
@@ -25,10 +24,23 @@ body.modal-active {
     align-items: center;
     justify-content: center;
     padding: 16px;
-    background: rgba(0, 0, 0, 0.7);
+    background: rgba(0, 0, 0, .7);
     transform-origin: center;
     backface-visibility: hidden;
     will-change: transform, opacity;
+    animation: meepBackdropIn .6s forwards;
+}
+
+.modal-container.anim-5 {
+    transform: scale(1);
+}
+
+.modal-container.anim-5.out {
+    animation: meepContainerOut .6s forwards;
+}
+
+.modal-container.anim-5.out .modal-background {
+    animation: meepBackdropOut .5s forwards;
 }
 
 .modal {
@@ -41,22 +53,13 @@ body.modal-active {
     text-align: center;
     overflow: hidden;
     color: var(--text, #222);
-    box-shadow: 0 20px 44px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 20px 44px rgba(0, 0, 0, .2);
+    transform: translateX(-1500px);
+    animation: meepIn .6s forwards;
 }
 
-.close-modal {
-    position: absolute;
-    top: 10px;
-    right: 14px;
-    z-index: 5;
-    width: 30px;
-    height: 30px;
-    border: 0;
-    background: transparent;
-    color: var(--muted, #555);
-    font-size: 24px;
-    line-height: 30px;
-    cursor: pointer;
+.modal-container.anim-5.out .modal {
+    animation: meepOut .5s forwards;
 }
 
 .modal h2 {
@@ -77,6 +80,28 @@ body.modal-active {
     display: flex;
     flex-direction: column;
     align-items: center;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 18px;
+}
+
+.close-modal {
+    position: absolute;
+    top: 10px;
+    right: 14px;
+    z-index: 5;
+    width: 30px;
+    height: 30px;
+    border: 0;
+    background: transparent;
+    color: var(--muted, #555);
+    font-size: 24px;
+    line-height: 30px;
+    cursor: pointer;
 }
 
 .modal-copy {
@@ -112,242 +137,39 @@ body.modal-active {
 .modal-icon-danger { color: #c21a1a; background: rgba(255, 77, 109, .16); }
 .modal-icon-edit { color: var(--brand, #ff014f); background: rgba(255, 1, 79, .14); }
 
-.modal-message.edit-mode {
-    white-space: normal;
-    padding-bottom: 8px;
-}
-
-.modal-message .edit-form {
-    display: grid;
-    gap: 0;
-}
-
-.modal-message .edit-meta {
-    margin: 0 0 6px;
-    color: var(--muted, #666);
-    font-size: .8rem;
-}
-
+.modal-message.edit-mode { white-space: normal; padding-bottom: 8px; }
+.modal-message .edit-form { display: grid; gap: 0; }
+.modal-message .edit-meta { margin: 0 0 6px; color: var(--muted, #666); font-size: .8rem; }
 .modal-message .edit-field { margin-top: 0; }
 .modal-message .edit-error { min-height: 0; color: #d11414; font-size: .82rem; font-weight: 700; }
 
-.modal-actions {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-    margin-top: 18px;
+@keyframes meepIn {
+    0% { transform: translateX(-1500px) skewX(30deg) scaleX(1.3); }
+    70% { transform: translateX(30px) skewX(0) scaleX(.9); }
+    100% { transform: translateX(0) skewX(0) scaleX(1); }
 }
 
-.modal-container.anim-1 { transform: scaleY(.01) scaleX(0); animation: unfoldIn .8s forwards; }
-.modal-container.anim-1 .modal { transform: scale(0); animation: zoomIn .4s .5s forwards; }
-.modal-container.anim-1.out { transform: scale(1); animation: unfoldOut .6s forwards; }
-.modal-container.anim-1.out .modal { animation: zoomOut .3s forwards; }
+@keyframes meepOut {
+    0% { transform: translateX(0); }
+    30% { transform: translateX(-30px) skewX(-5deg) scaleX(.9); }
+    100% { transform: translateX(1500px) skewX(30deg) scaleX(1.3); }
+}
 
-.modal-container.anim-2 { transform: scale(1); }
-.modal-container.anim-2 .modal-background { animation: fadeIn .4s forwards; }
-.modal-container.anim-2 .modal { opacity: 0; animation: scaleUp .5s forwards; }
-.modal-container.anim-2.out { animation: quickScaleDown .5s forwards; }
-.modal-container.anim-2.out .modal-background { animation: fadeOut .4s forwards; }
-.modal-container.anim-2.out .modal { animation: scaleDown .4s forwards; }
+@keyframes meepBackdropIn {
+    from { opacity: 0; transform: translateX(-80px); }
+    to { opacity: 1; transform: translateX(0); }
+}
 
-.modal-container.anim-3 { transform: scale(1); }
-.modal-container.anim-3 .modal { animation: moveUp .5s forwards; }
-.modal-container.anim-3.out .modal { animation: moveDown .5s forwards; }
+@keyframes meepBackdropOut {
+    from { opacity: 1; transform: translateX(0); }
+    to { opacity: 0; transform: translateX(80px); }
+}
 
-.modal-container.anim-4 { transform: scale(1); }
-.modal-container.anim-4 .modal { animation: blowUp .5s forwards; }
-.modal-container.anim-4.out .modal { animation: blowUpOut .5s forwards; }
-
-.modal-container.anim-5 { transform: scale(1); }
-.modal-container.anim-5 .modal { transform: translateX(-1500px); animation: roadRunnerIn .6s forwards; }
-.modal-container.anim-5.out { animation: quickScaleDown .6s forwards; }
-.modal-container.anim-5.out .modal { animation: roadRunnerOut .5s forwards; }
-
-.modal-container.anim-6 { transform: scale(1); }
-.modal-container.anim-6 .modal { background: transparent; animation: modalFadeIn .5s .4s forwards; }
-.modal-container.anim-6.out .modal { animation: modalFadeOut .4s forwards; }
-
-.modal-container.anim-7 { transform: scale(1); }
-.modal-container.anim-7 .modal { width: 70px; height: 70px; min-height: 70px; padding: 20px; border-radius: 70px; animation: bond .9s forwards; }
-.modal-container.anim-7 .modal h2,
-.modal-container.anim-7 .modal-message,
-.modal-container.anim-7 .modal-actions { opacity: 0; animation: contentFadeIn .4s .7s forwards; }
-.modal-container.anim-7.out .modal { animation: bondOut .6s forwards; }
-
-.modal-container.anim-8 { transform: scale(1); }
-.modal-container.anim-8 .modal { transform: translateY(-100vh); animation: slideDown .6s forwards; }
-.modal-container.anim-8.out .modal { animation: slideDownOut .5s forwards; }
-.modal-container.anim-9 { transform: scale(1); }
-.modal-container.anim-9 .modal { transform: translateY(100vh); animation: slideUp .6s forwards; }
-.modal-container.anim-9.out .modal { animation: slideUpOut .5s forwards; }
-.modal-container.anim-10 { transform: scale(1); }
-.modal-container.anim-10 .modal { transform: scale(0); animation: zoomBigIn .6s cubic-bezier(.175,.885,.32,1.275) forwards; }
-.modal-container.anim-10.out .modal { animation: zoomBigOut .4s forwards; }
-.modal-container.anim-11 { transform: scale(1); }
-.modal-container.anim-11 .modal { transform: scale(2); opacity: 0; animation: zoomOutIn .6s forwards; }
-.modal-container.anim-11.out .modal { animation: zoomOutClose .4s forwards; }
-.modal-container.anim-12 { transform: scale(1); }
-.modal-container.anim-12 .modal { transform: rotate(-180deg) scale(0); opacity: 0; animation: rotateIn .7s forwards; }
-.modal-container.anim-12.out .modal { animation: rotateOut .5s forwards; }
-.modal-container.anim-13 { transform: scale(1); }
-.modal-container.anim-13 .modal { transform: rotate(180deg) scale(0); opacity: 0; animation: rotateInReverse .7s forwards; }
-.modal-container.anim-13.out .modal { animation: rotateOutReverse .5s forwards; }
-.modal-container.anim-14 { transform: scale(1); perspective: 1000px; }
-.modal-container.anim-14 .modal { transform: rotateX(-90deg); transform-origin: top; opacity: 0; animation: flipIn .7s forwards; }
-.modal-container.anim-14.out .modal { animation: flipOut .5s forwards; }
-.modal-container.anim-15 { transform: scale(1); perspective: 1000px; }
-.modal-container.anim-15 .modal { transform: rotateY(90deg); opacity: 0; animation: flipSideIn .7s forwards; }
-.modal-container.anim-15.out .modal { animation: flipSideOut .5s forwards; }
-.modal-container.anim-16 { transform: scale(1); }
-.modal-container.anim-16 .modal { opacity: 0; animation: bounceIn .9s forwards; }
-.modal-container.anim-16.out .modal { animation: bounceOut .5s forwards; }
-.modal-container.anim-17 { transform: scale(1); }
-.modal-container.anim-17 .modal { opacity: 0; animation: bounceDownIn .8s forwards; }
-.modal-container.anim-17.out .modal { animation: bounceDownOut .6s forwards; }
-.modal-container.anim-18 { transform: scale(1); }
-.modal-container.anim-18 .modal { transform: scale(0); opacity: 0; animation: elasticIn .9s forwards; }
-.modal-container.anim-18.out .modal { animation: elasticOut .5s forwards; }
-.modal-container.anim-19 { transform: scale(1); }
-.modal-container.anim-19 .modal { transform: translateX(100vw); animation: elasticSlideIn .9s forwards; }
-.modal-container.anim-19.out .modal { animation: elasticSlideOut .6s forwards; }
-.modal-container.anim-20 { transform: scale(1); }
-.modal-container.anim-20 .modal { transform: translateY(-100vh); animation: dropIn .8s forwards; }
-.modal-container.anim-20.out .modal { animation: dropOut .5s forwards; }
-
-.modal-container.normal { transform: scale(1); }
-.modal-container.normal .modal { transform: none; opacity: 1; }
-.modal-container.normal.out { transform: scale(0); transition: transform .2s ease; }
-
-.modal-container.anim-1 .modal-background { animation: backdropUnfoldIn .8s forwards; }
-.modal-container.anim-1.out .modal-background { animation: backdropUnfoldOut .6s forwards; }
-.modal-container.anim-2 .modal-background { animation: backdropRevealIn .5s forwards; }
-.modal-container.anim-2.out .modal-background { animation: backdropRevealOut .5s forwards; }
-.modal-container.anim-3 .modal-background { animation: backdropMoveUp .5s forwards; }
-.modal-container.anim-3.out .modal-background { animation: backdropMoveDown .5s forwards; }
-.modal-container.anim-4 .modal-background { animation: backdropZoomIn .5s forwards; }
-.modal-container.anim-4.out .modal-background { animation: backdropZoomOut .5s forwards; }
-.modal-container.anim-5 .modal-background { animation: backdropSlideLeft .6s forwards; }
-.modal-container.anim-5.out .modal-background { animation: backdropSlideRight .5s forwards; }
-.modal-container.anim-6 .modal-background { animation: backdropSketchIn .7s forwards; }
-.modal-container.anim-6.out .modal-background { animation: backdropSketchOut .4s forwards; }
-.modal-container.anim-7 .modal-background { animation: backdropBondIn .9s forwards; }
-.modal-container.anim-7.out .modal-background { animation: backdropBondOut .6s forwards; }
-.modal-container.anim-8 .modal-background { animation: backdropSlideDown .6s forwards; }
-.modal-container.anim-8.out .modal-background { animation: backdropSlideDownOut .5s forwards; }
-.modal-container.anim-9 .modal-background { animation: backdropSlideUp .6s forwards; }
-.modal-container.anim-9.out .modal-background { animation: backdropSlideUpOut .5s forwards; }
-.modal-container.anim-10 .modal-background { animation: backdropZoomIn .6s forwards; }
-.modal-container.anim-10.out .modal-background { animation: backdropZoomOut .4s forwards; }
-.modal-container.anim-11 .modal-background { animation: backdropZoomOutIn .6s forwards; }
-.modal-container.anim-11.out .modal-background { animation: backdropZoomOutClose .4s forwards; }
-.modal-container.anim-12 .modal-background { animation: backdropRotateIn .7s forwards; }
-.modal-container.anim-12.out .modal-background { animation: backdropRotateOut .5s forwards; }
-.modal-container.anim-13 .modal-background { animation: backdropRotateReverseIn .7s forwards; }
-.modal-container.anim-13.out .modal-background { animation: backdropRotateReverseOut .5s forwards; }
-.modal-container.anim-14 .modal-background { animation: backdropFlipXIn .7s forwards; }
-.modal-container.anim-14.out .modal-background { animation: backdropFlipXOut .5s forwards; }
-.modal-container.anim-15 .modal-background { animation: backdropFlipYIn .7s forwards; }
-.modal-container.anim-15.out .modal-background { animation: backdropFlipYOut .5s forwards; }
-.modal-container.anim-16 .modal-background { animation: backdropBounceIn .9s forwards; }
-.modal-container.anim-16.out .modal-background { animation: backdropBounceOut .5s forwards; }
-.modal-container.anim-17 .modal-background { animation: backdropBounceDownIn .8s forwards; }
-.modal-container.anim-17.out .modal-background { animation: backdropBounceDownOut .6s forwards; }
-.modal-container.anim-18 .modal-background { animation: backdropElasticIn .9s forwards; }
-.modal-container.anim-18.out .modal-background { animation: backdropElasticOut .5s forwards; }
-.modal-container.anim-19 .modal-background { animation: backdropElasticSlideIn .9s forwards; }
-.modal-container.anim-19.out .modal-background { animation: backdropElasticSlideOut .6s forwards; }
-.modal-container.anim-20 .modal-background { animation: backdropDropIn .8s forwards; }
-.modal-container.anim-20.out .modal-background { animation: backdropDropOut .5s forwards; }
-.modal-container.normal .modal-background { animation: backdropNormalIn .25s forwards; }
-.modal-container.normal.out .modal-background { animation: backdropNormalOut .2s forwards; }
-
-@keyframes backdropUnfoldIn { 0% { opacity: 0; transform: scaleY(.01) scaleX(0); } 50% { opacity: .7; transform: scaleY(.01) scaleX(1); } 100% { opacity: 1; transform: scale(1); } }
-@keyframes backdropUnfoldOut { 0% { opacity: 1; transform: scale(1); } 50% { opacity: .7; transform: scaleY(.01) scaleX(1); } 100% { opacity: 0; transform: scaleY(.01) scaleX(0); } }
-@keyframes backdropRevealIn { from { opacity: 0; transform: scale(.92); } to { opacity: 1; transform: scale(1); } }
-@keyframes backdropRevealOut { from { opacity: 1; transform: scale(1); } to { opacity: 0; transform: scale(.92); } }
-@keyframes backdropMoveUp { from { opacity: 0; transform: translateY(50px); } to { opacity: 1; transform: translateY(0); } }
-@keyframes backdropMoveDown { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(50px); } }
-@keyframes backdropZoomIn { from { opacity: 0; transform: scale(.75); } to { opacity: 1; transform: scale(1); } }
-@keyframes backdropZoomOut { from { opacity: 1; transform: scale(1); } to { opacity: 0; transform: scale(1.08); } }
-@keyframes backdropSlideLeft { from { opacity: 0; transform: translateX(-80px); } to { opacity: 1; transform: translateX(0); } }
-@keyframes backdropSlideRight { from { opacity: 1; transform: translateX(0); } to { opacity: 0; transform: translateX(80px); } }
-@keyframes backdropSketchIn { from { opacity: 0; transform: scale(.96); } to { opacity: 1; transform: scale(1); } }
-@keyframes backdropSketchOut { from { opacity: 1; transform: scale(1); } to { opacity: 0; transform: scale(.96); } }
-@keyframes backdropBondIn { 0% { opacity: 0; transform: scale(.05); border-radius: 50%; } 70% { opacity: .85; transform: scale(.96); border-radius: 18%; } 100% { opacity: 1; transform: scale(1); border-radius: 0; } }
-@keyframes backdropBondOut { from { opacity: 1; transform: scale(1); border-radius: 0; } to { opacity: 0; transform: scale(.75); border-radius: 18%; } }
-@keyframes backdropSlideDown { from { opacity: 0; transform: translateY(-100%); } to { opacity: 1; transform: translateY(0); } }
-@keyframes backdropSlideDownOut { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(100%); } }
-@keyframes backdropSlideUp { from { opacity: 0; transform: translateY(100%); } to { opacity: 1; transform: translateY(0); } }
-@keyframes backdropSlideUpOut { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(-100%); } }
-@keyframes backdropZoomOutIn { from { opacity: 0; transform: scale(1.18); } to { opacity: 1; transform: scale(1); } }
-@keyframes backdropZoomOutClose { from { opacity: 1; transform: scale(1); } to { opacity: 0; transform: scale(1.18); } }
-@keyframes backdropRotateIn { from { opacity: 0; transform: rotate(-12deg) scale(.9); } to { opacity: 1; transform: rotate(0) scale(1); } }
-@keyframes backdropRotateOut { from { opacity: 1; transform: rotate(0) scale(1); } to { opacity: 0; transform: rotate(12deg) scale(.9); } }
-@keyframes backdropRotateReverseIn { from { opacity: 0; transform: rotate(12deg) scale(.9); } to { opacity: 1; transform: rotate(0) scale(1); } }
-@keyframes backdropRotateReverseOut { from { opacity: 1; transform: rotate(0) scale(1); } to { opacity: 0; transform: rotate(-12deg) scale(.9); } }
-@keyframes backdropFlipXIn { from { opacity: 0; transform: perspective(1000px) rotateX(-20deg) scale(.94); } to { opacity: 1; transform: perspective(1000px) rotateX(0) scale(1); } }
-@keyframes backdropFlipXOut { from { opacity: 1; transform: perspective(1000px) rotateX(0) scale(1); } to { opacity: 0; transform: perspective(1000px) rotateX(20deg) scale(.94); } }
-@keyframes backdropFlipYIn { from { opacity: 0; transform: perspective(1000px) rotateY(20deg) scale(.94); } to { opacity: 1; transform: perspective(1000px) rotateY(0) scale(1); } }
-@keyframes backdropFlipYOut { from { opacity: 1; transform: perspective(1000px) rotateY(0) scale(1); } to { opacity: 0; transform: perspective(1000px) rotateY(-20deg) scale(.94); } }
-@keyframes backdropBounceIn { 0% { opacity: 0; transform: scale(.75); } 40% { transform: scale(1.05); } 60% { transform: scale(.97); } 80% { transform: scale(1.02); opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
-@keyframes backdropBounceOut { 20% { transform: scale(.97); } 100% { opacity: 0; transform: scale(.75); } }
-@keyframes backdropBounceDownIn { 0% { opacity: 0; transform: translateY(-30px); } 60% { transform: translateY(8px); } 80% { transform: translateY(-3px); opacity: 1; } 100% { opacity: 1; transform: translateY(0); } }
-@keyframes backdropBounceDownOut { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(35px); } }
-@keyframes backdropElasticIn { 0% { opacity: 0; transform: scale(.8); } 40% { transform: scale(1.06); } 60% { transform: scale(.96); } 80% { transform: scale(1.02); opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
-@keyframes backdropElasticOut { from { opacity: 1; transform: scale(1); } to { opacity: 0; transform: scale(.82); } }
-@keyframes backdropElasticSlideIn { 0% { opacity: 0; transform: translateX(70px); } 50% { transform: translateX(-12px); } 70% { transform: translateX(6px); } 100% { opacity: 1; transform: translateX(0); } }
-@keyframes backdropElasticSlideOut { from { opacity: 1; transform: translateX(0); } to { opacity: 0; transform: translateX(70px); } }
-@keyframes backdropDropIn { 0% { opacity: 0; transform: translateY(-70px); } 60% { transform: translateY(10px); } 80% { transform: translateY(-4px); } 100% { opacity: 1; transform: translateY(0); } }
-@keyframes backdropDropOut { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(-70px); } }
-@keyframes backdropNormalIn { from { opacity: 0; } to { opacity: 1; } }
-@keyframes backdropNormalOut { from { opacity: 1; } to { opacity: 0; } }
-
-@keyframes unfoldIn { 0% { transform: scaleY(.01) scaleX(0); } 50% { transform: scaleY(.01) scaleX(1); } 100% { transform: scaleY(1) scaleX(1); } }
-@keyframes unfoldOut { 0% { transform: scaleY(1) scaleX(1); } 50% { transform: scaleY(.01) scaleX(1); } 100% { transform: scaleY(.01) scaleX(0); } }
-@keyframes zoomIn { from { transform: scale(0); } to { transform: scale(1); } }
-@keyframes zoomOut { from { transform: scale(1); } to { transform: scale(0); } }
-@keyframes fadeIn { from { background: rgba(0,0,0,0); } to { background: rgba(0,0,0,.7); } }
-@keyframes fadeOut { from { background: rgba(0,0,0,.7); } to { background: rgba(0,0,0,0); } }
-@keyframes scaleUp { from { transform: scale(.7) translateY(100px); opacity: 0; } to { transform: scale(1) translateY(0); opacity: 1; } }
-@keyframes scaleDown { from { transform: scale(1); opacity: 1; } to { transform: scale(.7) translateY(100px); opacity: 0; } }
-@keyframes quickScaleDown { from { transform: scale(1); } to { transform: scale(0); } }
-@keyframes moveUp { from { transform: translateY(150px); } to { transform: translateY(0); } }
-@keyframes moveDown { from { transform: translateY(0); } to { transform: translateY(150px); } }
-@keyframes blowUp { from { transform: scale(0); } to { transform: scale(1); } }
-@keyframes blowUpOut { from { transform: scale(1); opacity: 1; } to { transform: scale(2); opacity: 0; } }
-@keyframes roadRunnerIn { 0% { transform: translateX(-1500px) skewX(30deg) scaleX(1.3); } 70% { transform: translateX(30px) skewX(0) scaleX(.9); } 100% { transform: translateX(0) skewX(0) scaleX(1); } }
-@keyframes roadRunnerOut { 0% { transform: translateX(0); } 100% { transform: translateX(1500px) skewX(30deg) scaleX(1.3); } }
-@keyframes modalFadeIn { from { background: transparent; } to { background: var(--surface, #fff); } }
-@keyframes modalFadeOut { from { background: var(--surface, #fff); } to { background: transparent; } }
-@keyframes contentFadeIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
-@keyframes bond { 0% { width: 70px; height: 70px; border-radius: 70px; transform: translateX(600px); } 70% { transform: translateX(0); width: 70px; height: 70px; border-radius: 70px; } 100% { width: 320px; height: 180px; border-radius: 8px; } }
-@keyframes bondOut { from { transform: scale(1); opacity: 1; } to { transform: translateY(200px) rotate(45deg); opacity: 0; } }
-@keyframes slideDown { from { transform: translateY(-100vh); } to { transform: translateY(0); } }
-@keyframes slideDownOut { from { transform: translateY(0); } to { transform: translateY(100vh); } }
-@keyframes slideUp { from { transform: translateY(100vh); } to { transform: translateY(0); } }
-@keyframes slideUpOut { from { transform: translateY(0); } to { transform: translateY(-100vh); } }
-@keyframes zoomBigIn { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-@keyframes zoomBigOut { from { transform: scale(1); opacity: 1; } to { transform: scale(0); opacity: 0; } }
-@keyframes zoomOutIn { from { transform: scale(2); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-@keyframes zoomOutClose { from { transform: scale(1); opacity: 1; } to { transform: scale(2); opacity: 0; } }
-@keyframes rotateIn { from { transform: rotate(-180deg) scale(0); opacity: 0; } to { transform: rotate(0) scale(1); opacity: 1; } }
-@keyframes rotateOut { from { transform: rotate(0) scale(1); opacity: 1; } to { transform: rotate(180deg) scale(0); opacity: 0; } }
-@keyframes rotateInReverse { from { transform: rotate(180deg) scale(0); opacity: 0; } to { transform: rotate(0) scale(1); opacity: 1; } }
-@keyframes rotateOutReverse { from { transform: rotate(0) scale(1); opacity: 1; } to { transform: rotate(-180deg) scale(0); opacity: 0; } }
-@keyframes flipIn { from { transform: rotateX(-90deg); opacity: 0; } to { transform: rotateX(0); opacity: 1; } }
-@keyframes flipOut { from { transform: rotateX(0); opacity: 1; } to { transform: rotateX(90deg); opacity: 0; } }
-@keyframes flipSideIn { from { transform: rotateY(90deg); opacity: 0; } to { transform: rotateY(0); opacity: 1; } }
-@keyframes flipSideOut { from { transform: rotateY(0); opacity: 1; } to { transform: rotateY(-90deg); opacity: 0; } }
-@keyframes bounceIn { 0% { transform: scale(.3); opacity: 0; } 40% { transform: scale(1.1); } 60% { transform: scale(.9); } 80% { transform: scale(1.03); opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
-@keyframes bounceOut { 20% { transform: scale(.9); } 100% { transform: scale(0); opacity: 0; } }
-@keyframes bounceDownIn { 0% { transform: translateY(-500px); opacity: 0; } 60% { transform: translateY(30px); } 80% { transform: translateY(-10px); opacity: 1; } 100% { transform: translateY(0); opacity: 1; } }
-@keyframes bounceDownOut { from { transform: translateY(0); } to { transform: translateY(500px); opacity: 0; } }
-@keyframes elasticIn { 0% { transform: scale(0); opacity: 0; } 40% { transform: scale(1.3); } 60% { transform: scale(.8); } 80% { transform: scale(1.1); opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
-@keyframes elasticOut { from { transform: scale(1); opacity: 1; } to { transform: scale(0); opacity: 0; } }
-@keyframes elasticSlideIn { 0% { transform: translateX(100vw); } 50% { transform: translateX(-40px); } 70% { transform: translateX(20px); } 100% { transform: translateX(0); } }
-@keyframes elasticSlideOut { from { transform: translateX(0); } to { transform: translateX(100vw); } }
-@keyframes dropIn { 0% { transform: translateY(-100vh); opacity: 0; } 60% { transform: translateY(30px); opacity: 1; } 80% { transform: translateY(-10px); } 100% { transform: translateY(0); opacity: 1; } }
-@keyframes dropOut { from { transform: translateY(0); opacity: 1; } to { transform: translateY(-100vh); opacity: 0; } }
+@keyframes meepContainerOut {
+    0% { transform: scale(1); }
+    99.9% { transform: scale(1); }
+    100% { transform: scale(0); }
+}
 
 @media (prefers-reduced-motion: reduce) {
     .modal-container,
@@ -356,5 +178,12 @@ body.modal-active {
         animation: none !important;
         transition: none !important;
     }
-    .modal-container:not(.hidden) { transform: none !important; }
+
+    .modal-container:not(.hidden) {
+        transform: scale(1) !important;
+    }
+
+    .modal-container:not(.hidden) .modal {
+        transform: none !important;
+    }
 }
