@@ -35,6 +35,11 @@ body.modal-active {
     transform: scale(1);
 }
 
+.modal-container.anim-5 .modal {
+    transform: translateX(-1500px);
+    animation: meepIn .6s cubic-bezier(.165, .84, .44, 1) forwards;
+}
+
 .modal-container.anim-5.out {
     animation: meepContainerOut .6s forwards;
 }
@@ -91,6 +96,16 @@ body.modal-active {
     justify-content: center;
     gap: 10px;
     margin-top: 18px;
+}
+
+.modal-actions .btn {
+    flex: 1 1 0;
+    width: auto;
+    height: 52px;
+    min-height: 52px;
+    margin-top: 0;
+    padding: 0 12px;
+    line-height: 1.15;
 }
 
 .close-modal {
