@@ -37,7 +37,7 @@ body.modal-active {
 
 .modal-container.anim-5 .modal {
     transform: translateX(-1500px);
-    animation: meepIn .6s cubic-bezier(.165, .84, .44, 1) forwards;
+    animation: meepIn .3s cubic-bezier(.165, .84, .44, 1) forwards;
 }
 
 .modal-container.anim-5.out {
@@ -59,8 +59,9 @@ body.modal-active {
     overflow: hidden;
     color: var(--text, #222);
     box-shadow: 0 20px 44px rgba(0, 0, 0, .2);
-    transform: translateX(-1500px);
-    animation: meepIn .6s forwards;
+    /* Keep the resting state animation-free.  The entrance motion starts only
+       when JavaScript adds .anim-5, so it reliably restarts on every modal. */
+    transform: translateX(0);
 }
 
 .modal-svg {
@@ -175,13 +176,13 @@ body.modal-active {
 }
 
 @keyframes meepBackdropIn {
-    from { opacity: 0; transform: translateX(-80px); }
-    to { opacity: 1; transform: translateX(0); }
+    from { background-color: rgba(0, 0, 0, 0); }
+    to { background-color: rgba(0, 0, 0, .7); }
 }
 
 @keyframes meepBackdropOut {
-    from { opacity: 1; transform: translateX(0); }
-    to { opacity: 0; transform: translateX(80px); }
+    from { background-color: rgba(0, 0, 0, .7); }
+    to { background-color: rgba(0, 0, 0, 0); }
 }
 
 @keyframes meepContainerOut {
