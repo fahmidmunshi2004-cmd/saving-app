@@ -22,6 +22,7 @@ const modalTitle = document.getElementById("modalTitle");
 const modalMessage = document.getElementById("modalMessage");
 const modalOkBtn = document.getElementById("modalOkBtn");
 const modalCancelBtn = document.getElementById("modalCancelBtn");
+const modalCloseBtn = document.getElementById("modalCloseBtn");
 
 const clearDataBtn = document.getElementById("clearDataBtn");
 const logoutBtn = document.getElementById("logoutBtn");

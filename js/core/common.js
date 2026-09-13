@@ -651,6 +651,16 @@ if (modalAnimationSelect) {
   });
 }
 
+if (modalCloseBtn) {
+  modalCloseBtn.addEventListener("click", () => {
+    if (modalCancelBtn && !modalCancelBtn.classList.contains("hidden")) {
+      modalCancelBtn.click();
+    } else {
+      modalOkBtn?.click();
+    }
+  });
+}
+
 applyModalAnimation(currentModalAnimation, false);
 window.setModalAnimation = applyModalAnimation;
 window.getModalAnimation = () => currentModalAnimation;
