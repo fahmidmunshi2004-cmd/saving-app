@@ -57,7 +57,7 @@ html[data-theme="dark"] .history,
 html[data-theme="dark"] .wallet-item,
 html[data-theme="dark"] .settings-item,
 html[data-theme="dark"] .box,
-html[data-theme="dark"] .modal-card,
+html[data-theme="dark"] .modal,
 html[data-theme="dark"] .loader-card {
     background: linear-gradient(180deg, #0b0f14, #090c11);
     border: 1px solid rgba(255, 255, 255, 0.06);
@@ -71,7 +71,7 @@ html[data-theme="dark"] .history h3,
 html[data-theme="dark"] .wallet-item strong,
 html[data-theme="dark"] .settings-item,
 html[data-theme="dark"] .box h3,
-html[data-theme="dark"] .modal-card h3 {
+html[data-theme="dark"] .modal h2 {
     color: var(--text);
 }
 
@@ -105,7 +105,7 @@ html[data-theme="dark"] .box h3 i,
 html[data-theme="dark"] .history h3 i,
 html[data-theme="dark"] .wallet-head i,
 html[data-theme="dark"] .settings-item strong,
-html[data-theme="dark"] .modal-card h3 i {
+html[data-theme="dark"] .modal h2 i {
     color: #fff;
 }
 
@@ -301,12 +301,12 @@ html[data-theme="dark"] .wallet-rate-chart-card {
     padding: 14px;
 }
 
-html[data-theme="dark"] .modal-card,
+html[data-theme="dark"] .modal,
 html[data-theme="dark"] .loader-card {
     background: linear-gradient(180deg, #0b0f14, #070a0e) !important;
 }
 
-html[data-theme="dark"] .modal-card::before {
+html[data-theme="dark"] .modal::before {
     background: linear-gradient(90deg, rgba(255, 255, 255, 0.08), rgba(255, 77, 121, 0.25), rgba(255, 255, 255, 0.08));
 }
 
@@ -319,36 +319,6 @@ html[data-theme="dark"] .app-loader {
         radial-gradient(500px 220px at 10% 10%, rgba(255, 77, 121, 0.08), transparent 68%),
         radial-gradient(420px 200px at 88% 88%, rgba(97, 168, 255, 0.06), transparent 70%),
         rgba(0, 0, 0, 0.82);
-}
-
-html[data-theme="dark"] .app-modal.six .modal-card {
-    animation-name: modalFadeInDark;
-}
-
-html[data-theme="dark"] .app-modal.six.out .modal-card {
-    animation-name: modalFadeOutDark;
-}
-
-@keyframes modalFadeInDark {
-    0% {
-        background: transparent;
-    }
-
-    100% {
-        background: linear-gradient(180deg, #0b0f14, #070a0e);
-        box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
-    }
-}
-
-@keyframes modalFadeOutDark {
-    0% {
-        background: linear-gradient(180deg, #0b0f14, #070a0e);
-    }
-
-    100% {
-        background: transparent;
-        box-shadow: none;
-    }
 }
 
 html[data-theme="dark"] .login-card {
@@ -517,7 +487,7 @@ html[data-theme="dark"] .login-overlay {
     backdrop-filter: blur(10px);
 }
 
-html[data-theme="dark"] .modal-card {
+html[data-theme="dark"] .modal {
     color: var(--text);
 }
 

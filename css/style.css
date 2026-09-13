@@ -1875,7 +1875,7 @@ input:not(:placeholder-shown)+.floating-label {
     }
 
     .app-loader,
-    .app-modal,
+    .modal-container,
     .login-overlay {
         backdrop-filter: blur(3px);
     }
@@ -2180,7 +2180,7 @@ input:not(:placeholder-shown)+.floating-label {
         font-size: 0.78rem;
     }
 
-    .modal-card,
+    .modal,
     .loader-card,
     .login-card {
         border-radius: 14px;

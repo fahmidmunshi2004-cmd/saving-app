@@ -310,13 +310,13 @@ let loaderCount = 0;
 let loaderDotsTimer = null;
 let modalCloseTimer = null;
 const MODAL_MOTION_CLASS = {
-  "anim-1": "one",
-  "anim-2": "two",
-  "anim-3": "three",
-  "anim-4": "four",
-  "anim-5": "five",
-  "anim-6": "six",
-  "anim-7": "seven",
+  "anim-1": "anim-1",
+  "anim-2": "anim-2",
+  "anim-3": "anim-3",
+  "anim-4": "anim-4",
+  "anim-5": "anim-5",
+  "anim-6": "anim-6",
+  "anim-7": "anim-7",
   "anim-8": "anim-8",
   "anim-9": "anim-9",
   "anim-10": "anim-10",
@@ -358,17 +358,7 @@ const MODAL_CLOSE_DURATION_MS = {
 const MODAL_CONTAINER_CLASSES = [
   "hidden",
   "out",
-  "closing",
-  "modal-motion",
-  "modal-active",
-  "simple",
-  "one",
-  "two",
-  "three",
-  "four",
-  "five",
-  "six",
-  "seven",
+  "modal-container",
   "anim-8",
   "anim-9",
   "anim-10",
@@ -390,8 +380,8 @@ const DEFAULT_MODAL_ANIMATION = "anim-5";
 const MODAL_ANIMATION_SET = new Set(Object.keys(MODAL_MOTION_CLASS));
 let currentModalAnimation = readPreferredModalAnimation();
 
-function getModalCardElement() {
-  return appModal ? appModal.querySelector(".modal-card") : null;
+function getModalElement() {
+  return appModal ? appModal.querySelector(".modal") : null;
 }
 
 function getModalMotionClass() {
@@ -402,38 +392,11 @@ function isModalOverlayTarget(event) {
   return Boolean(event && (event.target === appModal || event.target?.classList?.contains("modal-background")));
 }
 
-function bindModalCardClickGuard() {
-  const card = getModalCardElement();
-  if (!card || card.dataset.clickGuardBound === "true") return;
-  card.dataset.clickGuardBound = "true";
-  card.addEventListener("click", (event) => event.stopPropagation());
-}
-
-function syncModalGeometry() {
-  const card = getModalCardElement();
-  const rect = appModal?.querySelector(".modal-svg rect");
-  if (!card) return;
-
-  const previousVisibility = appModal.style.visibility;
-  const previousTransform = appModal.style.transform;
-  appModal.style.visibility = "hidden";
-  appModal.style.transform = "scale(1)";
-  const width = Math.max(1, Math.round(card.offsetWidth));
-  const height = Math.max(1, Math.round(card.offsetHeight));
-  appModal.style.visibility = previousVisibility;
-  appModal.style.transform = previousTransform;
-
-  card.style.setProperty("--modal-w", `${width}px`);
-  card.style.setProperty("--modal-h", `${height}px`);
-  const sketchLen = Math.max(1, 2 * (width + height));
-  card.style.setProperty("--sketch-len", String(sketchLen));
-  appModal.style.setProperty("--sketch-len", String(sketchLen));
-  if (rect) {
-    rect.setAttribute("width", String(width));
-    rect.setAttribute("height", String(height));
-    rect.style.strokeDasharray = String(sketchLen);
-    rect.style.strokeDashoffset = String(sketchLen);
-  }
+function bindModalClickGuard() {
+  const modal = getModalElement();
+  if (!modal || modal.dataset.clickGuardBound === "true") return;
+  modal.dataset.clickGuardBound = "true";
+  modal.addEventListener("click", (event) => event.stopPropagation());
 }
 
 function normalizeModalAnimation(value) {
@@ -489,13 +452,12 @@ function clearModalCloseTimer() {
 function prepareModalMotion() {
   if (!appModal) return;
   clearModalCloseTimer();
-  bindModalCardClickGuard();
+  bindModalClickGuard();
   appModal.classList.remove(...MODAL_CONTAINER_CLASSES);
-  appModal.classList.add("app-modal");
+  appModal.classList.add("modal-container");
   appModal.dataset.modalAnimation = currentModalAnimation;
   document.body.classList.add("modal-active");
   document.documentElement.classList.add("modal-active");
-  syncModalGeometry();
   void appModal.offsetWidth;
   appModal.classList.add(getModalMotionClass());
 }
@@ -679,7 +641,7 @@ async function withLoader(text, task) {
   }
 }
 
-bindModalCardClickGuard();
+bindModalClickGuard();
 
 if (modalAnimationSelect) {
   modalAnimationSelect.addEventListener("change", () => {
