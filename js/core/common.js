@@ -310,24 +310,50 @@ let loaderCount = 0;
 let loaderDotsTimer = null;
 let modalCloseTimer = null;
 const MODAL_MOTION_CLASS = {
-  simple: "simple",
-  unfolding: "one",
-  revealing: "two",
-  uncovering: "three",
-  "blow-up": "four",
-  meep: "five",
-  sketch: "six",
-  bond: "seven"
+  "anim-1": "one",
+  "anim-2": "two",
+  "anim-3": "three",
+  "anim-4": "four",
+  "anim-5": "five",
+  "anim-6": "six",
+  "anim-7": "seven",
+  "anim-8": "anim-8",
+  "anim-9": "anim-9",
+  "anim-10": "anim-10",
+  "anim-11": "anim-11",
+  "anim-12": "anim-12",
+  "anim-13": "anim-13",
+  "anim-14": "anim-14",
+  "anim-15": "anim-15",
+  "anim-16": "anim-16",
+  "anim-17": "anim-17",
+  "anim-18": "anim-18",
+  "anim-19": "anim-19",
+  "anim-20": "anim-20",
+  normal: "normal"
 };
 const MODAL_CLOSE_DURATION_MS = {
-  simple: 280,
-  meep: 500,
-  unfolding: 1300,
-  revealing: 500,
-  uncovering: 500,
-  "blow-up": 500,
-  sketch: 500,
-  bond: 2000
+  "anim-1": 1000,
+  "anim-2": 500,
+  "anim-3": 500,
+  "anim-4": 500,
+  "anim-5": 500,
+  "anim-6": 500,
+  "anim-7": 1500,
+  "anim-8": 500,
+  "anim-9": 500,
+  "anim-10": 400,
+  "anim-11": 400,
+  "anim-12": 500,
+  "anim-13": 500,
+  "anim-14": 500,
+  "anim-15": 500,
+  "anim-16": 500,
+  "anim-17": 600,
+  "anim-18": 500,
+  "anim-19": 600,
+  "anim-20": 500,
+  normal: 250
 };
 const MODAL_CONTAINER_CLASSES = [
   "hidden",
@@ -343,10 +369,24 @@ const MODAL_CONTAINER_CLASSES = [
   "five",
   "six",
   "seven",
+  "anim-8",
+  "anim-9",
+  "anim-10",
+  "anim-11",
+  "anim-12",
+  "anim-13",
+  "anim-14",
+  "anim-15",
+  "anim-16",
+  "anim-17",
+  "anim-18",
+  "anim-19",
+  "anim-20",
+  "normal",
   ...Object.keys(MODAL_MOTION_CLASS)
 ];
 const MODAL_ANIMATION_STORAGE_KEY = "vault_modal_animation";
-const DEFAULT_MODAL_ANIMATION = "meep";
+const DEFAULT_MODAL_ANIMATION = "anim-5";
 const MODAL_ANIMATION_SET = new Set(Object.keys(MODAL_MOTION_CLASS));
 let currentModalAnimation = readPreferredModalAnimation();
 
