@@ -313,7 +313,7 @@ const MODAL_CONTAINER_CLASSES = [
   "hidden",
   "out",
   "modal-container",
-  "anim-5"
+  "five"
 ];
 
 function getModalElement() {
@@ -352,7 +352,7 @@ function prepareModalMotion() {
   document.body.classList.add("modal-active");
   document.documentElement.classList.add("modal-active");
   void appModal.offsetWidth;
-  appModal.classList.add("anim-5");
+  appModal.classList.add("five");
 }
 
 function closeModalMotion(onDone) {
