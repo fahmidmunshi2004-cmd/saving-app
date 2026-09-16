@@ -263,17 +263,3 @@ body.modal-active {
     99.9% { transform: scale(1); }
     100% { transform: scale(0); }
 }
-
-@media (prefers-reduced-motion: reduce) {
-    .modal-container,
-    .modal-container .modal-background,
-    .modal-container .modal { transition: none !important; }
-
-    .modal-container:not(.hidden) {
-        transform: scale(1) !important;
-    }
-
-    .modal-container:not(.hidden) .modal {
-        transform: none !important;
-    }
-}
