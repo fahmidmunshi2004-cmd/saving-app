@@ -645,4 +645,28 @@ html[data-theme="dark"] .mini-btn:hover {
         animation-duration: 1.25s !important;
         animation-iteration-count: infinite !important;
     }
+
+    .modal-container.anim-5 .modal {
+        animation: meepIn .3s cubic-bezier(.165, .84, .44, 1) forwards !important;
+        animation-duration: .3s !important;
+        animation-iteration-count: 1 !important;
+    }
+
+    .modal-container.anim-5 .modal-background {
+        animation: meepBackdropIn .5s cubic-bezier(.165, .84, .44, 1) forwards !important;
+        animation-duration: .5s !important;
+        animation-iteration-count: 1 !important;
+    }
+
+    .modal-container.anim-5.out .modal {
+        animation: meepOut .5s cubic-bezier(.165, .84, .44, 1) forwards !important;
+        animation-duration: .5s !important;
+        animation-iteration-count: 1 !important;
+    }
+
+    .modal-container.anim-5.out .modal-background {
+        animation: meepBackdropOut .5s cubic-bezier(.165, .84, .44, 1) forwards !important;
+        animation-duration: .5s !important;
+        animation-iteration-count: 1 !important;
+    }
 }
