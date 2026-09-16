@@ -632,4 +632,17 @@ html[data-theme="dark"] .mini-btn:hover {
         transition-duration: 0.01ms !important;
         scroll-behavior: auto !important;
     }
+
+    /* Keep the loading indicator visibly active while signing in. */
+    .app-loader .loader-spinner::before {
+        animation: spin 0.9s linear infinite !important;
+        animation-duration: 0.9s !important;
+        animation-iteration-count: infinite !important;
+    }
+
+    .app-loader .loader-core {
+        animation: pulse-core 1.25s ease-in-out infinite !important;
+        animation-duration: 1.25s !important;
+        animation-iteration-count: infinite !important;
+    }
 }
