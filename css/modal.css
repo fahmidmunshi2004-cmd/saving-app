@@ -3,6 +3,79 @@ body.modal-active {
     overflow: hidden;
 }
 
+.app-loader {
+    position: fixed;
+    inset: 0;
+    z-index: 3000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    background:
+        radial-gradient(500px 220px at 10% 10%, rgba(255, 1, 79, .18), transparent 68%),
+        radial-gradient(420px 200px at 88% 88%, rgba(26, 162, 219, .14), transparent 70%),
+        rgba(16, 22, 34, .42);
+    backdrop-filter: blur(8px);
+}
+
+.loader-card {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 26px 20px 22px;
+}
+
+.loader-spinner {
+    width: 48px;
+    height: 48px;
+    display: inline-grid;
+    place-items: center;
+    position: relative;
+    border-radius: 50%;
+    background: radial-gradient(circle at center, rgba(255, 1, 79, .22), rgba(255, 1, 79, .02) 66%, transparent 67%);
+    box-shadow: 0 0 0 1px rgba(255, 1, 79, .12), 0 10px 24px rgba(255, 1, 79, .2);
+}
+
+.loader-spinner::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border: 3px solid color-mix(in srgb, var(--brand) 22%, #fff);
+    border-top-color: var(--brand);
+    border-radius: 50%;
+    animation: spin .9s linear infinite;
+}
+
+.loader-core {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: linear-gradient(140deg, #fff, #ffd3df 58%, #ff4b78 100%);
+    box-shadow: 0 0 0 6px rgba(255, 1, 79, .09), 0 0 18px rgba(255, 1, 79, .28);
+    animation: pulse-core 1.25s ease-in-out infinite;
+}
+
+#loaderText {
+    margin: 14px 0 0;
+    font-family: var(--font-display, Arial, sans-serif);
+    font-size: .95rem;
+    font-weight: 700;
+    color: color-mix(in srgb, var(--text) 86%, #4b5563 14%);
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+}
+
+#loaderText .loader-dots {
+    display: inline-block;
+    width: 1.9ch;
+    text-align: left;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes pulse-core { 0%, 100% { transform: scale(.82); } 50% { transform: scale(1); } }
+
 .modal-container {
     position: fixed;
     inset: 0;
