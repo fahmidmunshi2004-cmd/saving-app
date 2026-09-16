@@ -1899,7 +1899,78 @@ input:not(:placeholder-shown)+.floating-label {
     }
 
     .lang-menu {
-        width: min(100%, 100vw - 20px);
+        /* Keep the trigger in the header, but turn its long option list into
+           a comfortable bottom sheet on small touch screens. */
+        position: fixed;
+        top: auto;
+        right: 10px;
+        bottom: calc(10px + env(safe-area-inset-bottom));
+        left: 10px;
+        width: auto;
+        max-height: min(72dvh, 560px);
+        padding: 12px;
+        border-radius: 22px;
+        box-shadow: 0 20px 50px rgba(21, 30, 48, 0.26);
+        gap: 12px;
+    }
+
+    html[dir="rtl"] .lang-menu {
+        right: 10px;
+        left: 10px;
+    }
+
+    .lang-menu::before {
+        content: "";
+        position: absolute;
+        top: 6px;
+        left: 50%;
+        width: 36px;
+        height: 4px;
+        border-radius: 999px;
+        background: color-mix(in srgb, var(--muted) 28%, transparent);
+        transform: translateX(-50%);
+    }
+
+    .lang-menu-head {
+        padding-top: 5px;
+        gap: 8px;
+    }
+
+    .lang-menu-title {
+        padding-left: 4px;
+        font-size: 0.95rem;
+    }
+
+    .lang-search {
+        min-height: 44px;
+    }
+
+    .lang-menu-list {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+        max-height: min(44dvh, 340px);
+        padding: 2px;
+    }
+
+    .lang-option {
+        min-height: 62px;
+        padding: 9px;
+        gap: 9px;
+        border-radius: 14px;
+    }
+
+    .lang-option-flag {
+        width: 32px;
+        height: 24px;
+    }
+
+    .lang-option-name {
+        font-size: 0.9rem;
+    }
+
+    .lang-option-meta {
+        margin-top: 2px;
+        font-size: 0.72rem;
     }
 
     .stats,
