@@ -1,4 +1,4 @@
-﻿:root {
+:root {
     --color-primary: #ff014f;
     --color-secondary: #f4f5f6;
     --color-tertiary: #0d1013;
@@ -52,8 +52,8 @@
     --s-extra-bold: 800;
     --s-black: 900;
     --transition: 0.4s;
-    --font-primary: "Nunito", sans-serif;
-    --font-secondary: "Nunito", sans-serif;
+    --font-primary: "Sono", "Noto Sans Bengali", sans-serif;
+    --font-secondary: "Sono", "Noto Sans Bengali", sans-serif;
     --font-size-b1: 18px;
     --font-size-b2: 22px;
     --font-size-b3: 14px;
@@ -107,6 +107,7 @@ body,
 body {
     margin: 0;
     font-family: var(--font-body);
+    font-weight: 500;
     color: var(--text);
     min-height: 100vh;
     background:
@@ -693,9 +694,26 @@ html[dir="rtl"] .lang-menu {
 h1 {
     margin: 0;
     font-size: 1.35rem;
-    font-weight: 700;
+    font-weight: 900;
     font-family: var(--font-display);
     letter-spacing: 0.2px;
+}
+
+h2,
+h3,
+h4,
+h5,
+h6,
+.app-boot-card h2,
+.login-card h2,
+.box h3,
+.side-head h3,
+.chart-head h3,
+.history h3,
+.wallet-rate-head h3 {
+    font-family: var(--font-display);
+    font-weight: 800;
+    letter-spacing: 0.1px;
 }
 
 .sub {
@@ -1886,16 +1904,18 @@ input:not(:placeholder-shown)+.floating-label {
 @media (max-width: 620px) {
 
     .lang-picker-wrap {
-        top: 10px;
-        right: 10px;
-        left: 10px;
+        position: relative;
+        inset: auto;
+        z-index: 2;
+        margin: 14px 0 0;
         width: auto;
         min-width: 0;
+        flex: 0 0 auto;
     }
 
     html[dir="rtl"] .lang-picker-wrap {
-        right: 10px;
-        left: 10px;
+        right: auto;
+        left: auto;
     }
 
     .lang-menu {
@@ -2010,21 +2030,46 @@ input:not(:placeholder-shown)+.floating-label {
     }
 
     .hero {
-        padding: 62px 12px 12px;
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0;
+        padding: 14px 12px 12px;
         border-radius: 14px;
     }
 
+    .brand {
+        min-width: 0;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .brand > div:last-child {
+        min-width: 0;
+    }
+
+    .lang-switcher {
+        min-height: 48px;
+        border-radius: 14px;
+        padding: 10px 12px;
+    }
+
+    .lang-switcher-label {
+        font-size: 0.94rem;
+        font-weight: 700;
+    }
+
     .lang-picker-wrap {
-        top: 10px;
-        right: 10px;
-        left: 10px;
+        top: auto;
+        right: auto;
+        left: auto;
         min-width: 0;
         width: auto;
     }
 
     html[dir="rtl"] .lang-picker-wrap {
-        right: 10px;
-        left: 10px;
+        right: auto;
+        left: auto;
     }
 
     .logo {
@@ -2034,7 +2079,10 @@ input:not(:placeholder-shown)+.floating-label {
     }
 
     h1 {
-        font-size: 1.05rem;
+        font-size: clamp(1.08rem, 5vw, 1.3rem);
+        line-height: 1.2;
+        font-weight: 900;
+        overflow-wrap: anywhere;
     }
 
     .sub {
@@ -2045,7 +2093,8 @@ input:not(:placeholder-shown)+.floating-label {
     .side-head h3,
     .chart-head h3,
     .history h3 {
-        font-size: 0.92rem;
+        font-size: 0.94rem;
+        font-weight: 800;
     }
 
     .stat,
