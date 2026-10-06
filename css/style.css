@@ -1,3 +1,19 @@
+@font-face {
+    font-family: "Nohemi";
+    src: url("../assets/font/Nohemi-Regular-BF6a4e01a26b011.ttf") format("truetype");
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Nohemi";
+    src: url("../assets/font/Nohemi-Medium-BF6a4e01a26b011.ttf") format("truetype");
+    font-style: normal;
+    font-weight: 500 900;
+    font-display: swap;
+}
+
 :root {
     --color-primary: #ff014f;
     --color-secondary: #f4f5f6;
@@ -52,8 +68,8 @@
     --s-extra-bold: 800;
     --s-black: 900;
     --transition: 0.4s;
-    --font-primary: "Sono", "Noto Sans Bengali", sans-serif;
-    --font-secondary: "Sono", "Noto Sans Bengali", sans-serif;
+    --font-primary: "Nohemi", "Noto Sans Bengali", sans-serif;
+    --font-secondary: "Nohemi", "Noto Sans Bengali", sans-serif;
     --font-size-b1: 18px;
     --font-size-b2: 22px;
     --font-size-b3: 14px;
@@ -232,10 +248,15 @@ body {
 }
 
 .app-boot-line.native::after {
+    content: "";
+    position: absolute;
+    top: 0;
     width: 30%;
-    left: -30%;
-    background: linear-gradient(90deg, transparent, var(--brand), #1BA2DB, transparent);
-    animation: bootScan 1.1s linear infinite;
+    height: 100%;
+    left: 0;
+    border-radius: inherit;
+    background: linear-gradient(90deg, var(--brand), #1BA2DB);
+    animation: bootProgress 1.25s ease-in-out infinite;
 }
 
 .login-overlay {
@@ -1812,6 +1833,20 @@ input:not(:placeholder-shown)+.floating-label {
 
     100% {
         left: 100%;
+    }
+}
+
+@keyframes bootProgress {
+    0% {
+        transform: translateX(-110%);
+    }
+
+    50% {
+        transform: translateX(115%);
+    }
+
+    100% {
+        transform: translateX(340%);
     }
 }
 
