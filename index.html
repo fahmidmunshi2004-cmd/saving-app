@@ -46,7 +46,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore-compat.js"></script>
 
-    <link rel="stylesheet" href="css/style.css?v=21" />
+    <link rel="stylesheet" href="css/style.css?v=22" />
     <link rel="stylesheet" href="css/modal.css?v=8" />
     <link rel="stylesheet" href="css/dark-mode.css?v=10" />
 </head>
@@ -402,6 +402,27 @@
                         <span data-i18n="clear_all_data">Clear All Data</span></button>
                 </div>
             </div>
+            <section class="game-corner" aria-labelledby="gameCornerTitle">
+                <div class="game-corner-head">
+                    <div>
+                        <span class="game-corner-kicker"><i class="fa-solid fa-gamepad" aria-hidden="true"></i> MINI ARCADE</span>
+                        <h2 id="gameCornerTitle">Game Corner</h2>
+                        <p>Take a quick break with 20 games, made for touch and keyboard.</p>
+                    </div>
+                    <span class="game-corner-count"><i class="fa-solid fa-sparkles" aria-hidden="true"></i> 20 games</span>
+                </div>
+                <div id="gameCornerGrid" class="game-corner-grid" aria-label="Choose a game"></div>
+                <section id="gameStage" class="game-stage hidden" aria-live="polite" aria-labelledby="activeGameTitle">
+                    <div class="game-stage-head">
+                        <div><span class="game-corner-kicker">NOW PLAYING</span><h3 id="activeGameTitle">Game</h3></div>
+                        <div class="game-stage-actions">
+                            <button id="restartGameBtn" class="game-control-btn" type="button"><i class="fa-solid fa-rotate-right" aria-hidden="true"></i> Restart</button>
+                            <button id="closeGameBtn" class="game-control-btn" type="button" aria-label="Close game"><i class="fa-solid fa-xmark" aria-hidden="true"></i> Close</button>
+                        </div>
+                    </div>
+                    <div id="gameStageBody" class="game-stage-body"></div>
+                </section>
+            </section>
         </section>
 
         <nav class="bottom-nav" aria-label="Bottom navigation">
@@ -448,7 +469,8 @@
     <script src="js/core/state.js?v=14"></script>
     <script src="js/core/common.js?v=17"></script>
     <script src="js/dark-mode.js?v=5"></script>
-    <script src="js/app.js?v=17"></script>
+    <script src="js/games.js?v=1"></script>
+    <script src="js/app.js?v=18"></script>
 </body>
 
 </html>
