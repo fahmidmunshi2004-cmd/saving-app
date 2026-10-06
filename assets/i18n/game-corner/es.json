@@ -1,7 +1,391 @@
 {
-  "ui":{"kicker":"MINI ARCADE","title":"Rincón de juegos","intro":"Tómate un descanso, supera tu récord y disfruta de juegos pensados para móvil.","count":"50 juegos","categoriesLine":"Puzles · Arcade · Clásicos · 50 formas de descansar","open":"Abrir rincón de juegos","pageKicker":"MINI ARCADE · 50 JUEGOS","pageIntro":"Elige un juego, supera tu récord y juega una ronda rápida.","search":"Buscar un juego...","filterAll":"Los 50","filterPuzzle":"Puzles","filterArcade":"Arcade","filterClassic":"Clásicos","filterQuick":"Rápidos","noGames":"No hay juegos que coincidan.","nowPlaying":"EN JUEGO","restart":"Reiniciar","close":"Cerrar","backSettings":"Ajustes","play":"Jugar","chooseGame":"Elige un juego","filterGames":"Filtrar juegos","categories":{"Puzzle":"Puzle","Arcade":"Arcade","Classic":"Clásico","Quick":"Rápido"}},
-  "games":{"guess":["Adivina el número","Encuentra el número secreto del 1 al 100."],"rps":["Piedra, papel o tijera","Elige una jugada y vence al ordenador."],"dice":["Tirada de dados","Lanza el dado e intenta superar tu marca."],"ttt":["Tres en raya","Alinea tres marcas. Dos jugadores por turnos."],"memory":["Parejas de memoria","Voltea cartas y encuentra seis parejas."],"color":["Adivina el color","Elige el tono que coincide con el color objetivo."],"math":["Reto matemático","Resuelve una suma, resta o multiplicación."],"higher":["Mayor o menor","Adivina si la siguiente carta será mayor o menor."],"coin":["Lanzamiento de moneda","Elige cara o cruz antes de que caiga."],"reaction":["Prueba de reflejos","Espera al verde y toca lo más rápido posible."],"click":["Cuenta clics","Toca tantas veces como puedas antes de acabar el tiempo."],"catch":["Atrapa la caja","Atrapa el objetivo móvil diez veces."],"snake":["Serpiente","Guía a la serpiente, come y evita las paredes."],"2048":["2048","Une fichas iguales para aumentar tu puntuación."],"word":["Palabras revueltas","Ordena las letras para descubrir la palabra."],"tap":["Toque rápido","Toca tantas veces como puedas en diez segundos."],"simon":["Simón dice","Recuerda la secuencia de colores y repítela."],"wheel":["Rueda de la suerte","Gira la rueda y descubre tu suerte."],"emoji":["Adivina el emoji","Descifra la pista de emojis y escribe la palabra."],"target":["Puntuación objetivo","Suma puntos hasta alcanzar el objetivo exacto."],"mole":["Atrapa al topo","Atrapa al topo antes de que vuelva a esconderse."],"lights":["Apaga las luces","Apaga todas las luces con pocos movimientos."],"mines":["Mini minas","Descubre casillas seguras y evita las minas."],"connect":["Conecta cuatro","Alinea cuatro fichas antes que tu rival."],"dots":["Puntos y cajas","Traza el último lado y gana una caja."],"fifteen":["Quince deslizante","Ordena las fichas numeradas."],"golf":["Mini golf","Ajusta dirección y fuerza para meter la bola."],"breakout":["Rompebloques","Haz rebotar la bola y rompe todos los ladrillos."],"pong":["Pong de bolsillo","Mantén la bola en juego con la pala."],"dodger":["Esquiva carriles","Cambia de carril para evitar los bloques."],"clock":["Para el reloj","Detén el cronómetro lo más cerca del objetivo."],"recall":["Recuerda la secuencia","Memoriza una secuencia numérica creciente."],"runner":["Carrera en cuadrícula","Recoge gemas y evita trampas antes de quedarte sin pasos."],"maze":["Escapa del laberinto","Encuentra la salida desde la entrada."],"typing":["Carrera de escritura","Escribe la frase con precisión antes de que acabe el tiempo."],"wordsearch":["Sopa de letras","Encuentra palabras ocultas en la cuadrícula."],"pattern":["Repite el patrón","Repite las casillas iluminadas en orden."],"odd":["Encuentra el diferente","Toca el símbolo que no pertenece al grupo."],"beat":["Sigue el ritmo","Mantén un ritmo constante durante diez toques."],"colorreflex":["Reflejos de color","Elige el color que coincide con el mostrado."],"mathsprint":["Sprint matemático","Resuelve tantas sumas como puedas en 30 segundos."],"prime":["Caza primos","Toca los números primos y evita los demás."],"anagram":["Carrera de anagramas","Resuelve anagramas antes de que se acabe el tiempo."],"mixer":["Mezcla de colores","Ajusta los controles RGB para igualar el tono."],"tower":["Apila la torre","Deja caer plataformas móviles para construir una torre."],"balance":["Barra de equilibrio","Mantén el marcador centrado durante 15 segundos."],"meteor":["Esquiva meteoritos","Cambia de carril para evitar meteoritos."],"fruit":["Atrapa frutas","Mueve la cesta, atrapa fruta y esquiva bombas."],"treasure":["Caza del tesoro","Sigue las pistas de frío y calor para hallar el tesoro."],"daily":["Reto diario","Descifra el código de cuatro cifras en seis intentos."]},
-  "buttons":{"Play now":"Jugar","Rock":"Piedra","Paper":"Papel","Scissors":"Tijera","Check number":"Comprobar","Roll dice":"Lanzar dado","Higher ↑":"Mayor ↑","Lower ↓":"Menor ↓","Heads":"Cara","Tails":"Cruz","Start test":"Empezar prueba","Ready?":"¿Listo?","Start":"Empezar","Stop":"Parar","Check":"Comprobar","Check word":"Comprobar palabra","Hide sequence":"Ocultar secuencia","Answer":"Responder","Submit":"Enviar","Check match":"Comprobar tono","Drop block":"Soltar bloque","← Lean":"← Inclinar","Lean →":"Inclinar →","Flag mode: off":"Banderas: no","Rose":"Rosa","Leaf":"Verde","Sky":"Azul","Sun":"Naranja"},
-  "phrases":{"Wait for green…":"Espera al verde…","TAP NOW!":"¡TOCA AHORA!","Result recorded":"Resultado guardado","Flag mode: on":"Banderas: sí","Game":"Juego"},
-  "words":{"Score":"Puntuación","Correct":"Correcto","Miss":"Fallo","Time":"Tiempo","left":"restantes","moves":"movimientos","found":"encontradas","wins":"gana","win":"ganas","Draw":"Empate","You":"Tú","Computer":"Ordenador","Try":"Intenta","again":"otra vez","Restart":"Reiniciar","points":"puntos","seconds":"segundos","safe":"seguras","remaining":"restantes","Game over":"Fin del juego","Final":"Final","Streak":"Racha","Your":"Tu","turn":"turno","Perfect":"¡Perfecto!","target":"objetivo","round":"ronda","catches":"atrapadas","misses":"fallos","blocks":"bloques","bricks":"ladrillos","guesses":"intentos","guess":"intento","s left":"s restantes"}
+  "ui": {
+    "kicker": "MINI ARCADE",
+    "title": "Rincón de juegos",
+    "intro": "Tómate un descanso, supera tu récord y disfruta de juegos pensados para móvil.",
+    "count": "50 juegos",
+    "categoriesLine": "Puzles · Arcade · Clásicos · 50 formas de descansar",
+    "open": "Abrir rincón de juegos",
+    "pageKicker": "MINI ARCADE · 50 JUEGOS",
+    "pageIntro": "Elige un juego, supera tu récord y juega una ronda rápida.",
+    "search": "Buscar un juego...",
+    "filterAll": "Los 50",
+    "filterPuzzle": "Puzles",
+    "filterArcade": "Arcade",
+    "filterClassic": "Clásicos",
+    "filterQuick": "Rápidos",
+    "noGames": "No hay juegos que coincidan.",
+    "nowPlaying": "EN JUEGO",
+    "restart": "Reiniciar",
+    "close": "Cerrar",
+    "backSettings": "Ajustes",
+    "play": "Jugar",
+    "chooseGame": "Elige un juego",
+    "filterGames": "Filtrar juegos",
+    "categories": {
+      "Puzzle": "Puzle",
+      "Arcade": "Arcade",
+      "Classic": "Clásico",
+      "Quick": "Rápido"
+    }
+  },
+  "games": {
+    "2048": {
+      "name": "2048",
+      "description": "Une fichas iguales para aumentar tu puntuación.",
+      "prompt": "Une fichas iguales para aumentar tu puntuación."
+    },
+    "guess": {
+      "name": "Adivina el número",
+      "description": "Encuentra el número secreto del 1 al 100.",
+      "prompt": "Encuentra el número secreto del 1 al 100."
+    },
+    "rps": {
+      "name": "Piedra, papel o tijera",
+      "description": "Elige una jugada y vence al ordenador.",
+      "prompt": "Elige una jugada y vence al ordenador."
+    },
+    "dice": {
+      "name": "Tirada de dados",
+      "description": "Lanza el dado e intenta superar tu marca.",
+      "prompt": "Lanza el dado e intenta superar tu marca."
+    },
+    "ttt": {
+      "name": "Tres en raya",
+      "description": "Alinea tres marcas. Dos jugadores por turnos.",
+      "prompt": "Alinea tres marcas. Dos jugadores por turnos."
+    },
+    "memory": {
+      "name": "Parejas de memoria",
+      "description": "Voltea cartas y encuentra seis parejas.",
+      "prompt": "Voltea cartas y encuentra seis parejas."
+    },
+    "color": {
+      "name": "Adivina el color",
+      "description": "Elige el tono que coincide con el color objetivo.",
+      "prompt": "Elige el tono que coincide con el color objetivo."
+    },
+    "math": {
+      "name": "Reto matemático",
+      "description": "Resuelve una suma, resta o multiplicación.",
+      "prompt": "Resuelve una suma, resta o multiplicación."
+    },
+    "higher": {
+      "name": "Mayor o menor",
+      "description": "Adivina si la siguiente carta será mayor o menor.",
+      "prompt": "Adivina si la siguiente carta será mayor o menor."
+    },
+    "coin": {
+      "name": "Lanzamiento de moneda",
+      "description": "Elige cara o cruz antes de que caiga.",
+      "prompt": "Elige cara o cruz antes de que caiga."
+    },
+    "reaction": {
+      "name": "Prueba de reflejos",
+      "description": "Espera al verde y toca lo más rápido posible.",
+      "prompt": "Espera al verde y toca lo más rápido posible."
+    },
+    "click": {
+      "name": "Cuenta clics",
+      "description": "Toca tantas veces como puedas antes de acabar el tiempo.",
+      "prompt": "Toca tantas veces como puedas antes de acabar el tiempo."
+    },
+    "catch": {
+      "name": "Atrapa la caja",
+      "description": "Atrapa el objetivo móvil diez veces.",
+      "prompt": "Atrapa el objetivo móvil diez veces."
+    },
+    "snake": {
+      "name": "Serpiente",
+      "description": "Guía a la serpiente, come y evita las paredes.",
+      "prompt": "Guía a la serpiente, come y evita las paredes."
+    },
+    "word": {
+      "name": "Palabras revueltas",
+      "description": "Ordena las letras para descubrir la palabra.",
+      "prompt": "Ordena las letras para descubrir la palabra."
+    },
+    "tap": {
+      "name": "Toque rápido",
+      "description": "Toca tantas veces como puedas en diez segundos.",
+      "prompt": "Toca tantas veces como puedas en diez segundos."
+    },
+    "simon": {
+      "name": "Simón dice",
+      "description": "Recuerda la secuencia de colores y repítela.",
+      "prompt": "Recuerda la secuencia de colores y repítela."
+    },
+    "wheel": {
+      "name": "Rueda de la suerte",
+      "description": "Gira la rueda y descubre tu suerte.",
+      "prompt": "Gira la rueda y descubre tu suerte."
+    },
+    "emoji": {
+      "name": "Adivina el emoji",
+      "description": "Descifra la pista de emojis y escribe la palabra.",
+      "prompt": "Descifra la pista de emojis y escribe la palabra."
+    },
+    "target": {
+      "name": "Puntuación objetivo",
+      "description": "Suma puntos hasta alcanzar el objetivo exacto.",
+      "prompt": "Suma puntos hasta alcanzar el objetivo exacto."
+    },
+    "mole": {
+      "name": "Atrapa al topo",
+      "description": "Atrapa al topo antes de que vuelva a esconderse.",
+      "prompt": "Atrapa al topo antes de que vuelva a esconderse."
+    },
+    "lights": {
+      "name": "Apaga las luces",
+      "description": "Apaga todas las luces con pocos movimientos.",
+      "prompt": "Apaga todas las luces con pocos movimientos."
+    },
+    "mines": {
+      "name": "Mini minas",
+      "description": "Descubre casillas seguras y evita las minas.",
+      "prompt": "Descubre casillas seguras y evita las minas."
+    },
+    "connect": {
+      "name": "Conecta cuatro",
+      "description": "Alinea cuatro fichas antes que tu rival.",
+      "prompt": "Alinea cuatro fichas antes que tu rival."
+    },
+    "dots": {
+      "name": "Puntos y cajas",
+      "description": "Traza el último lado y gana una caja.",
+      "prompt": "Traza el último lado y gana una caja."
+    },
+    "fifteen": {
+      "name": "Quince deslizante",
+      "description": "Ordena las fichas numeradas.",
+      "prompt": "Ordena las fichas numeradas."
+    },
+    "golf": {
+      "name": "Mini golf",
+      "description": "Ajusta dirección y fuerza para meter la bola.",
+      "prompt": "Ajusta dirección y fuerza para meter la bola."
+    },
+    "breakout": {
+      "name": "Rompebloques",
+      "description": "Haz rebotar la bola y rompe todos los ladrillos.",
+      "prompt": "Haz rebotar la bola y rompe todos los ladrillos."
+    },
+    "pong": {
+      "name": "Pong de bolsillo",
+      "description": "Mantén la bola en juego con la pala.",
+      "prompt": "Mantén la bola en juego con la pala."
+    },
+    "dodger": {
+      "name": "Esquiva carriles",
+      "description": "Cambia de carril para evitar los bloques.",
+      "prompt": "Cambia de carril para evitar los bloques."
+    },
+    "clock": {
+      "name": "Para el reloj",
+      "description": "Detén el cronómetro lo más cerca del objetivo.",
+      "prompt": "Detén el cronómetro lo más cerca del objetivo."
+    },
+    "recall": {
+      "name": "Recuerda la secuencia",
+      "description": "Memoriza una secuencia numérica creciente.",
+      "prompt": "Memoriza una secuencia numérica creciente."
+    },
+    "runner": {
+      "name": "Carrera en cuadrícula",
+      "description": "Recoge gemas y evita trampas antes de quedarte sin pasos.",
+      "prompt": "Recoge gemas y evita trampas antes de quedarte sin pasos."
+    },
+    "maze": {
+      "name": "Escapa del laberinto",
+      "description": "Encuentra la salida desde la entrada.",
+      "prompt": "Encuentra la salida desde la entrada."
+    },
+    "typing": {
+      "name": "Carrera de escritura",
+      "description": "Escribe la frase con precisión antes de que acabe el tiempo.",
+      "prompt": "Escribe la frase con precisión antes de que acabe el tiempo."
+    },
+    "wordsearch": {
+      "name": "Sopa de letras",
+      "description": "Encuentra palabras ocultas en la cuadrícula.",
+      "prompt": "Encuentra palabras ocultas en la cuadrícula."
+    },
+    "pattern": {
+      "name": "Repite el patrón",
+      "description": "Repite las casillas iluminadas en orden.",
+      "prompt": "Repite las casillas iluminadas en orden."
+    },
+    "odd": {
+      "name": "Encuentra el diferente",
+      "description": "Toca el símbolo que no pertenece al grupo.",
+      "prompt": "Toca el símbolo que no pertenece al grupo."
+    },
+    "beat": {
+      "name": "Sigue el ritmo",
+      "description": "Mantén un ritmo constante durante diez toques.",
+      "prompt": "Mantén un ritmo constante durante diez toques."
+    },
+    "colorreflex": {
+      "name": "Reflejos de color",
+      "description": "Elige el color que coincide con el mostrado.",
+      "prompt": "Elige el color que coincide con el mostrado."
+    },
+    "mathsprint": {
+      "name": "Sprint matemático",
+      "description": "Resuelve tantas sumas como puedas en 30 segundos.",
+      "prompt": "Resuelve tantas sumas como puedas en 30 segundos."
+    },
+    "prime": {
+      "name": "Caza primos",
+      "description": "Toca los números primos y evita los demás.",
+      "prompt": "Toca los números primos y evita los demás."
+    },
+    "anagram": {
+      "name": "Carrera de anagramas",
+      "description": "Resuelve anagramas antes de que se acabe el tiempo.",
+      "prompt": "Resuelve anagramas antes de que se acabe el tiempo."
+    },
+    "mixer": {
+      "name": "Mezcla de colores",
+      "description": "Ajusta los controles RGB para igualar el tono.",
+      "prompt": "Ajusta los controles RGB para igualar el tono."
+    },
+    "tower": {
+      "name": "Apila la torre",
+      "description": "Deja caer plataformas móviles para construir una torre.",
+      "prompt": "Deja caer plataformas móviles para construir una torre."
+    },
+    "balance": {
+      "name": "Barra de equilibrio",
+      "description": "Mantén el marcador centrado durante 15 segundos.",
+      "prompt": "Mantén el marcador centrado durante 15 segundos."
+    },
+    "meteor": {
+      "name": "Esquiva meteoritos",
+      "description": "Cambia de carril para evitar meteoritos.",
+      "prompt": "Cambia de carril para evitar meteoritos."
+    },
+    "fruit": {
+      "name": "Atrapa frutas",
+      "description": "Mueve la cesta, atrapa fruta y esquiva bombas.",
+      "prompt": "Mueve la cesta, atrapa fruta y esquiva bombas."
+    },
+    "treasure": {
+      "name": "Caza del tesoro",
+      "description": "Sigue las pistas de frío y calor para hallar el tesoro.",
+      "prompt": "Sigue las pistas de frío y calor para hallar el tesoro."
+    },
+    "daily": {
+      "name": "Reto diario",
+      "description": "Descifra el código de cuatro cifras en seis intentos.",
+      "prompt": "Descifra el código de cuatro cifras en seis intentos."
+    }
+  },
+  "buttons": {
+    "Play now": "Jugar",
+    "Rock": "Piedra",
+    "Paper": "Papel",
+    "Scissors": "Tijera",
+    "Check number": "Comprobar",
+    "Roll dice": "Lanzar dado",
+    "Higher ↑": "Mayor ↑",
+    "Lower ↓": "Menor ↓",
+    "Heads": "Cara",
+    "Tails": "Cruz",
+    "Start test": "Empezar prueba",
+    "Ready?": "¿Listo?",
+    "Start": "Empezar",
+    "Stop": "Parar",
+    "Check": "Comprobar",
+    "Check word": "Comprobar palabra",
+    "Hide sequence": "Ocultar secuencia",
+    "Answer": "Responder",
+    "Submit": "Enviar",
+    "Check match": "Comprobar tono",
+    "Drop block": "Soltar bloque",
+    "← Lean": "← Inclinar",
+    "Lean →": "Inclinar →",
+    "Flag mode: off": "Banderas: no",
+    "Rose": "Rosa",
+    "Leaf": "Verde",
+    "Sky": "Azul",
+    "Sun": "Naranja"
+  },
+  "phrases": {
+    "Wait for green…": "Espera al verde…",
+    "TAP NOW!": "¡TOCA AHORA!",
+    "Result recorded": "Resultado guardado",
+    "Flag mode: on": "Banderas: sí",
+    "Game": "Juego",
+    "Enter exactly four digits.": "Escribe exactamente cuatro cifras.",
+    "New code tomorrow.": "Ma?ana habr? un c?digo nuevo.",
+    "Correct!": "?Correcto!",
+    "Miss!": "?Fallo!",
+    "Game over": "Fin del juego",
+    "Time!": "?Tiempo!",
+    "Perfect!": "?Perfecto!",
+    "Your turn!": "?Tu turno!",
+    "Watch the sequence?": "Mira la secuencia?",
+    "Try again!": "?Int?ntalo de nuevo!",
+    "Not quite?try another.": "No del todo; prueba otra vez."
+  },
+  "words": {
+    "Score": "Puntuación",
+    "Correct": "Correcto",
+    "Miss": "Fallo",
+    "Time": "Tiempo",
+    "left": "restantes",
+    "moves": "movimientos",
+    "found": "encontradas",
+    "wins": "gana",
+    "win": "ganas",
+    "Draw": "Empate",
+    "You": "Tú",
+    "Computer": "Ordenador",
+    "Try": "Intenta",
+    "again": "otra vez",
+    "Restart": "Reiniciar",
+    "points": "puntos",
+    "seconds": "segundos",
+    "safe": "seguras",
+    "remaining": "restantes",
+    "Game over": "Fin del juego",
+    "Final": "Final",
+    "Streak": "Racha",
+    "Your": "Tu",
+    "turn": "turno",
+    "Perfect": "¡Perfecto!",
+    "target": "objetivo",
+    "round": "ronda",
+    "catches": "atrapadas",
+    "misses": "fallos",
+    "blocks": "bloques",
+    "bricks": "ladrillos",
+    "guesses": "intentos",
+    "guess": "intento",
+    "s left": "s restantes",
+    "rolled": "sali?",
+    "Card": "Carta",
+    "lights": "luces",
+    "tiles": "casillas",
+    "Player": "Jugador",
+    "Boxes": "Cajas",
+    "correct": "correctas",
+    "score": "puntuaci?n",
+    "streak": "racha",
+    "tries": "intentos",
+    "try": "intento",
+    "characters": "caracteres",
+    "platform": "plataforma",
+    "wide": "ancho",
+    "Average": "Promedio",
+    "beat": "ritmo",
+    "right": "correcto",
+    "wrong": "incorrecta",
+    "spot": "lugar",
+    "exact": "exactos"
+  },
+  "templates": {
+    "^([0-9]+) exact ? ([0-9]+) right digit, wrong spot ? ([0-9]+) guesses left$": "{0} exactos ? {1} cifra correcta en lugar incorrecto ? quedan {2} intentos"
+  }
 }

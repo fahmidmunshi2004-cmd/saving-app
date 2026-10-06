@@ -91,13 +91,21 @@
     const target = el("[data-result]");
     if (target) {
       target.dataset.gameSource = text;
-      target.textContent = translateGameText(text);
+      target.textContent = safePromptText(translateGameText(text));
     }
   };
   const translateGameText = (text) => {
     const source = String(text);
     const exact = catalog?.phrases?.[source] || catalog?.buttons?.[source];
     if (exact) return exact;
+    const templated = Object.entries(catalog?.templates || {}).sort((a, b) => b[0].length - a[0].length);
+    for (const [pattern, replacement] of templated) {
+      const match = source.match(new RegExp(pattern, "i"));
+      if (match) return source.replace(new RegExp(pattern, "i"), (...parts) => {
+        const captures = parts.slice(1, -2);
+        return replacement.replace(/\{(\d+)\}/g, (_, index) => captures[Number(index)] ?? "");
+      });
+    }
     let translated = source;
     const words = Object.entries(catalog?.words || {}).sort((a, b) => b[0].length - a[0].length);
     for (const [english, local] of words) {
@@ -114,8 +122,13 @@
     return {
       name: local.name || base[0],
       description: local.description || base[1],
-      prompt: local.prompt || local.description || catalog?.baseGames?.[id]?.prompt || base[1]
+      prompt: local.prompt || local.description || local.name || base[1]
     };
+  };
+  const safePromptText = (value) => {
+    const holder = document.createElement("textarea");
+    holder.innerHTML = String(value ?? "").replace(/\*\*/g, "").replace(/&#x20;?/gi, " ");
+    return holder.value.trim();
   };
   const localizeMarkup = (markup) => {
     const template = document.createElement("template");
@@ -237,6 +250,7 @@
         games: mergedGames,
         buttons: { ...base.buttons, ...loadedCatalog.buttons },
         phrases: { ...base.phrases, ...loadedCatalog.phrases },
+        templates: { ...base.templates, ...loadedCatalog.templates },
         baseGames: base.games
       };
     } catch (error) {
@@ -290,7 +304,7 @@
   };
 
   const frame = (prompt, inner) => {
-    const translatedPrompt = localizedGame(activeGame).prompt || translateGameText(prompt);
+    const translatedPrompt = safePromptText(localizedGame(activeGame).prompt || translateGameText(prompt));
     body.innerHTML = `<p class="game-prompt">${translatedPrompt}</p><div class="game-play-area">${localizeMarkup(inner)}<div class="game-result" data-result></div></div>`;
   };
   const action = (label, value, extra = "") => `<button class="game-action-btn" type="button" data-action="${value}" ${extra}>${translateGameText(label)}</button>`;

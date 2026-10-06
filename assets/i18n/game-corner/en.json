@@ -352,6 +352,27 @@
     "guesses": "guesses",
     "guess": "guess",
     "safe tiles": "safe tiles",
-    "s left": "s left"
-  }
+    "s left": "s left",
+    "rolled": "rolled",
+    "Card": "Card",
+    "lights": "lights",
+    "tiles": "tiles",
+    "Player": "Player",
+    "Boxes": "Boxes",
+    "correct": "correct",
+    "score": "score",
+    "streak": "streak",
+    "tries": "tries",
+    "try": "try",
+    "characters": "characters",
+    "platform": "platform",
+    "wide": "wide",
+    "Average": "Average",
+    "beat": "beat",
+    "right": "right",
+    "wrong": "wrong",
+    "spot": "spot",
+    "exact": "exact"
+  },
+  "templates": {}
 }

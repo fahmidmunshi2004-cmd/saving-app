@@ -1,7 +1,334 @@
 {
-  "ui":{"kicker":"MİNİ ARKAD","title":"Oyun Köşesi","intro":"Kısa bir mola ver, rekorunu kır ve mobil için hazırlanmış oyunların tadını çıkar.","count":"50 oyun","categoriesLine":"Bulmacalar · Arkad · Klasikler · Mola vermenin 50 yolu","open":"Oyun Köşesini Aç","pageKicker":"MİNİ ARKAD · 50 OYUN","pageIntro":"Bir oyun seç, rekorunu kır ve hızlı bir tur oyna.","search":"Oyun bul...","filterAll":"Tümü (50)","filterPuzzle":"Bulmacalar","filterArcade":"Arkad","filterClassic":"Klasikler","filterQuick":"Hızlı oyunlar","noGames":"Aramanla eşleşen oyun yok.","nowPlaying":"ŞİMDİ OYNUYOR","restart":"Yeniden başlat","close":"Kapat","backSettings":"Ayarlar","play":"Oyna","chooseGame":"Bir oyun seç","filterGames":"Oyunları filtrele","categories":{"Puzzle":"Bulmaca","Arcade":"Arkad","Classic":"Klasik","Quick":"Hızlı"}},
-  "games":{"guess":["Sayı Tahmini","1 ile 100 arasındaki gizli sayıyı bul."],"rps":["Taş Kağıt Makas","Bir hamle seç ve bilgisayarı yen."],"dice":["Zar Atışı","Zar at ve en iyi sonucunu yakala."],"ttt":["XOX","Üç işareti sırala. İki oyuncu sırayla oynar."],"memory":["Hafıza Eşleştirme","Kartları çevir ve altı eşleşen çifti bul."],"color":["Renk Tahmini","Hedef renkle eşleşen tonu seç."],"math":["Matematik Yarışması","Hızlı bir toplama, çıkarma veya çarpma sorusu çöz."],"higher":["Yüksek mi Düşük mü","Sonraki kartın daha yüksek mi düşük mü olacağını tahmin et."],"coin":["Yazı Tura","Para düşmeden yazı mı tura mı seç."],"reaction":["Tepki Testi","Yeşil olmasını bekle ve olabildiğince hızlı dokun."],"click":["Tıklama Sayacı","Süre dolmadan olabildiğince çok dokun."],"catch":["Kutuyu Yakala","Hareketli hedefi on kez yakala."],"snake":["Yılan","Yılanı yönlendir, yemleri topla ve duvarlardan kaç."],"2048":["2048","Aynı taşları birleştirerek puanını artır."],"word":["Karışık Kelime","Harfleri düzenleyip kelimeyi bul."],"tap":["Hızlı Dokunuş","On saniyede olabildiğince çok dokun."],"simon":["Simon Diyor ki","Renk dizisini hatırla ve tekrarla."],"wheel":["Şans Çarkı","Çarkı çevir ve şansını gör."],"emoji":["Emojiyi Tahmin Et","Emoji ipucunu çöz ve kelimeyi yaz."],"target":["Hedef Puan","Puan toplayıp tam hedefe ulaş."],"mole":["Köstebeği Yakala","Saklanmadan önce çıkan köstebeğe vur."],"lights":["Işıkları Söndür","Az hamlede tüm ışıkları kapat."],"mines":["Mini Mayınlar","Güvenli kareleri aç ve mayınlardan kaç."],"connect":["Dörtü Birleştir","Rakibinden önce dört taşı sırala."],"dots":["Noktalar ve Kutular","Son çizgiyi çizerek kutuyu kazan."],"fifteen":["15 Taşlı Kaydırmaca","Numaralı taşları sıraya diz."],"golf":["Mini Golf","Topu deliğe sokmak için yönü ve gücü ayarla."],"breakout":["Tuğla Kırma","Topu sektir ve tüm tuğlaları kır."],"pong":["Cep Pong","Raketi kullanıp topu oyunda tut."],"dodger":["Şerit Değiştir","Şerit değiştirerek düşen bloklardan kaç."],"clock":["Saati Durdur","Zamanlayıcıyı hedefe en yakın yerde durdur."],"recall":["Sırayı Hatırla","Giderek uzayan sayı dizisini aklında tut."],"runner":["Izgara Koşusu","Hamlelerin bitmeden mücevherleri topla ve tuzaklardan kaç."],"maze":["Labirentten Kaçış","Girişten çıkışa giden yolu bul."],"typing":["Yazma Yarışı","Süre dolmadan cümleyi doğru yaz."],"wordsearch":["Kelime Avı","Harf ızgarasındaki gizli kelimeleri bul."],"pattern":["Deseni Hatırla","Yanan karelere aynı sırayla dokun."],"odd":["Farklı Olanı Bul","Diğerlerine uymayan simgeye dokun."],"beat":["Ritme Dokun","On dokunuş boyunca sabit ritmi koru."],"colorreflex":["Renk Refleksi","Gösterilen renkle eşleşen rengi seç."],"mathsprint":["Matematik Sprinti","30 saniyede olabildiğince çok toplama çöz."],"prime":["Asal Sayı Avı","Asal sayılara dokun, diğerlerinden kaçın."],"anagram":["Anagram Yarışı","Süre bitmeden olabildiğince çok anagram çöz."],"mixer":["Renk Karıştırıcı","RGB kaydırıcılarla hedef tonu yakala."],"tower":["Kuleyi Yığ","Hareketli platformları bırakarak kule kur."],"balance":["Denge Çubuğu","İşareti 15 saniye ortada tut."],"meteor":["Meteor Kaçışı","Şerit değiştirerek düşen meteorları atlat."],"fruit":["Meyve Yakala","Sepeti hareket ettir, meyveleri yakala ve bombalardan kaç."],"treasure":["Hazine Avı","Sıcak-soğuk ipuçlarıyla hazineyi bul."],"daily":["Günün Bulmacası","Günün dört haneli kodunu altı tahminde çöz."]},
-  "buttons":{"Play now":"Oyna","Rock":"Taş","Paper":"Kağıt","Scissors":"Makas","Check number":"Kontrol et","Roll dice":"Zar at","Higher ↑":"Yüksek ↑","Lower ↓":"Düşük ↓","Heads":"Yazı","Tails":"Tura","Start test":"Testi başlat","Ready?":"Hazır mısın?","Start":"Başlat","Stop":"Durdur","Check":"Kontrol et","Check word":"Kelimeyi kontrol et","Hide sequence":"Diziyi gizle","Answer":"Yanıtla","Submit":"Gönder","Check match":"Eşleşmeyi kontrol et","Drop block":"Bloğu bırak","← Lean":"← Sola eğil","Lean →":"Sağa eğil →","Flag mode: off":"Bayrak modu: kapalı","Rose":"Gül","Leaf":"Yeşil","Sky":"Mavi","Sun":"Turuncu"},
-  "phrases":{"Wait for green…":"Yeşil olmasını bekle…","TAP NOW!":"ŞİMDİ DOKUN!","Result recorded":"Sonuç kaydedildi","Flag mode: on":"Bayrak modu: açık","Game":"Oyun"},
-  "words":{"Score":"Puan","Correct":"Doğru","Miss":"Kaçtı","Time":"Süre","left":"kaldı","moves":"hamle","found":"bulundu","wins":"kazandı","win":"kazandın","Draw":"Berabere","You":"Sen","Computer":"Bilgisayar","Try":"Tekrar","again":"dene","Restart":"Yeniden başlat","points":"puan","seconds":"saniye","safe":"güvenli","remaining":"kaldı","Game over":"Oyun bitti","Final":"Son","Streak":"Seri","Your":"Senin","turn":"sıra","Perfect":"Harika","target":"hedef","round":"tur","catches":"yakalama","misses":"kaçırma","blocks":"blok","bricks":"tuğla","guesses":"tahmin","guess":"tahmin","s left":"sn kaldı"}
+  "ui": {
+    "kicker": "MİNİ ARKAD",
+    "title": "Oyun Köşesi",
+    "intro": "Kısa bir mola ver, rekorunu kır ve mobil için hazırlanmış oyunların tadını çıkar.",
+    "count": "50 oyun",
+    "categoriesLine": "Bulmacalar · Arkad · Klasikler · Mola vermenin 50 yolu",
+    "open": "Oyun Köşesini Aç",
+    "pageKicker": "MİNİ ARKAD · 50 OYUN",
+    "pageIntro": "Bir oyun seç, rekorunu kır ve hızlı bir tur oyna.",
+    "search": "Oyun bul...",
+    "filterAll": "Tümü (50)",
+    "filterPuzzle": "Bulmacalar",
+    "filterArcade": "Arkad",
+    "filterClassic": "Klasikler",
+    "filterQuick": "Hızlı oyunlar",
+    "noGames": "Aramanla eşleşen oyun yok.",
+    "nowPlaying": "ŞİMDİ OYNUYOR",
+    "restart": "Yeniden başlat",
+    "close": "Kapat",
+    "backSettings": "Ayarlar",
+    "play": "Oyna",
+    "chooseGame": "Bir oyun seç",
+    "filterGames": "Oyunları filtrele",
+    "categories": {
+      "Puzzle": "Bulmaca",
+      "Arcade": "Arkad",
+      "Classic": "Klasik",
+      "Quick": "Hızlı"
+    }
+  },
+  "games": {
+    "2048": {
+      "name": "2048",
+      "description": "Aynı taşları birleştirerek puanını artır.",
+      "prompt": "Aynı taşları birleştirerek puanını artır."
+    },
+    "guess": {
+      "name": "Sayı Tahmini",
+      "description": "1 ile 100 arasındaki gizli sayıyı bul.",
+      "prompt": "1 ile 100 arasındaki gizli sayıyı bul."
+    },
+    "rps": {
+      "name": "Taş Kağıt Makas",
+      "description": "Bir hamle seç ve bilgisayarı yen.",
+      "prompt": "Bir hamle seç ve bilgisayarı yen."
+    },
+    "dice": {
+      "name": "Zar Atışı",
+      "description": "Zar at ve en iyi sonucunu yakala.",
+      "prompt": "Zar at ve en iyi sonucunu yakala."
+    },
+    "ttt": {
+      "name": "XOX",
+      "description": "Üç işareti sırala. İki oyuncu sırayla oynar.",
+      "prompt": "Üç işareti sırala. İki oyuncu sırayla oynar."
+    },
+    "memory": {
+      "name": "Hafıza Eşleştirme",
+      "description": "Kartları çevir ve altı eşleşen çifti bul.",
+      "prompt": "Kartları çevir ve altı eşleşen çifti bul."
+    },
+    "color": {
+      "name": "Renk Tahmini",
+      "description": "Hedef renkle eşleşen tonu seç.",
+      "prompt": "Hedef renkle eşleşen tonu seç."
+    },
+    "math": {
+      "name": "Matematik Yarışması",
+      "description": "Hızlı bir toplama, çıkarma veya çarpma sorusu çöz.",
+      "prompt": "Hızlı bir toplama, çıkarma veya çarpma sorusu çöz."
+    },
+    "higher": {
+      "name": "Yüksek mi Düşük mü",
+      "description": "Sonraki kartın daha yüksek mi düşük mü olacağını tahmin et.",
+      "prompt": "Sonraki kartın daha yüksek mi düşük mü olacağını tahmin et."
+    },
+    "coin": {
+      "name": "Yazı Tura",
+      "description": "Para düşmeden yazı mı tura mı seç.",
+      "prompt": "Para düşmeden yazı mı tura mı seç."
+    },
+    "reaction": {
+      "name": "Tepki Testi",
+      "description": "Yeşil olmasını bekle ve olabildiğince hızlı dokun.",
+      "prompt": "Yeşil olmasını bekle ve olabildiğince hızlı dokun."
+    },
+    "click": {
+      "name": "Tıklama Sayacı",
+      "description": "Süre dolmadan olabildiğince çok dokun.",
+      "prompt": "Süre dolmadan olabildiğince çok dokun."
+    },
+    "catch": {
+      "name": "Kutuyu Yakala",
+      "description": "Hareketli hedefi on kez yakala.",
+      "prompt": "Hareketli hedefi on kez yakala."
+    },
+    "snake": {
+      "name": "Yılan",
+      "description": "Yılanı yönlendir, yemleri topla ve duvarlardan kaç.",
+      "prompt": "Yılanı yönlendir, yemleri topla ve duvarlardan kaç."
+    },
+    "word": {
+      "name": "Karışık Kelime",
+      "description": "Harfleri düzenleyip kelimeyi bul.",
+      "prompt": "Harfleri düzenleyip kelimeyi bul."
+    },
+    "tap": {
+      "name": "Hızlı Dokunuş",
+      "description": "On saniyede olabildiğince çok dokun.",
+      "prompt": "On saniyede olabildiğince çok dokun."
+    },
+    "simon": {
+      "name": "Simon Diyor ki",
+      "description": "Renk dizisini hatırla ve tekrarla.",
+      "prompt": "Renk dizisini hatırla ve tekrarla."
+    },
+    "wheel": {
+      "name": "Şans Çarkı",
+      "description": "Çarkı çevir ve şansını gör.",
+      "prompt": "Çarkı çevir ve şansını gör."
+    },
+    "emoji": {
+      "name": "Emojiyi Tahmin Et",
+      "description": "Emoji ipucunu çöz ve kelimeyi yaz.",
+      "prompt": "Emoji ipucunu çöz ve kelimeyi yaz."
+    },
+    "target": {
+      "name": "Hedef Puan",
+      "description": "Puan toplayıp tam hedefe ulaş.",
+      "prompt": "Puan toplayıp tam hedefe ulaş."
+    },
+    "mole": {
+      "name": "Köstebeği Yakala",
+      "description": "Saklanmadan önce çıkan köstebeğe vur.",
+      "prompt": "Saklanmadan önce çıkan köstebeğe vur."
+    },
+    "lights": {
+      "name": "Işıkları Söndür",
+      "description": "Az hamlede tüm ışıkları kapat.",
+      "prompt": "Az hamlede tüm ışıkları kapat."
+    },
+    "mines": {
+      "name": "Mini Mayınlar",
+      "description": "Güvenli kareleri aç ve mayınlardan kaç.",
+      "prompt": "Güvenli kareleri aç ve mayınlardan kaç."
+    },
+    "connect": {
+      "name": "Dörtü Birleştir",
+      "description": "Rakibinden önce dört taşı sırala.",
+      "prompt": "Rakibinden önce dört taşı sırala."
+    },
+    "dots": {
+      "name": "Noktalar ve Kutular",
+      "description": "Son çizgiyi çizerek kutuyu kazan.",
+      "prompt": "Son çizgiyi çizerek kutuyu kazan."
+    },
+    "fifteen": {
+      "name": "15 Taşlı Kaydırmaca",
+      "description": "Numaralı taşları sıraya diz.",
+      "prompt": "Numaralı taşları sıraya diz."
+    },
+    "golf": {
+      "name": "Mini Golf",
+      "description": "Topu deliğe sokmak için yönü ve gücü ayarla.",
+      "prompt": "Topu deliğe sokmak için yönü ve gücü ayarla."
+    },
+    "breakout": {
+      "name": "Tuğla Kırma",
+      "description": "Topu sektir ve tüm tuğlaları kır.",
+      "prompt": "Topu sektir ve tüm tuğlaları kır."
+    },
+    "pong": {
+      "name": "Cep Pong",
+      "description": "Raketi kullanıp topu oyunda tut.",
+      "prompt": "Raketi kullanıp topu oyunda tut."
+    },
+    "dodger": {
+      "name": "Şerit Değiştir",
+      "description": "Şerit değiştirerek düşen bloklardan kaç.",
+      "prompt": "Şerit değiştirerek düşen bloklardan kaç."
+    },
+    "clock": {
+      "name": "Saati Durdur",
+      "description": "Zamanlayıcıyı hedefe en yakın yerde durdur.",
+      "prompt": "Zamanlayıcıyı hedefe en yakın yerde durdur."
+    },
+    "recall": {
+      "name": "Sırayı Hatırla",
+      "description": "Giderek uzayan sayı dizisini aklında tut.",
+      "prompt": "Giderek uzayan sayı dizisini aklında tut."
+    },
+    "runner": {
+      "name": "Izgara Koşusu",
+      "description": "Hamlelerin bitmeden mücevherleri topla ve tuzaklardan kaç.",
+      "prompt": "Hamlelerin bitmeden mücevherleri topla ve tuzaklardan kaç."
+    },
+    "maze": {
+      "name": "Labirentten Kaçış",
+      "description": "Girişten çıkışa giden yolu bul.",
+      "prompt": "Girişten çıkışa giden yolu bul."
+    },
+    "typing": {
+      "name": "Yazma Yarışı",
+      "description": "Süre dolmadan cümleyi doğru yaz.",
+      "prompt": "Süre dolmadan cümleyi doğru yaz."
+    },
+    "wordsearch": {
+      "name": "Kelime Avı",
+      "description": "Harf ızgarasındaki gizli kelimeleri bul.",
+      "prompt": "Harf ızgarasındaki gizli kelimeleri bul."
+    },
+    "pattern": {
+      "name": "Deseni Hatırla",
+      "description": "Yanan karelere aynı sırayla dokun.",
+      "prompt": "Yanan karelere aynı sırayla dokun."
+    },
+    "odd": {
+      "name": "Farklı Olanı Bul",
+      "description": "Diğerlerine uymayan simgeye dokun.",
+      "prompt": "Diğerlerine uymayan simgeye dokun."
+    },
+    "beat": {
+      "name": "Ritme Dokun",
+      "description": "On dokunuş boyunca sabit ritmi koru.",
+      "prompt": "On dokunuş boyunca sabit ritmi koru."
+    },
+    "colorreflex": {
+      "name": "Renk Refleksi",
+      "description": "Gösterilen renkle eşleşen rengi seç.",
+      "prompt": "Gösterilen renkle eşleşen rengi seç."
+    },
+    "mathsprint": {
+      "name": "Matematik Sprinti",
+      "description": "30 saniyede olabildiğince çok toplama çöz.",
+      "prompt": "30 saniyede olabildiğince çok toplama çöz."
+    },
+    "prime": {
+      "name": "Asal Sayı Avı",
+      "description": "Asal sayılara dokun, diğerlerinden kaçın.",
+      "prompt": "Asal sayılara dokun, diğerlerinden kaçın."
+    },
+    "anagram": {
+      "name": "Anagram Yarışı",
+      "description": "Süre bitmeden olabildiğince çok anagram çöz.",
+      "prompt": "Süre bitmeden olabildiğince çok anagram çöz."
+    },
+    "mixer": {
+      "name": "Renk Karıştırıcı",
+      "description": "RGB kaydırıcılarla hedef tonu yakala.",
+      "prompt": "RGB kaydırıcılarla hedef tonu yakala."
+    },
+    "tower": {
+      "name": "Kuleyi Yığ",
+      "description": "Hareketli platformları bırakarak kule kur.",
+      "prompt": "Hareketli platformları bırakarak kule kur."
+    },
+    "balance": {
+      "name": "Denge Çubuğu",
+      "description": "İşareti 15 saniye ortada tut.",
+      "prompt": "İşareti 15 saniye ortada tut."
+    },
+    "meteor": {
+      "name": "Meteor Kaçışı",
+      "description": "Şerit değiştirerek düşen meteorları atlat.",
+      "prompt": "Şerit değiştirerek düşen meteorları atlat."
+    },
+    "fruit": {
+      "name": "Meyve Yakala",
+      "description": "Sepeti hareket ettir, meyveleri yakala ve bombalardan kaç.",
+      "prompt": "Sepeti hareket ettir, meyveleri yakala ve bombalardan kaç."
+    },
+    "treasure": {
+      "name": "Hazine Avı",
+      "description": "Sıcak-soğuk ipuçlarıyla hazineyi bul.",
+      "prompt": "Sıcak-soğuk ipuçlarıyla hazineyi bul."
+    },
+    "daily": {
+      "name": "Günün Bulmacası",
+      "description": "Günün dört haneli kodunu altı tahminde çöz.",
+      "prompt": "Günün dört haneli kodunu altı tahminde çöz."
+    }
+  },
+  "buttons": {
+    "Play now": "Oyna",
+    "Rock": "Taş",
+    "Paper": "Kağıt",
+    "Scissors": "Makas",
+    "Check number": "Kontrol et",
+    "Roll dice": "Zar at",
+    "Higher ↑": "Yüksek ↑",
+    "Lower ↓": "Düşük ↓",
+    "Heads": "Yazı",
+    "Tails": "Tura",
+    "Start test": "Testi başlat",
+    "Ready?": "Hazır mısın?",
+    "Start": "Başlat",
+    "Stop": "Durdur",
+    "Check": "Kontrol et",
+    "Check word": "Kelimeyi kontrol et",
+    "Hide sequence": "Diziyi gizle",
+    "Answer": "Yanıtla",
+    "Submit": "Gönder",
+    "Check match": "Eşleşmeyi kontrol et",
+    "Drop block": "Bloğu bırak",
+    "← Lean": "← Sola eğil",
+    "Lean →": "Sağa eğil →",
+    "Flag mode: off": "Bayrak modu: kapalı",
+    "Rose": "Gül",
+    "Leaf": "Yeşil",
+    "Sky": "Mavi",
+    "Sun": "Turuncu"
+  },
+  "phrases": {
+    "Wait for green…": "Yeşil olmasını bekle…",
+    "TAP NOW!": "ŞİMDİ DOKUN!",
+    "Result recorded": "Sonuç kaydedildi",
+    "Flag mode: on": "Bayrak modu: açık",
+    "Game": "Oyun",
+    "Enter exactly four digits.": "Tam olarak dört rakam gir.",
+    "New code tomorrow.": "Yeni kod yar?n gelecek.",
+    "Correct!": "Do?ru!",
+    "Miss!": "Ka?t?!",
+    "Game over": "Oyun bitti",
+    "Time!": "S?re doldu!",
+    "Perfect!": "Harika!",
+    "Your turn!": "S?ra sende!",
+    "Watch the sequence?": "S?ray? izle?",
+    "Try again!": "Tekrar dene!"
+  },
+  "templates": {
+    "^([0-9]+) exact [^a-z0-9]+ ([0-9]+) right digit, wrong spot [^a-z0-9]+ ([0-9]+) guesses left$": "{0} doğru · {1} doğru rakam yanlış yerde · {2} tahmin kaldı"
+  }
 }

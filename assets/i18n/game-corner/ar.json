@@ -316,7 +316,9 @@
     "Sky": "Sky",
     "Sun": "Sun"
   },
-  "phrases": {},
+  "phrases": {
+    "Enter exactly four digits.": "Enter exactly four digits."
+  },
   "words": {
     "Score": "Score",
     "Correct": "Correct",
