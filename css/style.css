@@ -969,6 +969,34 @@ h6,
     .game-page-title h2 { font-size: 1.38rem; }
 }
 
+/* Game Corner modal: match the app's animated popup open/close feel. */
+.game-stage {
+    padding: max(18px, env(safe-area-inset-top)) 18px max(18px, env(safe-area-inset-bottom));
+    background: rgba(10, 14, 25, 0);
+    opacity: 0;
+    transition: opacity .24s ease, background-color .24s ease, backdrop-filter .24s ease;
+    backdrop-filter: blur(0);
+}
+.game-stage:not(.hidden) {
+    opacity: 1;
+    background: rgba(9, 14, 28, .72);
+    backdrop-filter: blur(9px);
+}
+.game-modal-card {
+    transform: translateY(22px) scale(.96);
+    opacity: 0;
+    transition: transform .32s cubic-bezier(.2, .8, .2, 1), opacity .24s ease;
+}
+.game-stage:not(.hidden) .game-modal-card {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+}
+.game-stage.is-closing { opacity: 0; background: rgba(9, 14, 28, 0); backdrop-filter: blur(0); }
+.game-stage.is-closing .game-modal-card { transform: translateY(18px) scale(.97); opacity: 0; }
+@media (prefers-reduced-motion: reduce) {
+    .game-stage, .game-modal-card { transition-duration: .01ms !important; }
+}
+
 .game-corner-head,
 .game-stage-head {
     display: flex;

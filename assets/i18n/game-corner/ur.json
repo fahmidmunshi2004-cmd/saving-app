@@ -1,0 +1,357 @@
+{
+  "ui": {
+    "kicker": "MINI ARCADE",
+    "title": "Game Corner",
+    "intro": "Take a quick break, beat your best, and enjoy quick games made for mobile.",
+    "count": "50 games",
+    "categoriesLine": "Puzzles · Arcade · Classics · 50 ways to take a break",
+    "open": "Open Game Corner",
+    "pageKicker": "MINI ARCADE · 50 GAMES",
+    "pageIntro": "Pick a game, beat your best, and play a quick round.",
+    "search": "Find a game...",
+    "filterAll": "All 50",
+    "filterPuzzle": "Puzzles",
+    "filterArcade": "Arcade",
+    "filterClassic": "Classics",
+    "filterQuick": "Quick Play",
+    "noGames": "No games match that search.",
+    "nowPlaying": "NOW PLAYING",
+    "restart": "Restart",
+    "close": "Close",
+    "backSettings": "Settings",
+    "play": "Play now",
+    "chooseGame": "Choose a game",
+    "filterGames": "Filter games",
+    "categories": {
+      "Puzzle": "Puzzle",
+      "Arcade": "Arcade",
+      "Classic": "Classic",
+      "Quick": "Quick"
+    }
+  },
+  "games": {
+    "2048": {
+      "name": "2048",
+      "description": "Slide matching tiles together to grow your score.",
+      "prompt": "Use arrow buttons, keyboard arrows, or swipe the board."
+    },
+    "guess": {
+      "name": "Number Guess",
+      "description": "Find the secret number from 1 to 100.",
+      "prompt": "Guess the hidden number from 1 to 100."
+    },
+    "rps": {
+      "name": "Rock Paper Scissors",
+      "description": "Choose a move and beat the computer.",
+      "prompt": "Choose your move."
+    },
+    "dice": {
+      "name": "Dice Roll",
+      "description": "Roll the dice and chase your best result.",
+      "prompt": "Roll the dice."
+    },
+    "ttt": {
+      "name": "Tic Tac Toe",
+      "description": "Get three marks in a row. Two players take turns.",
+      "prompt": "Two players · X goes first."
+    },
+    "memory": {
+      "name": "Memory Match",
+      "description": "Flip cards and find all six matching pairs.",
+      "prompt": "Tap two cards to find each matching pair."
+    },
+    "color": {
+      "name": "Color Guess",
+      "description": "Pick the swatch that matches the target color.",
+      "prompt": "Tap the color swatch that matches the target."
+    },
+    "math": {
+      "name": "Math Quiz",
+      "description": "Solve a quick addition, subtraction, or multiplication.",
+      "prompt": "Solve this quick equation."
+    },
+    "higher": {
+      "name": "Higher or Lower",
+      "description": "Guess if the next card number is higher or lower.",
+      "prompt": "Will the next card be higher or lower? Equal cards count as a miss."
+    },
+    "coin": {
+      "name": "Coin Toss",
+      "description": "Call heads or tails before the coin lands.",
+      "prompt": "Pick a side, then flip the coin."
+    },
+    "reaction": {
+      "name": "Reaction Test",
+      "description": "Wait for green, then tap as quickly as you can.",
+      "prompt": "Tap Start, wait for the card to turn green, then tap it."
+    },
+    "click": {
+      "name": "Click Counter",
+      "description": "Tap as often as possible before time runs out.",
+      "prompt": "Tap the button as many times as you can in 10 seconds."
+    },
+    "catch": {
+      "name": "Catch the Box",
+      "description": "Catch the moving target ten times.",
+      "prompt": "Catch the moving target ten times."
+    },
+    "snake": {
+      "name": "Snake",
+      "description": "Guide the snake, eat food, and avoid the walls.",
+      "prompt": "Use the arrow buttons or swipe the board to guide the snake."
+    },
+    "word": {
+      "name": "Word Scramble",
+      "description": "Unscramble the letters to reveal the word.",
+      "prompt": "Unscramble the letters."
+    },
+    "tap": {
+      "name": "Quick Tap",
+      "description": "Tap as many times as you can in ten seconds.",
+      "prompt": "Tap as many times as possible before the 10-second timer ends."
+    },
+    "simon": {
+      "name": "Simon Says",
+      "description": "Watch the color sequence and repeat it.",
+      "prompt": "Watch the flashing sequence, then repeat it in order."
+    },
+    "wheel": {
+      "name": "Lucky Wheel",
+      "description": "Spin the wheel and see where luck lands.",
+      "prompt": "Spin for a little fun—no real rewards or money involved."
+    },
+    "emoji": {
+      "name": "Guess the Emoji",
+      "description": "Decode the emoji clue and enter the word.",
+      "prompt": "Guess the word from the emoji clue."
+    },
+    "target": {
+      "name": "Target Score",
+      "description": "Roll points and try to hit the target exactly.",
+      "prompt": "Roll points to reach the target."
+    },
+    "mole": {
+      "name": "Whack-a-Mole",
+      "description": "Catch the pop-up mole before it ducks away.",
+      "prompt": "Tap the glowing mole. Catch as many as you can in 20 seconds."
+    },
+    "lights": {
+      "name": "Lights Out",
+      "description": "Switch off every light with the fewest moves.",
+      "prompt": "Tap a light to switch it and its neighbors. Turn every light off."
+    },
+    "mines": {
+      "name": "Mini Mines",
+      "description": "Reveal safe tiles and avoid the hidden mines.",
+      "prompt": "Reveal safe tiles. Switch Flag mode to mark the five hidden mines."
+    },
+    "connect": {
+      "name": "Connect Four",
+      "description": "Connect four counters before your opponent.",
+      "prompt": "Two players · drop four counters in a row to win."
+    },
+    "dots": {
+      "name": "Dots & Boxes",
+      "description": "Claim boxes by drawing the final side.",
+      "prompt": "Two players take turns drawing sides. Complete more boxes to win."
+    },
+    "fifteen": {
+      "name": "Sliding 15",
+      "description": "Put the numbered tiles back in order.",
+      "prompt": "Slide tiles into order. Tap a tile beside the empty space."
+    },
+    "golf": {
+      "name": "Mini Golf",
+      "description": "Pick your aim and power to sink the putt.",
+      "prompt": "Adjust your shot power and land close to the hole."
+    },
+    "breakout": {
+      "name": "Breakout",
+      "description": "Bounce the ball and clear every brick.",
+      "prompt": "Clear the bricks. Move the paddle, then tap Launch."
+    },
+    "pong": {
+      "name": "Pocket Pong",
+      "description": "Keep the ball in play with your paddle.",
+      "prompt": "Move your paddle to keep the ball in play."
+    },
+    "dodger": {
+      "name": "Lane Dodger",
+      "description": "Switch lanes and dodge the falling blocks.",
+      "prompt": "Switch lanes to dodge the falling blocks."
+    },
+    "clock": {
+      "name": "Stop the Clock",
+      "description": "Stop the timer as close to the target as you can.",
+      "prompt": "Stop the timer as close to the target as you can."
+    },
+    "recall": {
+      "name": "Sequence Recall",
+      "description": "Remember a growing sequence of numbers.",
+      "prompt": "Remember the number sequence, then type it in order."
+    },
+    "runner": {
+      "name": "Grid Runner",
+      "description": "Collect gems and avoid traps before your moves run out.",
+      "prompt": "Move across the grid, collect four gems and avoid traps."
+    },
+    "maze": {
+      "name": "Maze Escape",
+      "description": "Find your way from the entrance to the exit.",
+      "prompt": "Find the exit at the bottom-right. Arrow buttons move one step."
+    },
+    "typing": {
+      "name": "Typing Sprint",
+      "description": "Type the phrase accurately before the timer ends.",
+      "prompt": "Type the phrase accurately before the timer runs out."
+    },
+    "wordsearch": {
+      "name": "Word Search",
+      "description": "Find the hidden word in a letter grid.",
+      "prompt": "Find the hidden words in the letter grid."
+    },
+    "pattern": {
+      "name": "Pattern Pop",
+      "description": "Repeat the glowing pattern in the right order.",
+      "prompt": "Repeat the glowing squares in the same order."
+    },
+    "odd": {
+      "name": "Odd One Out",
+      "description": "Spot the one symbol that does not belong.",
+      "prompt": "Tap the one symbol that is different."
+    },
+    "beat": {
+      "name": "Tap the Beat",
+      "description": "Keep a steady rhythm for ten taps.",
+      "prompt": "Tap the button ten times with a steady one-second rhythm."
+    },
+    "colorreflex": {
+      "name": "Color Reflex",
+      "description": "Match the shown color before the next one appears.",
+      "prompt": "Tap the color name that matches the color shown."
+    },
+    "mathsprint": {
+      "name": "Math Sprint",
+      "description": "Solve as many quick sums as you can in 30 seconds.",
+      "prompt": "Solve as many sums as possible in 30 seconds."
+    },
+    "prime": {
+      "name": "Prime Hunt",
+      "description": "Tap all prime numbers and avoid the decoys.",
+      "prompt": "Tap every prime number from 1 to 30. Avoid the decoys."
+    },
+    "anagram": {
+      "name": "Anagram Race",
+      "description": "Solve as many anagrams as you can before time runs out.",
+      "prompt": "Solve as many anagrams as you can in 30 seconds."
+    },
+    "mixer": {
+      "name": "Color Mixer",
+      "description": "Mix the RGB sliders to match the target shade.",
+      "prompt": "Adjust the red, green, and blue sliders to match the target shade."
+    },
+    "tower": {
+      "name": "Tower Stack",
+      "description": "Drop each moving platform to build a tall tower.",
+      "prompt": "Tap Drop when the moving block lines up. Stack as high as you can."
+    },
+    "balance": {
+      "name": "Balance Bar",
+      "description": "Keep the balance marker centered for 15 seconds.",
+      "prompt": "Keep your balance in the safe zone for 15 seconds."
+    },
+    "meteor": {
+      "name": "Meteor Dodge",
+      "description": "Dodge falling meteors by switching lanes.",
+      "prompt": "Switch lanes and avoid the falling meteors."
+    },
+    "fruit": {
+      "name": "Fruit Catcher",
+      "description": "Move your basket to catch fruit and dodge bombs.",
+      "prompt": "Move your basket to catch fruit and dodge bombs."
+    },
+    "treasure": {
+      "name": "Treasure Hunt",
+      "description": "Follow the hot and cold clues to find treasure.",
+      "prompt": "Tap a tile. Hotter means closer to the hidden treasure."
+    },
+    "daily": {
+      "name": "Daily Brain Teaser",
+      "description": "Crack today's number code in six guesses.",
+      "prompt": "Crack today's four-digit code. Digits may repeat. You have six guesses."
+    }
+  },
+  "buttons": {
+    "Play now": "Play now",
+    "Rock": "Rock",
+    "Paper": "Paper",
+    "Scissors": "Scissors",
+    "Check number": "Check number",
+    "Roll dice": "Roll dice",
+    "Higher ↑": "Higher ↑",
+    "Lower ↓": "Lower ↓",
+    "Heads": "Heads",
+    "Tails": "Tails",
+    "Start test": "Start test",
+    "Ready?": "Ready?",
+    "Start": "Start",
+    "Stop": "Stop",
+    "Check": "Check",
+    "Check word": "Check word",
+    "Hide sequence": "Hide sequence",
+    "Answer": "Answer",
+    "Submit": "Submit",
+    "Check match": "Check match",
+    "Drop block": "Drop block",
+    "← Lean": "← Lean",
+    "Lean →": "Lean →",
+    "Flag mode: off": "Flag mode: off",
+    "All 50": "All 50",
+    "Puzzles": "Puzzles",
+    "Arcade": "Arcade",
+    "Classics": "Classics",
+    "Quick Play": "Quick Play",
+    "Rose": "Rose",
+    "Leaf": "Leaf",
+    "Sky": "Sky",
+    "Sun": "Sun"
+  },
+  "phrases": {},
+  "words": {
+    "Score": "Score",
+    "Correct": "Correct",
+    "Miss": "Miss",
+    "Time": "Time",
+    "left": "left",
+    "moves": "moves",
+    "found": "found",
+    "wins": "wins",
+    "win": "win",
+    "Draw": "Draw",
+    "You": "You",
+    "Computer": "Computer",
+    "Try": "Try",
+    "again": "again",
+    "Restart": "Restart",
+    "points": "points",
+    "seconds": "seconds",
+    "safe": "safe",
+    "remaining": "remaining",
+    "Game over": "Game over",
+    "Final": "Final",
+    "Streak": "Streak",
+    "Your": "Your",
+    "turn": "turn",
+    "Perfect": "Perfect",
+    "target": "target",
+    "round": "round",
+    "catches": "catches",
+    "misses": "misses",
+    "blocks": "blocks",
+    "bricks": "bricks",
+    "guesses": "guesses",
+    "guess": "guess",
+    "safe tiles": "safe tiles",
+    "s left": "s left"
+  }
+}

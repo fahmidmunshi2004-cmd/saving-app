@@ -46,7 +46,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore-compat.js"></script>
 
-    <link rel="stylesheet" href="css/style.css?v=23" />
+    <link rel="stylesheet" href="css/style.css?v=24" />
     <link rel="stylesheet" href="css/modal.css?v=8" />
     <link rel="stylesheet" href="css/dark-mode.css?v=10" />
 </head>
@@ -405,38 +405,38 @@
             <section class="game-corner-launch" aria-labelledby="gameCornerTitle">
                 <div class="game-corner-head">
                     <div>
-                        <span class="game-corner-kicker"><i class="fa-solid fa-gamepad" aria-hidden="true"></i> MINI ARCADE</span>
-                        <h2 id="gameCornerTitle">Game Corner</h2>
-                        <p>Take a quick break, beat your best, and enjoy quick games made for mobile.</p>
+                        <span class="game-corner-kicker" data-game-text="kicker"><i class="fa-solid fa-gamepad" aria-hidden="true"></i> MINI ARCADE</span>
+                        <h2 id="gameCornerTitle" data-game-text="title">Game Corner</h2>
+                        <p data-game-text="intro">Take a quick break, beat your best, and enjoy quick games made for mobile.</p>
                     </div>
-                    <span class="game-corner-count"><i class="fa-solid fa-sparkles" aria-hidden="true"></i> 50 games</span>
+                    <span class="game-corner-count"><i class="fa-solid fa-sparkles" aria-hidden="true"></i> <span data-game-text="count">50 games</span></span>
                 </div>
                 <div class="game-corner-launch-actions">
-                    <span><i class="fa-solid fa-gamepad" aria-hidden="true"></i> Puzzles · Arcade · Classics · 50 ways to take a break</span>
-                    <button id="openGameCornerBtn" class="game-open-btn" type="button">Open Game Corner <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></button>
+                    <span data-game-text="categoriesLine"><i class="fa-solid fa-gamepad" aria-hidden="true"></i> Puzzles · Arcade · Classics · 50 ways to take a break</span>
+                    <button id="openGameCornerBtn" class="game-open-btn" type="button"><span data-game-text="open">Open Game Corner</span> <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></button>
                 </div>
             </section>
         </section>
 
         <section id="gameCornerView" class="view game-corner-view" aria-labelledby="gameCornerPageTitle">
             <div class="game-page-header">
-                <button id="backToSettingsBtn" class="game-control-btn" type="button"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Settings</button>
+                <button id="backToSettingsBtn" class="game-control-btn" type="button"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> <span data-game-text="backSettings">Settings</span></button>
                 <div class="game-page-title">
-                    <span class="game-corner-kicker"><i class="fa-solid fa-gamepad" aria-hidden="true"></i> MINI ARCADE · 50 GAMES</span>
-                    <h2 id="gameCornerPageTitle">Game Corner</h2>
-                    <p>Pick a game, beat your best, and play a quick round.</p>
+                    <span class="game-corner-kicker" data-game-text="pageKicker"><i class="fa-solid fa-gamepad" aria-hidden="true"></i> MINI ARCADE · 50 GAMES</span>
+                    <h2 id="gameCornerPageTitle" data-game-text="title">Game Corner</h2>
+                    <p data-game-text="pageIntro">Pick a game, beat your best, and play a quick round.</p>
                 </div>
-                <label class="game-search-wrap"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i><input id="gameSearch" type="search" placeholder="Find a game..." autocomplete="off"></label>
+                <label class="game-search-wrap"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i><input id="gameSearch" type="search" placeholder="Find a game..." autocomplete="off" data-game-placeholder="search"></label>
             </div>
             <div class="game-filters" role="group" aria-label="Filter games">
-                <button type="button" class="game-filter is-active" data-filter="all">All 50</button>
-                <button type="button" class="game-filter" data-filter="Puzzle">Puzzles</button>
-                <button type="button" class="game-filter" data-filter="Arcade">Arcade</button>
-                <button type="button" class="game-filter" data-filter="Classic">Classics</button>
-                <button type="button" class="game-filter" data-filter="Quick">Quick Play</button>
+                <button type="button" class="game-filter is-active" data-filter="all" data-game-text="filterAll">All 50</button>
+                <button type="button" class="game-filter" data-filter="Puzzle" data-game-text="filterPuzzle">Puzzles</button>
+                <button type="button" class="game-filter" data-filter="Arcade" data-game-text="filterArcade">Arcade</button>
+                <button type="button" class="game-filter" data-filter="Classic" data-game-text="filterClassic">Classics</button>
+                <button type="button" class="game-filter" data-filter="Quick" data-game-text="filterQuick">Quick Play</button>
             </div>
             <div id="gameCornerGrid" class="game-corner-grid" aria-label="Choose a game"></div>
-            <p id="noGamesMessage" class="game-result hidden">No games match that search.</p>
+            <p id="noGamesMessage" class="game-result hidden" data-game-text="noGames">No games match that search.</p>
         </section>
 
         <nav class="bottom-nav" aria-label="Bottom navigation">
@@ -463,10 +463,10 @@
     <section id="gameStage" class="game-stage hidden" role="dialog" aria-modal="true" aria-live="polite" aria-labelledby="activeGameTitle">
         <div class="game-modal-card">
             <div class="game-stage-head">
-                <div><span class="game-corner-kicker">NOW PLAYING</span><h3 id="activeGameTitle">Game</h3></div>
+                <div><span class="game-corner-kicker" data-game-text="nowPlaying">NOW PLAYING</span><h3 id="activeGameTitle">Game</h3></div>
                 <div class="game-stage-actions">
-                    <button id="restartGameBtn" class="game-control-btn" type="button"><i class="fa-solid fa-rotate-right" aria-hidden="true"></i> Restart</button>
-                    <button id="closeGameBtn" class="game-control-btn" type="button" aria-label="Close game"><i class="fa-solid fa-xmark" aria-hidden="true"></i> Close</button>
+                    <button id="restartGameBtn" class="game-control-btn" type="button"><i class="fa-solid fa-rotate-right" aria-hidden="true"></i> <span data-game-text="restart">Restart</span></button>
+                    <button id="closeGameBtn" class="game-control-btn" type="button" aria-label="Close game"><i class="fa-solid fa-xmark" aria-hidden="true"></i> <span data-game-text="close">Close</span></button>
                 </div>
             </div>
             <div id="gameStageBody" class="game-stage-body"></div>
@@ -496,8 +496,8 @@
     <script src="js/core/state.js?v=14"></script>
     <script src="js/core/common.js?v=17"></script>
     <script src="js/dark-mode.js?v=5"></script>
-    <script src="js/games.js?v=2"></script>
-    <script src="js/app.js?v=18"></script>
+    <script src="js/games.js?v=4"></script>
+    <script src="js/app.js?v=19"></script>
 </body>
 
 </html>

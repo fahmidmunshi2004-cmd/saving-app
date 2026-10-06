@@ -66,8 +66,12 @@
   if (!grid || !cornerView || !stage || !body || !title) return;
 
   let activeGame = null;
+  let gameCloseTimer = null;
   let previousFocus = null;
   let categoryFilter = "all";
+  let localeRequest = 0;
+  let catalog = null;
+  const textSources = new WeakMap();
   let cleanup = [];
   let timers = [];
   const random = (max) => Math.floor(Math.random() * max);
@@ -85,7 +89,72 @@
   const el = (selector) => body.querySelector(selector);
   const result = (text) => {
     const target = el("[data-result]");
-    if (target) target.textContent = text;
+    if (target) {
+      target.dataset.gameSource = text;
+      target.textContent = translateGameText(text);
+    }
+  };
+  const translateGameText = (text) => {
+    const source = String(text);
+    const exact = catalog?.phrases?.[source] || catalog?.buttons?.[source];
+    if (exact) return exact;
+    let translated = source;
+    const words = Object.entries(catalog?.words || {}).sort((a, b) => b[0].length - a[0].length);
+    for (const [english, local] of words) {
+      const escaped = english.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      const pattern = new RegExp(`\\b${escaped}\\b`, "gi");
+      translated = translated.replace(pattern, local);
+    }
+    return translated;
+  };
+  const localizedGame = (id) => {
+    const base = games.find((game) => game[3] === id) || [];
+    const source = catalog?.games?.[id];
+    const local = Array.isArray(source) ? { name: source[0], description: source[1] } : (source || {});
+    return {
+      name: local.name || base[0],
+      description: local.description || base[1],
+      prompt: local.prompt || local.description || catalog?.baseGames?.[id]?.prompt || base[1]
+    };
+  };
+  const localizeMarkup = (markup) => {
+    const template = document.createElement("template");
+    template.innerHTML = markup;
+    const walker = document.createTreeWalker(template.content, NodeFilter.SHOW_TEXT);
+    let node;
+    while ((node = walker.nextNode())) {
+      const original = node.nodeValue;
+      textSources.set(node, original);
+      node.nodeValue = translateGameText(original.trim()) === original.trim()
+        ? original
+        : original.replace(original.trim(), translateGameText(original.trim()));
+    }
+    template.content.querySelectorAll("[placeholder]").forEach((input) => {
+      input.dataset.gamePlaceholderSource = input.getAttribute("placeholder");
+      input.setAttribute("placeholder", translateGameText(input.dataset.gamePlaceholderSource));
+    });
+    template.content.querySelectorAll("[aria-label]").forEach((item) => {
+      item.dataset.gameAriaSource = item.getAttribute("aria-label");
+      item.setAttribute("aria-label", translateGameText(item.dataset.gameAriaSource));
+    });
+    return template.innerHTML;
+  };
+  const localizeTree = (root) => {
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+    let node;
+    while ((node = walker.nextNode())) {
+      const parent = node.parentElement;
+      if (parent?.hasAttribute("data-result") && parent.dataset.gameSource) {
+        parent.textContent = translateGameText(parent.dataset.gameSource);
+        continue;
+      }
+      const source = textSources.get(node) ?? node.nodeValue;
+      textSources.set(node, source);
+      const trimmed = source.trim();
+      if (trimmed) node.nodeValue = source.replace(trimmed, translateGameText(trimmed));
+    }
+    root.querySelectorAll("[data-game-placeholder-source]").forEach((item) => item.setAttribute("placeholder", translateGameText(item.dataset.gamePlaceholderSource)));
+    root.querySelectorAll("[data-game-aria-source]").forEach((item) => item.setAttribute("aria-label", translateGameText(item.dataset.gameAriaSource)));
   };
   const stop = () => {
     timers.forEach(([clear, id]) => clear(id));
@@ -94,30 +163,104 @@
     cleanup = [];
   };
   const closeGame = () => {
+    if (stage.classList.contains("hidden") || stage.classList.contains("is-closing")) return;
     stop();
-    activeGame = null;
-    stage.classList.add("hidden");
-    document.body.classList.remove("game-modal-open");
-    body.replaceChildren();
-    previousFocus?.focus?.();
-    previousFocus = null;
+    stage.classList.add("is-closing");
+    stage.querySelector(".game-modal-card")?.classList.add("is-closing");
+    window.clearTimeout(gameCloseTimer);
+    gameCloseTimer = window.setTimeout(() => {
+      activeGame = null;
+      stage.classList.add("hidden");
+      stage.classList.remove("is-opening", "is-closing");
+      stage.querySelector(".game-modal-card")?.classList.remove("is-opening", "is-closing");
+      document.body.classList.remove("game-modal-open");
+      body.replaceChildren();
+      previousFocus?.focus?.();
+      previousFocus = null;
+    }, 360);
   };
 
-  grid.innerHTML = games.map(([name, desc, icon, id, category], index) => `
+  const renderGrid = () => {
+    grid.innerHTML = games.map(([name, desc, icon, id, category], index) => {
+      const translated = localizedGame(id);
+      const categoryLabel = catalog?.ui?.categories?.[category] || category;
+      return `
     <article class="game-card">
-      <div class="game-card-top"><span class="game-card-icon"><i class="fa-solid ${icon}" aria-hidden="true"></i></span><span class="game-category">${category}</span></div>
-      <h3>${String(index + 1).padStart(2, "0")}. ${name}</h3>
-      <p>${desc}</p>
-      <button class="game-play-btn" type="button" data-start="${id}">Play now <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></button>
-    </article>`).join("");
+      <div class="game-card-top"><span class="game-card-icon"><i class="fa-solid ${icon}" aria-hidden="true"></i></span><span class="game-category">${categoryLabel}</span></div>
+      <h3>${String(index + 1).padStart(2, "0")}. ${translated.name || name}</h3>
+      <p>${translated.description || desc}</p>
+      <button class="game-play-btn" type="button" data-start="${id}">${catalog?.ui?.play || "Play now"} <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></button>
+    </article>`;
+    }).join("");
+    filterGames();
+  };
+
+  const localizeStaticUi = () => {
+    if (!catalog?.ui) return;
+    const ui = catalog.ui;
+    document.querySelectorAll("[data-game-text]").forEach((node) => {
+      const source = node.dataset.gameSourceText || node.dataset.gameText;
+      node.dataset.gameSourceText = source;
+      const value = ui[source];
+      if (value === undefined) return;
+      const icon = node.querySelector(":scope > i");
+      node.textContent = value;
+      if (icon) node.prepend(icon, " ");
+    });
+    document.querySelectorAll("[data-game-placeholder]").forEach((node) => {
+      node.placeholder = ui[node.dataset.gamePlaceholder] || "Find a game...";
+    });
+    if (close) close.setAttribute("aria-label", ui.close || "Close");
+    if (grid) grid.setAttribute("aria-label", ui.chooseGame || "Choose a game");
+    if (cornerView) cornerView.querySelector(".game-filters")?.setAttribute("aria-label", ui.filterGames || "Filter games");
+  };
+
+  window.applyGameCornerLanguage = async (lang = "en") => {
+    const requestId = ++localeRequest;
+    try {
+      const response = await fetch(`assets/i18n/game-corner/${lang}.json?v=1`, { cache: "no-store" });
+      if (!response.ok) throw new Error(`Game Corner translations unavailable for ${lang}`);
+      const loadedCatalog = await response.json();
+      if (requestId !== localeRequest) return;
+      const enResponse = lang === "en" ? null : await fetch("assets/i18n/game-corner/en.json?v=1", { cache: "no-store" });
+      const base = enResponse ? await enResponse.json() : loadedCatalog;
+      const mergedGames = Object.fromEntries(Object.keys(base.games || {}).map((id) => {
+        const source = base.games[id];
+        const translated = loadedCatalog.games?.[id];
+        const local = Array.isArray(translated) ? { name: translated[0], description: translated[1] } : (translated || {});
+        return [id, { ...source, ...local }];
+      }));
+      catalog = {
+        ...base,
+        ...loadedCatalog,
+        ui: { ...base.ui, ...loadedCatalog.ui, categories: { ...base.ui?.categories, ...loadedCatalog.ui?.categories } },
+        games: mergedGames,
+        buttons: { ...base.buttons, ...loadedCatalog.buttons },
+        phrases: { ...base.phrases, ...loadedCatalog.phrases },
+        baseGames: base.games
+      };
+    } catch (error) {
+      if (requestId !== localeRequest) return;
+      catalog = null;
+      console.warn("Game Corner translation bundle could not be loaded", error);
+    }
+    localizeStaticUi();
+    renderGrid();
+    if (activeGame) {
+      const selected = games.find((game) => game[3] === activeGame);
+      title.textContent = localizedGame(activeGame).name || selected?.[0] || "Game";
+      localizeTree(body);
+    }
+  };
 
   const filterGames = () => {
     const query = search?.value.trim().toLowerCase() || "";
     let shown = 0;
     grid.querySelectorAll(".game-card").forEach((card, index) => {
       const game = games[index];
+      const translated = localizedGame(game[3]);
       const visible = (categoryFilter === "all" || game[4] === categoryFilter)
-        && (!query || `${game[0]} ${game[1]} ${game[4]}`.toLowerCase().includes(query));
+        && (!query || `${translated.name || game[0]} ${translated.description || game[1]} ${catalog?.ui?.categories?.[game[4]] || game[4]}`.toLowerCase().includes(query));
       card.classList.toggle("hidden", !visible);
       shown += Number(visible);
     });
@@ -129,17 +272,28 @@
     activeGame = id;
     const selected = games.find((game) => game[3] === id);
     if (!selected) return;
-    title.textContent = selected[0];
-    stage.classList.remove("hidden");
+    title.textContent = localizedGame(id).name || selected[0];
+    window.clearTimeout(gameCloseTimer);
+    stage.classList.remove("hidden", "is-closing");
+    stage.classList.add("is-opening");
+    const modalCard = stage.querySelector(".game-modal-card");
+    modalCard?.classList.remove("is-closing");
+    modalCard?.classList.add("is-opening");
+    window.requestAnimationFrame(() => {
+      void stage.offsetWidth;
+      stage.classList.remove("is-opening");
+      modalCard?.classList.remove("is-opening");
+    });
     document.body.classList.add("game-modal-open");
     close?.focus();
     renderers[id]();
   };
 
   const frame = (prompt, inner) => {
-    body.innerHTML = `<p class="game-prompt">${prompt}</p><div class="game-play-area">${inner}<div class="game-result" data-result></div></div>`;
+    const translatedPrompt = localizedGame(activeGame).prompt || translateGameText(prompt);
+    body.innerHTML = `<p class="game-prompt">${translatedPrompt}</p><div class="game-play-area">${localizeMarkup(inner)}<div class="game-result" data-result></div></div>`;
   };
-  const action = (label, value, extra = "") => `<button class="game-action-btn" type="button" data-action="${value}" ${extra}>${label}</button>`;
+  const action = (label, value, extra = "") => `<button class="game-action-btn" type="button" data-action="${value}" ${extra}>${translateGameText(label)}</button>`;
   const numberedBoard = (klass, count) => `<div class="game-board ${klass}">${Array.from({ length: count }, (_, i) => `<button class="game-cell" type="button" data-cell="${i}"></button>`).join("")}</div>`;
 
   const renderers = {
@@ -253,15 +407,15 @@
       let startAt = 0;
       on(el("[data-action=reaction-start]"), "click", (event) => {
         const button = el("[data-reaction]");
-        button.disabled = true; button.textContent = "Wait for green…"; button.style.background = "#ff8f3c";
+        button.disabled = true; button.dataset.gameSource = "Wait for green…"; button.textContent = translateGameText(button.dataset.gameSource); button.style.background = "#ff8f3c";
         event.currentTarget.disabled = true;
-        later(() => { startAt = performance.now(); button.disabled = false; button.textContent = "TAP NOW!"; button.style.background = "#3eb75e"; }, 900 + random(1800));
+        later(() => { startAt = performance.now(); button.disabled = false; button.dataset.gameSource = "TAP NOW!"; button.textContent = translateGameText(button.dataset.gameSource); button.style.background = "#3eb75e"; }, 900 + random(1800));
       });
       on(el("[data-reaction]"), "click", (event) => {
         if (!startAt) { result("Too soon! Restart and wait for green."); return; }
         result(`Your reaction: ${Math.round(performance.now() - startAt)} ms`);
         startAt = 0; el("[data-action=reaction-start]").disabled = false;
-        event.currentTarget.disabled = true; event.currentTarget.textContent = "Result recorded";
+        event.currentTarget.disabled = true; event.currentTarget.dataset.gameSource = "Result recorded"; event.currentTarget.textContent = translateGameText(event.currentTarget.dataset.gameSource)
       });
     },
     click() { timedTap("Tap the button as many times as you can in 10 seconds.", "Click!", "click-score"); },
@@ -363,7 +517,7 @@
     mines() {
       const mineSet=new Set();while(mineSet.size<5)mineSet.add(random(25));let flags=false,over=false;
       frame("Reveal safe tiles. Switch Flag mode to mark the five hidden mines.",`${action("Flag mode: off","flag-mode")}<div class="game-board game-mines-grid">${Array.from({length:25},(_,i)=>`<button class="game-cell" data-mine="${i}"></button>`).join("")}</div>`);
-      on(body,"click",e=>{if(e.target.closest("[data-action=flag-mode]")){flags=!flags;e.target.textContent=`Flag mode: ${flags?"on":"off"}`;return;}const b=e.target.closest("[data-mine]");if(!b||over||b.disabled)return;const i=Number(b.dataset.mine);if(flags){b.textContent=b.textContent==="⚑"?"":"⚑";return;}b.disabled=true;if(mineSet.has(i)){b.textContent="💥";b.classList.add("is-mine-hit");over=true;result("Mine! Restart for a new board.");body.querySelectorAll("[data-mine]").forEach((x,n)=>{if(mineSet.has(n))x.textContent="💣";x.disabled=true;});return;}const x=i%5,y=Math.floor(i/5);let count=0;for(let yy=Math.max(0,y-1);yy<=Math.min(4,y+1);yy++)for(let xx=Math.max(0,x-1);xx<=Math.min(4,x+1);xx++)if(mineSet.has(yy*5+xx))count++;b.textContent=count||"·";b.classList.add("is-open");if([...body.querySelectorAll("[data-mine]")].filter(x=>x.disabled).length===20){over=true;result("Board cleared! Nice work.");}else result(`${25-mineSet.size-[...body.querySelectorAll("[data-mine]")].filter(x=>x.disabled).length} safe tiles left.`);});
+      on(body,"click",e=>{if(e.target.closest("[data-action=flag-mode]")){flags=!flags;e.target.dataset.gameSource=`Flag mode: ${flags?"on":"off"}`;e.target.textContent=translateGameText(e.target.dataset.gameSource);return;}const b=e.target.closest("[data-mine]");if(!b||over||b.disabled)return;const i=Number(b.dataset.mine);if(flags){b.textContent=b.textContent==="⚑"?"":"⚑";return;}b.disabled=true;if(mineSet.has(i)){b.textContent="💥";b.classList.add("is-mine-hit");over=true;result("Mine! Restart for a new board.");body.querySelectorAll("[data-mine]").forEach((x,n)=>{if(mineSet.has(n))x.textContent="💣";x.disabled=true;});return;}const x=i%5,y=Math.floor(i/5);let count=0;for(let yy=Math.max(0,y-1);yy<=Math.min(4,y+1);yy++)for(let xx=Math.max(0,x-1);xx<=Math.min(4,x+1);xx++)if(mineSet.has(yy*5+xx))count++;b.textContent=count||"·";b.classList.add("is-open");if([...body.querySelectorAll("[data-mine]")].filter(x=>x.disabled).length===20){over=true;result("Board cleared! Nice work.");}else result(`${25-mineSet.size-[...body.querySelectorAll("[data-mine]")].filter(x=>x.disabled).length} safe tiles left.`);});
     },
     connect() {
       const board=Array(42).fill("");let turn="🔴",done=false;const wins=[];
@@ -481,8 +635,8 @@
     const button = event.target.closest("[data-start]");
     if (button) { previousFocus = button; showGame(button.dataset.start); }
   });
-  launcher?.addEventListener("click", () => showView("gameCornerView"));
-  backToSettings?.addEventListener("click", () => showView("settingsView"));
+  launcher?.addEventListener("click", () => window.showView("gameCornerView"));
+  backToSettings?.addEventListener("click", () => window.showView("settingsView"));
   search?.addEventListener("input", filterGames);
   cornerView.querySelectorAll("[data-filter]").forEach((button) => button.addEventListener("click", () => {
     categoryFilter = button.dataset.filter;
