@@ -202,6 +202,18 @@ function updateLanguagePickerUI() {
     }
     const hasOptions = !!list?.children.length;
     if (empty) empty.classList.toggle("hidden", hasOptions);
+    if (!langMenu.classList.contains("hidden") && window.matchMedia("(max-width: 620px)").matches) {
+      const triggerRect = langSwitcher?.getBoundingClientRect();
+      if (triggerRect) {
+        const menuWidth = Math.min(420, window.innerWidth - 24);
+        const left = Math.max(12, Math.min(triggerRect.right - menuWidth, window.innerWidth - menuWidth - 12));
+        langMenu.style.left = `${left}px`;
+        langMenu.style.right = "auto";
+      }
+    } else {
+      langMenu.style.left = "";
+      langMenu.style.right = "";
+    }
   }
 }
 
@@ -691,8 +703,11 @@ async function resolveMembershipForUser(memberId, preferredGroupId = "") {
 }
 
 let loginProgress = false;
+let loginProgressTimer = 0;
 
 function finalizeLoginFlow() {
+  window.clearTimeout(loginProgressTimer);
+  loginProgressTimer = 0;
   if (!loginProgress) return;
   loginProgress = false;
   if (googleLoginBtn) {
@@ -1936,6 +1951,7 @@ function initFirebase() {
   googleProvider = new firebase.auth.GoogleAuthProvider();
   googleProvider.setCustomParameters({ prompt: "select_account" });
   auth.onAuthStateChanged((user) => {
+    finalizeLoginFlow();
     handleGoogleAuthUser(user).catch((e) => appAlert(e.message || tx("auth_error")));
   });
 }
@@ -1943,7 +1959,7 @@ function initFirebase() {
 function registerServiceWorker() {
   if (!("serviceWorker" in navigator)) return;
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("./sw.js?v=18").catch(() => { });
+    navigator.serviceWorker.register("./sw.js?v=19").catch(() => { });
   });
 }
 
@@ -2055,6 +2071,12 @@ googleLoginBtn.addEventListener("click", async () => {
   if (loginProgress) return;
   try {
     loginProgress = true;
+    window.clearTimeout(loginProgressTimer);
+    loginProgressTimer = window.setTimeout(() => {
+      if (!loginProgress) return;
+      finalizeLoginFlow();
+      appAlert(tx("auth_error"));
+    }, 30000);
     googleLoginBtn.disabled = true;
     googleLoginBtn.style.opacity = "0.7";
     showLoader(tx("signing_in"));

@@ -1232,6 +1232,8 @@ h6,
 }
 
 .game-board-ttt { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.game-board-ttt .game-cell.is-ttt-x { color: #2563eb; background: #e8f0ff; }
+.game-board-ttt .game-cell.is-ttt-o { color: #e11d48; background: #ffe8ef; }
 .game-board-memory { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 .game-cell.is-open { background: var(--brand); color: #fff; }
 
@@ -2527,14 +2529,13 @@ input:not(:placeholder-shown)+.floating-label {
     }
 
     .lang-menu {
-        /* Keep the trigger in the header, but turn its long option list into
-           a comfortable bottom sheet on small touch screens. */
-        position: fixed;
-        top: auto;
-        right: 10px;
-        bottom: calc(10px + env(safe-area-inset-bottom));
-        left: 10px;
-        width: auto;
+        /* Keep the menu attached to the selector and let it open below. */
+        position: absolute;
+        top: calc(100% + 8px);
+        right: 0;
+        bottom: auto;
+        left: auto;
+        width: min(420px, calc(100vw - 24px));
         max-height: min(72dvh, 560px);
         padding: 12px;
         border-radius: 22px;
@@ -2543,8 +2544,8 @@ input:not(:placeholder-shown)+.floating-label {
     }
 
     html[dir="rtl"] .lang-menu {
-        right: 10px;
-        left: 10px;
+        right: auto;
+        left: 0;
     }
 
     .lang-menu::before {

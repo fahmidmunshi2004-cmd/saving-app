@@ -66,6 +66,7 @@
   if (!grid || !cornerView || !stage || !body || !title) return;
 
   let activeGame = null;
+  const gamePreferences = new Map();
   let gameCloseTimer = null;
   let previousFocus = null;
   let categoryFilter = "all";
@@ -341,20 +342,84 @@
       on(el("[data-action=roll-die]"), "click", () => { const n = random(6); el("[data-die]").textContent = faces[n]; result(`You rolled ${n + 1}!`); });
     },
     ttt() {
+      let mode = "", difficulty = "easy", turn = "X", done = false, locked = false;
       const cells = Array(9).fill("");
-      let turn = "X";
-      let done = false;
       const wins = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
-      frame("Two players · X goes first.", numberedBoard("game-board-ttt", 9));
+      frame("Choose who to play with.", `<div class="game-options" data-mode-picker><button class="game-action-btn" data-mode="friend">${translateGameText("Friend")}</button><button class="game-action-btn" data-mode="robot">${translateGameText("Robot")}</button></div><div class="game-options hidden" data-difficulty><button class="game-action-btn" data-level="easy">${translateGameText("Easy")}</button><button class="game-action-btn" data-level="medium">${translateGameText("Medium")}</button><button class="game-action-btn" data-level="hard">${translateGameText("Hard")}</button></div><div data-ttt-board></div>`);
+      const board = el("[data-ttt-board]");
+      const draw = () => {
+        board.innerHTML = numberedBoard("game-board-ttt", 9);
+        board.querySelectorAll("[data-cell]").forEach((cell, i) => {
+          cell.textContent = cells[i];
+          cell.classList.toggle("is-ttt-x", cells[i] === "X");
+          cell.classList.toggle("is-ttt-o", cells[i] === "O");
+        });
+      };
+      const play = (index, mark) => {
+        if (done || cells[index]) return false;
+        cells[index] = mark;
+        draw();
+        if (wins.some((line) => line.every((i) => cells[i] === mark))) {
+          done = true;
+          result(mark === "X" ? "X wins!" : mode === "robot" ? "Robot wins!" : "O wins!");
+        } else if (cells.every(Boolean)) {
+          done = true;
+          result("It's a draw!");
+        } else {
+          turn = mark === "X" ? "O" : "X";
+          result(mode === "robot" ? (turn === "X" ? "Your turn · X" : "Robot is thinking…") : `${turn}'s turn`);
+        }
+        return true;
+      };
+      const bestMove = () => {
+        const empty = cells.map((value, i) => value ? -1 : i).filter((i) => i >= 0);
+        const findWin = (mark) => empty.find((i) => {
+          cells[i] = mark;
+          const winsNow = wins.some((line) => line.every((cell) => cells[cell] === mark));
+          cells[i] = "";
+          return winsNow;
+        });
+        if (difficulty === "hard") {
+          const win = findWin("O"); if (win !== undefined) return win;
+          const block = findWin("X"); if (block !== undefined) return block;
+          if (!cells[4]) return 4;
+          const corners = [0,2,6,8].filter((i) => !cells[i]);
+          if (corners.length) return corners[random(corners.length)];
+        }
+        if (difficulty === "medium" && Math.random() < 0.65) {
+          const win = findWin("O"); if (win !== undefined) return win;
+          const block = findWin("X"); if (block !== undefined) return block;
+        }
+        return empty[random(empty.length)];
+      };
       on(body, "click", (event) => {
+        const modeButton = event.target.closest("[data-mode]");
+        if (modeButton) {
+          mode = modeButton.dataset.mode;
+          el("[data-mode-picker]").classList.add("hidden");
+          if (mode === "robot") el("[data-difficulty]").classList.remove("hidden");
+          else result("Friend mode · X goes first");
+          return;
+        }
+        const levelButton = event.target.closest("[data-level]");
+        if (levelButton) {
+          difficulty = levelButton.dataset.level;
+          el("[data-difficulty]").classList.add("hidden");
+          result(`Robot mode · ${difficulty[0].toUpperCase() + difficulty.slice(1)} · You are X`);
+          return;
+        }
         const cell = event.target.closest("[data-cell]");
-        if (!cell || done || cells[cell.dataset.cell]) return;
-        const i = Number(cell.dataset.cell);
-        cells[i] = turn;
-        cell.textContent = turn;
-        if (wins.some((line) => line.every((n) => cells[n] === turn))) { done = true; result(`${turn} wins!`); }
-        else if (cells.every(Boolean)) { done = true; result("It's a draw!"); }
-        else { turn = turn === "X" ? "O" : "X"; result(`${turn}'s turn.`); }
+        if (!cell || !mode || done || locked) return;
+        if (mode === "robot" && turn !== "X") return;
+        const mark = mode === "friend" ? turn : "X";
+        if (!play(Number(cell.dataset.cell), mark) || done || mode !== "robot") return;
+        locked = true;
+        later(() => {
+          locked = false;
+          if (done) return;
+          const move = bestMove();
+          if (move !== undefined) play(move, "O");
+        }, 350);
       });
     },
     memory() {
@@ -362,7 +427,7 @@
       const opened = [];
       let matched = 0;
       let locked = false;
-      frame("Tap two cards to find each matching pair.", numberedBoard("game-board-memory", 12));
+      frame("Tap two cards to find each matching pair. Match all six pairs.", numberedBoard("game-board-memory", 12));
       body.querySelectorAll("[data-cell]").forEach((cell, i) => { cell.textContent = "?"; });
       on(body, "click", (event) => {
         const cell = event.target.closest("[data-cell]");
@@ -565,13 +630,13 @@
       let start=0,raf=0;const target=(3+random(5)).toFixed(1);frame(`Stop the timer at ${target} seconds (within 0.15 seconds wins).`,`${action("Start","clock-start")}<div class="game-big" data-clock>0.00</div>${action("Stop","clock-stop","disabled")}`);const display=el("[data-clock]");const tick=()=>{display.textContent=((performance.now()-start)/1000).toFixed(2);raf=requestAnimationFrame(tick);};on(body,"click",e=>{const a=e.target.closest("[data-action]")?.dataset.action;if(a==="clock-start"){start=performance.now();el("[data-action=clock-stop]").disabled=false;e.target.disabled=true;tick();}if(a==="clock-stop"){cancelAnimationFrame(raf);const diff=Math.abs(Number(display.textContent)-Number(target));result(diff<=.15?`Perfect stop! ${display.textContent}s`: `Off by ${diff.toFixed(2)}s. Target was ${target}s.`);e.target.disabled=true;el("[data-action=clock-start]").disabled=false;}});cleanup.push(()=>cancelAnimationFrame(raf));
     },
     recall() {
-      const sequence=Array.from({length:7},()=>random(9)+1),shown=sequence.slice(0,3).join(" – ");frame("Remember the number sequence, then type it in order.",`<div class="game-big" data-sequence>${shown}</div>${action("Hide sequence","hide-sequence")}<input class="game-input" data-input inputmode="numeric" placeholder="Enter the sequence"><button class="game-action-btn" data-action="check-sequence">Check</button>`);on(el("[data-action=hide-sequence]"),"click",()=>el("[data-sequence]").textContent="? ? ?");on(el("[data-action=check-sequence]"),"click",()=>{const input=el("[data-input]").value.trim().replace(/\s+/g,"");const length=Math.min(7,3+Math.floor(input.length/4));result(input===sequence.slice(0,length).join("")?`Correct! ${length} digits remembered.`:"Not quite—restart for a new sequence.");});
+      const sequence=Array.from({length:9},()=>random(9)+1),shown=sequence.slice(0,5).join(" – ");frame("Remember the number sequence, then type it in order.",`<div class="game-big" data-sequence>${shown}</div>${action("Hide sequence","hide-sequence")}<input class="game-input" data-input inputmode="numeric" placeholder="Enter the sequence"><button class="game-action-btn" data-action="check-sequence">Check</button>`);on(el("[data-action=hide-sequence]"),"click",()=>el("[data-sequence]").textContent="? ? ? ? ?");on(el("[data-action=check-sequence]"),"click",()=>{const input=el("[data-input]").value.trim().replace(/\s+/g,"");result(input===sequence.slice(0,5).join("")?"Correct! All five digits remembered.":"Not quite—restart for a new sequence.");});
     },
     runner() {
       let pos=0,steps=15,gem=0,traps=new Set([7,8,14]);const treasures=new Set([2,5,10,13]);frame("Move across the grid, collect four gems and avoid traps.",`<div class="game-runner-grid">${Array.from({length:16},(_,i)=>`<button class="game-cell" data-runner="${i}"></button>`).join("")}</div><div class="game-options">${["up","left","down","right"].map(d=>`<button class="game-action-btn" data-dir="${d}">${{up:"↑",down:"↓",left:"←",right:"→"}[d]}</button>`).join("")}</div>`);const draw=()=>body.querySelectorAll("[data-runner]").forEach((b,i)=>b.textContent=i===pos?"🧑":treasures.has(i)?"💎":traps.has(i)?"⚠️":"");draw();const move=d=>{const next=pos+({up:-4,down:4,left:-1,right:1}[d]);if(next<0||next>15||(d==="left"&&pos%4===0)||(d==="right"&&pos%4===3))return;pos=next;steps--;if(treasures.has(pos)){gem++;treasures.delete(pos);}if(traps.has(pos)){result("You hit a trap! Restart and find another route.");body.querySelectorAll("[data-dir]").forEach(b=>b.disabled=true);}else if(gem>=4){result(`All gems collected in ${15-steps} moves!`);}else if(steps===0){result(`Moves over · Gems found: ${gem}/4`);}else result(`${gem}/4 gems · ${steps} moves left`);draw();};on(body,"click",e=>{const d=e.target.closest("[data-dir]")?.dataset.dir;if(d)move(d);});
     },
     maze() {
-      const walls=new Set([1,2,3,4,5,7,8,10,13,14,17,19,20,21,22,23,30,31,32,33,34]);let pos=0;frame("Find the exit at the bottom-right. Arrow buttons move one step.",`<div class="game-board game-maze-grid">${Array.from({length:36},(_,i)=>`<button class="game-cell" data-maze="${i}"></button>`).join("")}</div><div class="game-options">${["up","left","down","right"].map(d=>`<button class="game-action-btn" data-dir="${d}">${{up:"↑",down:"↓",left:"←",right:"→"}[d]}</button>`).join("")}</div>`);const draw=()=>body.querySelectorAll("[data-maze]").forEach((b,i)=>{b.textContent=i===pos?"🧍":i===35?"🏁":walls.has(i)?"■":"";b.classList.toggle("is-wall",walls.has(i));});draw();const move=d=>{const n=pos+({up:-6,down:6,left:-1,right:1}[d]);if(n<0||n>35||(d==="left"&&pos%6===0)||(d==="right"&&pos%6===5)||walls.has(n))return;pos=n;draw();result(pos===35?"You escaped the maze!":"Keep going to the exit.");};on(body,"click",e=>{const d=e.target.closest("[data-dir]")?.dataset.dir;if(d)move(d);});
+      const walls=new Set([1,2,3,4,5,7,8,9,10,11,13,14,15,16,17,19,20,21,22,23,29,30,31,32,33]);let pos=0;frame("Find the exit at the bottom-right. Arrow buttons move one step.",`<div class="game-board game-maze-grid">${Array.from({length:36},(_,i)=>`<button class="game-cell" data-maze="${i}"></button>`).join("")}</div><div class="game-options">${["up","left","down","right"].map(d=>`<button class="game-action-btn" data-dir="${d}">${{up:"↑",down:"↓",left:"←",right:"→"}[d]}</button>`).join("")}</div>`);const draw=()=>body.querySelectorAll("[data-maze]").forEach((b,i)=>{b.textContent=i===pos?"🧍":i===35?"🏁":walls.has(i)?"■":"";b.classList.toggle("is-wall",walls.has(i));});draw();const move=d=>{const n=pos+({up:-6,down:6,left:-1,right:1}[d]);if(n<0||n>35||(d==="left"&&pos%6===0)||(d==="right"&&pos%6===5)||walls.has(n))return;pos=n;draw();result(pos===35?"You escaped the maze!":"Keep going to the exit.");};on(body,"click",e=>{const d=e.target.closest("[data-dir]")?.dataset.dir;if(d)move(d);});
     },
     typing() {
       const phrases=["save a little every day","small steps build big goals","plan spend and save","money grows with good habits"];const phrase=phrases[random(phrases.length)];let time=20;frame(`Type this phrase accurately before 20 seconds run out: “${phrase}”`,`<input class="game-input" data-type autocomplete="off" placeholder="Start typing…"><div class="game-big" data-typing>20</div>`);on(el("[data-type]"),"input",e=>{if(e.target.value===phrase){stop();result(`Perfect typing! ${phrase.length} characters.`);}else if(!phrase.startsWith(e.target.value))result("Check the phrase and try again.");});every(()=>{time--;el("[data-typing]").textContent=time;if(time<=0){stop();result("Time is up. Restart for a new phrase.");}},1000);
@@ -583,7 +648,7 @@
       const seq=Array.from({length:10},()=>random(9));let index=0,round=3,locked=false;frame("Repeat the glowing squares in the same order.",`<div class="game-board game-pattern-grid">${Array.from({length:9},(_,i)=>`<button class="game-cell" data-pattern="${i}"></button>`).join("")}</div>${action("Show pattern","show-pattern")}`);const flash=i=>{const b=el(`[data-pattern="${i}"]`);b.classList.add("is-open");later(()=>b.classList.remove("is-open"),260);};const show=()=>{locked=true;result("Watch closely…");for(let i=0;i<round;i++)later(()=>flash(seq[i]),450+i*450);later(()=>{locked=false;index=0;result("Your turn!");},500+round*450);};on(body,"click",e=>{if(e.target.closest("[data-action=show-pattern]")){show();return;}const b=e.target.closest("[data-pattern]");if(!b||locked)return;const i=Number(b.dataset.pattern);flash(i);if(i!==seq[index]){result("Pattern missed. Restart to play again.");locked=true;return;}index++;if(index===round){round=Math.min(round+1,10);result(`Perfect! Pattern length ${round}.`);locked=true;later(show,600);}});
     },
     odd() {
-      let score=0;const rounds=Array.from({length:10},()=>{const icons=["🍒","🍋","🍇","🍎","🍊"];const odd=random(9);return{icons,odd};});let round=0;frame("Tap the one symbol that is different.",`<div class="game-board game-odd-grid" data-odd></div>`);const draw=()=>{const r=rounds[round];if(!r){result(`Game finished · ${score}/10 correct!`);return;}el("[data-odd]").innerHTML=Array.from({length:9},(_,i)=>`<button class="game-cell" data-odd-cell="${i}">${r.icons[i===r.odd?4:1+random(3)]}</button>`).join("");};draw();on(body,"click",e=>{const b=e.target.closest("[data-odd-cell]");if(!b)return;score+=Number(b.dataset.oddCell)===rounds[round].odd?1:0;round++;result(`${score} correct · ${10-round} rounds left`);draw();});
+      let score=0;const rounds=Array.from({length:15},()=>{const icons=["🍒","🍋","🍇","🍎","🍊","🍉"];const odd=random(16);return{icons,odd};});let round=0;frame("Tap the one symbol that is different.",`<div class="game-board game-odd-grid" data-odd></div>`);const draw=()=>{const r=rounds[round];if(!r){result(`Game finished · ${score}/15 correct!`);return;}el("[data-odd]").innerHTML=Array.from({length:16},(_,i)=>`<button class="game-cell" data-odd-cell="${i}">${r.icons[i===r.odd?5:random(5)]}</button>`).join("");};draw();on(body,"click",e=>{const b=e.target.closest("[data-odd-cell]");if(!b)return;score+=Number(b.dataset.oddCell)===rounds[round].odd?1:0;round++;result(`${score} correct · ${15-round} rounds left`);draw();});
     },
     beat() {
       let taps=[],start=0;frame("Tap the button ten times with a steady one-second rhythm.",`<div class="game-big" data-beat>0 / 10</div>${action("Tap the beat","beat-tap")}`);on(el("[data-action=beat-tap]"),"click",()=>{const now=performance.now();if(start)taps.push(now-start);start=now;el("[data-beat]").textContent=`${taps.length} / 10`;if(taps.length>=10){const avg=taps.reduce((a,b)=>a+b,0)/taps.length;result(`Average beat: ${(avg/1000).toFixed(2)}s · ${Math.abs(avg-1000)<120?"Perfect rhythm!":"Try to stay near one second."}`);el("[data-action=beat-tap]").disabled=true;}});
@@ -635,9 +700,9 @@
   }
 
   function timedTap(prompt, label, kind) {
-    let count=0,seconds=10,started=false;
+    let count=0,seconds=7,started=false;
     frame(prompt, `<div class="game-big" data-score>0</div>${action(label, "timed-tap")}`);
-    result("10 seconds");
+    result("7 seconds");
     on(el("[data-action=timed-tap]"),"click",(event)=>{
       if(seconds<=0)return;
       if(!started){started=true;const button=event.currentTarget;const timer=every(()=>{seconds--;result(seconds>0?`${seconds} seconds left`: `Time! Your score: ${count}`);if(seconds<=0){window.clearInterval(timer);button.disabled=true;}},1000);}
