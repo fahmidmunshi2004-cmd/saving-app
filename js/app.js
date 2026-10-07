@@ -15,14 +15,14 @@ let currentLang = "en";
 const LANGUAGE_OPTIONS = [
   { code: "en", name: "English", native: "English", flagCode: "us", locale: "en-US", dir: "ltr" },
   { code: "bn", name: "Bengali", native: "বাংলা", flagCode: "bd", locale: "bn-BD", dir: "ltr" },
-  { code: "ar", name: "Arabic", native: "Ø§Ù„Ø¹Ø±Ø¨ÙŠØ©", flagCode: "sa", locale: "ar-SA", dir: "rtl" },
-  { code: "hi", name: "Hindi", native: "à¤¹à¤¿à¤¨à¥à¤¦à¥€", flagCode: "in", locale: "hi-IN", dir: "ltr" },
-  { code: "ur", name: "Urdu", native: "Ø§Ø±Ø¯Ùˆ", flagCode: "pk", locale: "ur-PK", dir: "rtl" },
-  { code: "es", name: "Spanish", native: "EspaÃ±ol", flagCode: "es", locale: "es-ES", dir: "ltr" },
-  { code: "fr", name: "French", native: "FranÃ§ais", flagCode: "fr", locale: "fr-FR", dir: "ltr" },
+  { code: "ar", name: "Arabic", native: "العربية", flagCode: "sa", locale: "ar-SA", dir: "rtl" },
+  { code: "hi", name: "Hindi", native: "हिन्दी", flagCode: "in", locale: "hi-IN", dir: "ltr" },
+  { code: "ur", name: "Urdu", native: "اردو", flagCode: "pk", locale: "ur-PK", dir: "rtl" },
+  { code: "es", name: "Spanish", native: "Español", flagCode: "es", locale: "es-ES", dir: "ltr" },
+  { code: "fr", name: "French", native: "Français", flagCode: "fr", locale: "fr-FR", dir: "ltr" },
   { code: "de", name: "German", native: "Deutsch", flagCode: "de", locale: "de-DE", dir: "ltr" },
-  { code: "tr", name: "Turkish", native: "TÃ¼rkÃ§e", flagCode: "tr", locale: "tr-TR", dir: "ltr" },
-  { code: "ru", name: "Russian", native: "Ð ÑƒÑÑÐºÐ¸Ð¹", flagCode: "ru", locale: "ru-RU", dir: "ltr" }
+  { code: "tr", name: "Turkish", native: "Türkçe", flagCode: "tr", locale: "tr-TR", dir: "ltr" },
+  { code: "ru", name: "Russian", native: "Русский", flagCode: "ru", locale: "ru-RU", dir: "ltr" }
 ];
 let langSearchQuery = "";
 let i18n = {};
@@ -735,6 +735,9 @@ async function handleGoogleAuthUser(user) {
       if (currentSession?.type === "gmail") {
         currentSession = null;
         saveSession();
+        stopGroupRealtimeSync();
+        loadData();
+        updateUI(false);
       }
       applyAuthState();
       return;
@@ -763,10 +766,10 @@ async function handleGoogleAuthUser(user) {
           currentSession.canEdit = true;
           saveSession();
         }
-        await loadGroupSharedData();
-        syncTransactionState();
-        updateUI();
       }
+      await loadGroupSharedData();
+      syncTransactionState();
+      updateUI();
       applyAuthState();
       return;
     }
@@ -1835,7 +1838,7 @@ function initFirebase() {
 function registerServiceWorker() {
   if (!("serviceWorker" in navigator)) return;
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("./sw.js?v=37").catch(() => { });
+    navigator.serviceWorker.register("./sw.js?v=38").catch(() => { });
   });
 }
 
