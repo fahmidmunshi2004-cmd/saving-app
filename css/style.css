@@ -256,7 +256,18 @@ body {
     left: 0;
     border-radius: inherit;
     background: linear-gradient(90deg, var(--brand), #1BA2DB);
-    animation: bootProgress 1.25s ease-in-out infinite;
+    width: 0;
+    animation: bootProgress 1.2s ease-out forwards;
+}
+
+.app-boot-overlay.is-complete .app-boot-line.native::after {
+    width: 100%;
+    animation: none;
+    transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .app-boot-line.native::after { animation-duration: .01ms; }
 }
 
 .login-overlay {
@@ -920,7 +931,8 @@ h6,
 
 .game-connect-grid { grid-template-columns: repeat(7, minmax(0, 1fr)); }
 .game-connect-grid .game-cell { width: min(10vw, 46px); height: min(10vw, 46px); min-width: 32px; min-height: 32px; }
-.game-mole-grid,.game-runner-grid,.game-odd-grid,.game-pattern-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.game-mole-grid,.game-runner-grid,.game-pattern-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.game-odd-grid { grid-template-columns: repeat(var(--odd-columns, 4), minmax(0, 1fr)); }
 .game-mole-grid .game-cell,.game-runner-grid .game-cell,.game-odd-grid .game-cell,.game-pattern-grid .game-cell { width: min(18vw, 58px); height: min(18vw, 58px); }
 .game-lights-grid,.game-mines-grid,.game-fifteen-grid,.game-word-grid,.game-prime-grid,.game-treasure-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); }
 .game-maze-grid { grid-template-columns: repeat(6, minmax(0, 1fr)); }
@@ -928,6 +940,8 @@ h6,
 .game-lights-grid .game-cell,.game-maze-grid .game-cell,.game-fifteen-grid .game-cell { width: min(14vw, 54px); height: min(14vw, 54px); }
 .game-cell.is-on { background: #ffcb45; color: #513900; box-shadow: 0 0 16px rgba(255, 203, 69, .42); }
 .game-cell.is-wrong,.game-cell.is-mine-hit { background: #ff5577; color: white; }
+.game-odd-grid .game-cell.is-odd-miss { animation: oddMiss .32s ease; border-color: #ff5577; }
+@keyframes oddMiss { 25%, 75% { transform: translateX(-3px); } 50% { transform: translateX(3px); } }
 .game-maze-grid .game-cell.is-wall { background: color-mix(in srgb, var(--text) 32%, var(--surface)); }
 .game-dodge-lanes { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); width: min(100%, 330px); gap: 7px; }
 .game-dodge-lane { min-height: 150px; display: grid; place-items: center; border: 1px solid var(--stroke); border-radius: 13px; background: color-mix(in srgb, var(--brand) 8%, var(--surface)); font-size: 1.7rem; }
@@ -982,19 +996,30 @@ h6,
     background: rgba(9, 14, 28, .72);
     backdrop-filter: blur(9px);
 }
-.game-modal-card {
-    transform: translateY(22px) scale(.96);
-    opacity: 0;
-    transition: transform .32s cubic-bezier(.2, .8, .2, 1), opacity .24s ease;
+.game-stage.is-opening {
+    animation: gameStageDropIn .42s cubic-bezier(.18, .78, .24, 1) both;
 }
-.game-stage:not(.hidden) .game-modal-card {
+.game-modal-card {
     transform: translateY(0) scale(1);
     opacity: 1;
+    transition: transform .32s cubic-bezier(.2, .8, .2, 1), opacity .24s ease;
+}
+.game-modal-card.is-opening {
+    animation: gameCardDropIn .42s cubic-bezier(.18, .78, .24, 1) both;
 }
 .game-stage.is-closing { opacity: 0; background: rgba(9, 14, 28, 0); backdrop-filter: blur(0); }
 .game-stage.is-closing .game-modal-card { transform: translateY(18px) scale(.97); opacity: 0; }
+@keyframes gameStageDropIn {
+    from { opacity: 0; background: rgba(9, 14, 28, 0); backdrop-filter: blur(0); }
+    to { opacity: 1; background: rgba(9, 14, 28, .72); backdrop-filter: blur(9px); }
+}
+@keyframes gameCardDropIn {
+    from { transform: translateY(28px) scale(.94); opacity: 0; }
+    65% { transform: translateY(-3px) scale(1.01); opacity: 1; }
+    to { transform: translateY(0) scale(1); opacity: 1; }
+}
 @media (prefers-reduced-motion: reduce) {
-    .game-stage, .game-modal-card { transition-duration: .01ms !important; }
+    .game-stage, .game-modal-card, .game-options.is-revealing { transition-duration: .01ms !important; animation-duration: .01ms !important; }
 }
 
 .game-corner-head,
@@ -1193,6 +1218,13 @@ h6,
     flex-wrap: wrap;
     justify-content: center;
     gap: 9px;
+}
+.game-options.is-revealing {
+    animation: gameOptionsReveal .32s cubic-bezier(.2, .8, .2, 1) both;
+}
+@keyframes gameOptionsReveal {
+    from { opacity: 0; transform: translateY(-10px) scale(.98); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
 .game-action-btn {

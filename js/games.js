@@ -398,7 +398,13 @@
         if (modeButton) {
           mode = modeButton.dataset.mode;
           el("[data-mode-picker]").classList.add("hidden");
-          if (mode === "robot") el("[data-difficulty]").classList.remove("hidden");
+          if (mode === "robot") {
+            const options = el("[data-difficulty]");
+            options.classList.remove("hidden");
+            options.classList.remove("is-revealing");
+            void options.offsetWidth;
+            options.classList.add("is-revealing");
+          }
           else result("Friend mode · X goes first");
           return;
         }
@@ -649,9 +655,63 @@
       const seq=Array.from({length:10},()=>random(9));let index=0,round=3,locked=false;frame("Repeat the glowing squares in the same order.",`<div class="game-board game-pattern-grid">${Array.from({length:9},(_,i)=>`<button class="game-cell" data-pattern="${i}"></button>`).join("")}</div>${action("Show pattern","show-pattern")}`);const flash=i=>{const b=el(`[data-pattern="${i}"]`);b.classList.add("is-open");later(()=>b.classList.remove("is-open"),260);};const show=()=>{locked=true;result("Watch closely…");for(let i=0;i<round;i++)later(()=>flash(seq[i]),450+i*450);later(()=>{locked=false;index=0;result("Your turn!");},500+round*450);};on(body,"click",e=>{if(e.target.closest("[data-action=show-pattern]")){show();return;}const b=e.target.closest("[data-pattern]");if(!b||locked)return;const i=Number(b.dataset.pattern);flash(i);if(i!==seq[index]){result("Pattern missed. Restart to play again.");locked=true;return;}index++;if(index===round){round=Math.min(round+1,10);result(`Perfect! Pattern length ${round}.`);locked=true;later(show,600);}});
     },
     odd() {
-      let score=0;const rounds=Array.from({length:15},()=>{const icons=["🍒","🍋","🍇","🍎","🍊","🍉"];const odd=random(16);return{icons,odd};});let round=0;frame("Tap the one symbol that is different.",`<div class="game-board game-odd-grid" data-odd></div>`);const draw=()=>{const r=rounds[round];if(!r){result(`Game finished · ${score}/15 correct!`);return;}el("[data-odd]").innerHTML=Array.from({length:16},(_,i)=>`<button class="game-cell" data-odd-cell="${i}">${r.icons[i===r.odd?5:random(5)]}</button>`).join("");};draw();on(body,"click",e=>{const b=e.target.closest("[data-odd-cell]");if(!b)return;score+=Number(b.dataset.oddCell)===rounds[round].odd?1:0;round++;result(`${score} correct · ${15-round} rounds left`);draw();});
-    },
-    beat() {
+      const categories = [
+        { common: ["🍎", "🍐", "🍊", "🍋", "🍌", "🍉"], odd: ["🥕", "🥦", "🌽", "🍅"] },
+        { common: ["🐶", "🐱", "🐰", "🐻", "🐼", "🦊"], odd: ["🐟", "🐬", "🦈", "🐙"] },
+        { common: ["🚗", "🚌", "🚕", "🚙", "🚓", "🚑"], odd: ["✈️", "🚁", "🚀", "🛸"] },
+        { common: ["⚽", "🏀", "🏈", "⚾", "🎾", "🏐"], odd: ["🎸", "🎹", "🥁", "🎺"] },
+        { common: ["😀", "😃", "😄", "😁", "😆", "😊"], odd: ["😢", "😭", "😞", "🥺"] },
+        { common: ["🔴", "🟠", "🟡", "🟢", "🔵", "🟣"], odd: ["⬛", "⬜", "🔺", "⭐"] },
+        { common: ["1", "2", "3", "4", "5", "6"], odd: ["A", "B", "C", "D"] },
+        { common: ["🌸", "🌼", "🌻", "🌷", "🌹", "🪷"], odd: ["🍄", "🌵", "🌴", "🌳"] }
+      ];
+      const totalRounds = 15;
+      let score = 0, round = 0, found = new Set();
+      frame("Find every item that does not belong. Each round has more than one.", `<div class="game-big" data-odd-progress></div><div class="game-board game-odd-grid" data-odd></div>`);
+      const draw = () => {
+        if (round >= totalRounds) { result(`Game finished · ${score}/${totalRounds} rounds cleared!`); return; }
+        const category = categories[random(categories.length)];
+        const oddCount = Math.min(2 + Math.floor(round / 4), 5);
+        const side = round < 5 ? 4 : 5;
+        const grid = side * side;
+        found = new Set();
+        const positions = new Set();
+        while (positions.size < oddCount) positions.add(random(grid));
+        el("[data-odd]").style.setProperty("--odd-columns", side);
+        el("[data-odd-progress]").textContent = `Round ${round + 1}/${totalRounds} · Find ${oddCount} odd ones`;
+        el("[data-odd]").innerHTML = Array.from({ length: grid }, (_, i) => {
+          const isOdd = positions.has(i);
+          const icons = isOdd ? category.odd : category.common;
+          const symbol = icons[random(icons.length)];
+          return `<button class="game-cell" type="button" data-odd-cell="${i}" data-odd-answer="${isOdd}">${symbol}</button>`;
+        }).join("");
+      };
+      draw();
+      on(body, "click", (event) => {
+        const cell = event.target.closest("[data-odd-cell]");
+        if (!cell || cell.disabled) return;
+        const oddCount = Math.min(2 + Math.floor(round / 4), 5);
+        const isOdd = cell.dataset.oddAnswer === "true";
+        if (isOdd) {
+          cell.disabled = true;
+          found.add(Number(cell.dataset.oddCell));
+          cell.classList.add("is-open");
+          cell.textContent = "✓";
+          if (found.size === oddCount) {
+            score++;
+            round++;
+            result(`Correct! ${score} rounds cleared.`);
+            later(draw, 500);
+          } else {
+            result(`${found.size}/${oddCount} found · Keep looking`);
+          }
+        } else {
+          cell.classList.add("is-odd-miss");
+          later(() => cell.classList.remove("is-odd-miss"), 700);
+          result("That one belongs. Find the remaining odd ones!");
+        }
+      });
+    },    beat() {
       let taps=[],start=0;frame("Tap the button ten times with a steady one-second rhythm.",`<div class="game-big" data-beat>0 / 10</div>${action("Tap the beat","beat-tap")}`);on(el("[data-action=beat-tap]"),"click",()=>{const now=performance.now();if(start)taps.push(now-start);start=now;el("[data-beat]").textContent=`${taps.length} / 10`;if(taps.length>=10){const avg=taps.reduce((a,b)=>a+b,0)/taps.length;result(`Average beat: ${(avg/1000).toFixed(2)}s · ${Math.abs(avg-1000)<120?"Perfect rhythm!":"Try to stay near one second."}`);el("[data-action=beat-tap]").disabled=true;}});
     },
     colorreflex() {

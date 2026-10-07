@@ -582,6 +582,7 @@ const bootOverlayShownAt = Date.now();
 
 function hideBootOverlay() {
   if (bootOverlayClosed || !appBootOverlay) return;
+  appBootOverlay.classList.add("is-complete");
   const elapsed = Date.now() - bootOverlayShownAt;
   const waitMs = Math.max(0, BOOT_MIN_SHOW_MS - elapsed);
   setTimeout(() => {
@@ -1959,7 +1960,7 @@ function initFirebase() {
 function registerServiceWorker() {
   if (!("serviceWorker" in navigator)) return;
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("./sw.js?v=26").catch(() => { });
+    navigator.serviceWorker.register("./sw.js?v=28").catch(() => { });
   });
 }
 
@@ -2229,6 +2230,8 @@ async function bootApp() {
 
 bootApp().catch((error) => {
   console.error("Boot failed", error);
+}).finally(() => {
+  hideBootOverlay();
 });
 
 window.addIncome = addIncome;

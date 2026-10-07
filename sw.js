@@ -1,4 +1,4 @@
-const CACHE_NAME = "vaultbudget-v26";
+const CACHE_NAME = "jomao-v28";
 const ASSETS = [
   "./",
   "./index.html",
@@ -20,8 +20,7 @@ const ASSETS = [
   "./assets/i18n/tr.json",
   "./assets/i18n/ru.json",
   "./manifest.webmanifest",
-  "./assets/icons/icon-192.svg",
-  "./assets/icons/icon-512.svg"
+  "./assets/icons/main-logo.png"
 ];
 
 self.addEventListener("install", (event) => {
