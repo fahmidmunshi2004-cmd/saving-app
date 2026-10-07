@@ -1,4 +1,4 @@
-const CACHE_NAME = "vaultbudget-v19";
+const CACHE_NAME = "vaultbudget-v26";
 const ASSETS = [
   "./",
   "./index.html",

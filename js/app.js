@@ -1,4 +1,4 @@
-﻿async function getCurrentMemberDoc() {
+async function getCurrentMemberDoc() {
   if (!currentSession?.groupId || !currentSession?.memberId || !db) return null;
   const snap = await db
     .collection("groupMembers")
@@ -1959,7 +1959,7 @@ function initFirebase() {
 function registerServiceWorker() {
   if (!("serviceWorker" in navigator)) return;
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("./sw.js?v=19").catch(() => { });
+    navigator.serviceWorker.register("./sw.js?v=26").catch(() => { });
   });
 }
 

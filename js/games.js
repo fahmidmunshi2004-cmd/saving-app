@@ -347,6 +347,7 @@
       const wins = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
       frame("Choose who to play with.", `<div class="game-options" data-mode-picker><button class="game-action-btn" data-mode="friend">${translateGameText("Friend")}</button><button class="game-action-btn" data-mode="robot">${translateGameText("Robot")}</button></div><div class="game-options hidden" data-difficulty><button class="game-action-btn" data-level="easy">${translateGameText("Easy")}</button><button class="game-action-btn" data-level="medium">${translateGameText("Medium")}</button><button class="game-action-btn" data-level="hard">${translateGameText("Hard")}</button></div><div data-ttt-board></div>`);
       const board = el("[data-ttt-board]");
+      draw();
       const draw = () => {
         board.innerHTML = numberedBoard("game-board-ttt", 9);
         board.querySelectorAll("[data-cell]").forEach((cell, i) => {

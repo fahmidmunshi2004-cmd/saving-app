@@ -53,7 +53,7 @@
     "ttt": {
       "name": "Tic Tac Toe",
       "description": "Get three marks in a row. Two players take turns.",
-      "prompt": "Two players · X goes first."
+      "prompt": "Choose who to play with."
     },
     "memory": {
       "name": "Memory Match",
