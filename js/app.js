@@ -549,8 +549,12 @@ function applyAuthState() {
     saveSession();
   }
 
+  const loginProvider = currentSession.authProvider || sessionStorage.getItem("vault_auth_provider");
+  const loginLabel = loginProvider === "facebook"
+    ? (currentSession.displayName || firebaseUser?.displayName || currentSession.email)
+    : currentSession.email;
   authInfo.innerText = currentSession.type === "gmail"
-    ? tx("logged_in_as_email", { email: currentSession.email })
+    ? tx("logged_in_as_email", { email: loginLabel })
     : tx("logged_in_as_group_user", { username: currentSession.username });
 
   const lastView = sessionStorage.getItem("vault_active_view") || "homeView";
@@ -714,6 +718,23 @@ async function resolveTrustedMembership(membership, uid) {
 let loginProgress = false;
 let loginProgressTimer = 0;
 let pendingSocialCredential = null;
+let activeSocialProviderName = "";
+
+function resolveAuthProviderName(user) {
+  if (activeSocialProviderName === "facebook" || activeSocialProviderName === "google") {
+    return activeSocialProviderName;
+  }
+  const savedProvider = sessionStorage.getItem("vault_auth_provider");
+  if (savedProvider === "facebook" || savedProvider === "google") return savedProvider;
+  return user?.providerData?.some((provider) => provider.providerId === "facebook.com") ? "facebook" : "google";
+}
+
+function getAuthDisplayName(user, providerName) {
+  const providerId = providerName === "facebook" ? "facebook.com" : "google.com";
+  return user?.providerData?.find((provider) => provider.providerId === providerId)?.displayName
+    || user?.displayName
+    || "";
+}
 
 function finalizeLoginFlow() {
   window.clearTimeout(loginProgressTimer);
@@ -732,6 +753,7 @@ async function handleGoogleAuthUser(user) {
   firebaseUser = user || null;
   try {
     if (!firebaseUser) {
+      sessionStorage.removeItem("vault_auth_provider");
       if (currentSession?.type === "gmail") {
         currentSession = null;
         saveSession();
@@ -743,8 +765,12 @@ async function handleGoogleAuthUser(user) {
       return;
     }
 
+    const authProvider = resolveAuthProviderName(firebaseUser);
+    sessionStorage.setItem("vault_auth_provider", authProvider);
     const previousSession = currentSession ? { ...currentSession } : null;
-    const sameGoogleAccount = previousSession?.type === "gmail" && previousSession.uid === firebaseUser.uid;
+    const sameGoogleAccount = previousSession?.type === "gmail"
+      && previousSession.uid === firebaseUser.uid
+      && (!previousSession.authProvider || previousSession.authProvider === authProvider);
     if (!sameGoogleAccount && currentSession) {
       currentSession = null;
       saveSession();
@@ -753,6 +779,9 @@ async function handleGoogleAuthUser(user) {
     await processInviteLink();
 
     if (sameGoogleAccount && currentSession?.type === "gmail" && currentSession.uid === firebaseUser.uid) {
+      currentSession.authProvider = authProvider;
+      currentSession.displayName = getAuthDisplayName(firebaseUser, authProvider);
+      currentSession.email = firebaseUser.email || currentSession.email;
       if (currentSession.groupId) {
         const latestMember = await resolveMembershipForUser(`gmail_${firebaseUser.uid}`, currentSession.groupId);
         if (latestMember) {
@@ -782,6 +811,8 @@ async function handleGoogleAuthUser(user) {
         type: "gmail",
         uid: firebaseUser.uid,
         email: firebaseUser.email,
+        authProvider,
+        displayName: getAuthDisplayName(firebaseUser, authProvider),
         groupId: m.groupId,
         memberId,
         role: m.role || "viewer",
@@ -792,6 +823,8 @@ async function handleGoogleAuthUser(user) {
           type: "gmail",
           uid: firebaseUser.uid,
           email: firebaseUser.email,
+          authProvider,
+          displayName: getAuthDisplayName(firebaseUser, authProvider),
           role: "personal",
         canEdit: true
       };
@@ -1838,7 +1871,7 @@ function initFirebase() {
 function registerServiceWorker() {
   if (!("serviceWorker" in navigator)) return;
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("./sw.js?v=38").catch(() => { });
+    navigator.serviceWorker.register("./sw.js?v=40").catch(() => { });
   });
 }
 
@@ -1941,7 +1974,10 @@ async function startSocialLogin(provider, button, providerName) {
     button.disabled = true;
     button.style.opacity = "0.7";
     showLoader(tx("signing_in"));
+    activeSocialProviderName = providerName;
     const result = await auth.signInWithPopup(provider);
+    sessionStorage.setItem("vault_auth_provider", providerName);
+    activeSocialProviderName = "";
     if (pendingSocialCredential && providerName !== pendingSocialCredential.providerName) {
       const pending = pendingSocialCredential;
       pendingSocialCredential = null;
@@ -1950,7 +1986,18 @@ async function startSocialLogin(provider, button, providerName) {
         return;
       }
       try {
-        await result.user.linkWithCredential(pending.credential);
+        const linkedResult = await result.user.linkWithCredential(pending.credential);
+        sessionStorage.setItem("vault_auth_provider", pending.providerName);
+        if (currentSession?.uid === linkedResult.user.uid) {
+          currentSession.authProvider = pending.providerName;
+          currentSession.displayName = getAuthDisplayName(linkedResult.user, pending.providerName);
+          currentSession.email = linkedResult.user.email || currentSession.email;
+          saveSession();
+          await loadGroupSharedData();
+          syncTransactionState();
+          updateUI();
+          applyAuthState();
+        }
         appAlert(tx("social_account_linked"));
       } catch (linkError) {
         console.error("Social account linking failed", linkError);
@@ -1958,6 +2005,7 @@ async function startSocialLogin(provider, button, providerName) {
       }
     }
   } catch (error) {
+    activeSocialProviderName = "";
     finalizeLoginFlow();
     if (error?.code === "auth/popup-closed-by-user") return;
     if (error?.code === "auth/account-exists-with-different-credential") {
@@ -2061,7 +2109,11 @@ clearDataBtn.addEventListener("click", async () => {
           await doc.ref.delete();
         }
 
-        await db.collection("userFinance").doc(firebaseUser.uid).delete();
+        const userFinanceRef = db.collection("userFinance").doc(firebaseUser.uid);
+        await Promise.all(["google", "facebook"].map((provider) =>
+          userFinanceRef.collection("accounts").doc(provider).delete()
+        ));
+        await userFinanceRef.delete();
       }
     } catch (err) {
       remoteClearError = err?.message || "Remote clear failed";

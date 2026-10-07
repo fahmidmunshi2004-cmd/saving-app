@@ -54,8 +54,15 @@ function applyGroupFinanceSnapshot(data = {}) {
 
 function financeStorageKey(key) {
   if (currentSession?.groupId) return `jomao_group_${currentSession.groupId}_${key}`;
-  if (currentSession?.uid) return `jomao_user_${currentSession.uid}_${key}`;
+  if (currentSession?.uid) return `jomao_user_${currentSession.uid}_${financeProviderKey()}_${key}`;
   return `jomao_guest_${key}`;
+}
+
+function financeProviderKey() {
+  const provider = currentSession?.authProvider || sessionStorage.getItem("vault_auth_provider");
+  if (provider === "facebook" || provider === "facebook.com") return "facebook";
+  if (provider === "google" || provider === "google.com") return "google";
+  return firebaseUser?.providerData?.some((item) => item.providerId === "facebook.com") ? "facebook" : "google";
 }
 
 function readFinanceFromStorage() {
@@ -77,20 +84,26 @@ function readFinanceFromStorage() {
   deletedTransactions.push(...localDeletedTransactions);
 }
 
-function migrateLegacyFinanceToUser(uid) {
-  const migrationKey = "jomao_finance_migrated_v1";
-  if (!uid || localStorage.getItem(migrationKey)) return false;
+function migrateLegacyFinanceToGoogle(uid) {
+  const migrationKey = "jomao_finance_migrated_to_google_v2";
+  if (!uid) return false;
 
   const legacyKeys = ["income", "expense", "breakdown", "transactions", "deletedTransactions"];
-  const hasLegacyData = legacyKeys.some((key) => localStorage.getItem(key) !== null);
-  if (hasLegacyData) {
-    legacyKeys.forEach((key) => {
-      const value = localStorage.getItem(key);
-      if (value !== null) localStorage.setItem(`jomao_user_${uid}_${key}`, value);
-    });
-  }
-  localStorage.setItem(migrationKey, "1");
-  return hasLegacyData;
+  let migratedAny = false;
+  legacyKeys.forEach((key) => {
+    const targetKey = `jomao_user_${uid}_google_${key}`;
+    if (localStorage.getItem(targetKey) !== null) return;
+
+    const oldUserValue = localStorage.getItem(`jomao_user_${uid}_${key}`);
+    const legacyValue = localStorage.getItem(key);
+    const value = oldUserValue !== null ? oldUserValue : (!localStorage.getItem(migrationKey) ? legacyValue : null);
+    if (value !== null) {
+      localStorage.setItem(targetKey, value);
+      migratedAny = true;
+    }
+  });
+  if (!localStorage.getItem(migrationKey)) localStorage.setItem(migrationKey, "1");
+  return migratedAny;
 }
 
 function syncCurrentSessionFromGroupMembers(docs = []) {
@@ -107,14 +120,20 @@ function syncCurrentSessionFromGroupMembers(docs = []) {
         type: "gmail",
         uid: firebaseUser.uid,
         email: firebaseUser.email,
+        authProvider: sessionStorage.getItem("vault_auth_provider") || "google",
+        displayName: typeof getAuthDisplayName === "function"
+          ? getAuthDisplayName(firebaseUser, sessionStorage.getItem("vault_auth_provider") || "google")
+          : (firebaseUser.displayName || ""),
         role: "personal",
         canEdit: true
       };
       saveSession();
       stopGroupRealtimeSync();
-      loadData();
-      updateUI(false);
-      applyAuthState();
+      loadGroupSharedData().then(() => {
+        syncTransactionState();
+        updateUI(false);
+        applyAuthState();
+      }).catch((error) => console.error("Personal finance load failed", error));
     }
     return;
   }
@@ -223,7 +242,7 @@ function saveData(syncRemote = true) {
   }
 
   if (syncRemote && currentSession?.uid && !currentSession?.groupId && db) {
-    db.collection("userFinance").doc(currentSession.uid).set({
+    db.collection("userFinance").doc(currentSession.uid).collection("accounts").doc(financeProviderKey()).set({
       income,
       expense,
       breakdown,
@@ -244,7 +263,9 @@ function loadData() {
     return;
   }
 
-  if (!currentSession.groupId) migrateLegacyFinanceToUser(currentSession.uid);
+  if (!currentSession.groupId && financeProviderKey() === "google") {
+    migrateLegacyFinanceToGoogle(currentSession.uid);
+  }
   readFinanceFromStorage();
 }
 
@@ -252,13 +273,32 @@ async function loadGroupSharedData() {
   if (!currentSession?.groupId || !db) {
     loadData();
     if (currentSession?.uid && db) {
-      const ref = db.collection("userFinance").doc(currentSession.uid);
+      const userFinanceRef = db.collection("userFinance").doc(currentSession.uid);
+      const providerKey = financeProviderKey();
+      const ref = userFinanceRef.collection("accounts").doc(providerKey);
       try {
         const snap = await ref.get();
         if (snap.exists) {
           applyGroupFinanceSnapshot(snap.data() || {});
           saveData(false);
         } else {
+          const legacySnap = await userFinanceRef.get();
+          const legacyData = legacySnap.exists ? legacySnap.data() || {} : {};
+          const hasLegacyFinance = ["income", "expense", "transactions"].some((key) => Object.prototype.hasOwnProperty.call(legacyData, key));
+          if (hasLegacyFinance) {
+            await userFinanceRef.collection("accounts").doc("google").set({
+              income: Number(legacyData.income) || 0,
+              expense: Number(legacyData.expense) || 0,
+              breakdown: legacyData.breakdown || {},
+              transactions: legacyData.transactions || [],
+              deletedTransactions: legacyData.deletedTransactions || []
+            }, { merge: true });
+            if (providerKey === "google") {
+              applyGroupFinanceSnapshot(legacyData);
+              saveData(false);
+              return;
+            }
+          }
           saveData(true);
         }
       } catch (error) {

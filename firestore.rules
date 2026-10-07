@@ -174,6 +174,12 @@ service cloud.firestore {
 
     match /userFinance/{uid} {
       allow read, write: if signedIn() && request.auth.uid == uid;
+
+      match /accounts/{provider} {
+        allow read, write: if signedIn()
+          && request.auth.uid == uid
+          && provider in ["google", "facebook"];
+      }
     }
 
     match /{document=**} {
