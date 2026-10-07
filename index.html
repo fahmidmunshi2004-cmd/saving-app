@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+﻿﻿<!DOCTYPE html>
 <html lang="en" dir="ltr">
 
 <head>
@@ -33,9 +33,9 @@
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="apple-mobile-web-app-title" content="Jomao" />
-    <link rel="manifest" href="manifest.webmanifest?v=34" />
-    <link rel="apple-touch-icon" sizes="1254x1254" href="assets/icons/main-logo.png?v=34" />
-    <link rel="icon" type="image/png" sizes="1254x1254" href="assets/icons/main-logo.png?v=34" />
+    <link rel="manifest" href="manifest.webmanifest?v=36" />
+    <link rel="apple-touch-icon" sizes="1254x1254" href="assets/icons/main-logo.png?v=36" />
+    <link rel="icon" type="image/png" sizes="1254x1254" href="assets/icons/main-logo.png?v=36" />
     <link rel="preload" href="assets/font/Nohemi-Regular-BF6a4e01a26b011.ttf" as="font" type="font/ttf" crossorigin />
     <link rel="preload" href="assets/font/Nohemi-Medium-BF6a4e01a26b011.ttf" as="font" type="font/ttf" crossorigin />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
@@ -45,9 +45,9 @@
     <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore-compat.js"></script>
 
-    <link rel="stylesheet" href="css/style.css?v=34" />
-    <link rel="stylesheet" href="css/modal.css?v=34" />
-    <link rel="stylesheet" href="css/dark-mode.css?v=34" />
+    <link rel="stylesheet" href="css/style.css?v=36" />
+    <link rel="stylesheet" href="css/modal.css?v=36" />
+    <link rel="stylesheet" href="css/dark-mode.css?v=36" />
 </head>
 
 <body>
@@ -77,11 +77,14 @@
         <section id="loginOverlay" class="login-overlay">
             <div class="login-card">
                 <h2 data-i18n="login_required">Login Required</h2>
-                <p class="login-help" data-i18n="login_help">Continue with Google (Gmail) to access the app.</p>
+                <p class="login-help" data-i18n="login_help">Continue with Google or Facebook to access the app.</p>
                 <div class="login-actions">
                     <button id="googleLoginBtn" class="btn expense-btn" type="button"><i
                             class="fa-brands fa-google"></i>
                         <span data-i18n="continue_google">Continue with Google</span></button>
+                    <button id="facebookLoginBtn" class="btn facebook-login-btn" type="button"><i
+                            class="fa-brands fa-facebook-f"></i>
+                        <span data-i18n="continue_facebook">Continue with Facebook</span></button>
                 </div>
             </div>
         </section>
@@ -298,31 +301,20 @@
                             class="fa-solid fa-people-group"></i> <span data-i18n="create_group_account">Create Group
                             Account</span></button>
                     <button id="addAnotherGroupBtn" class="btn expense-btn" type="button"><i
-                            class="fa-solid fa-right-left"></i> <span data-i18n="add_another_group">Add Another
-                            Group</span></button>
+                            class="fa-solid fa-link"></i> <span data-i18n="join_group">Join Group</span></button>
                 </div>
                 <div id="groupActionFormCard" class="settings-item hidden">
                     <strong id="groupActionTitle" data-i18n="group_action">Group Action</strong><br />
                     <div class="field">
-                        <span class="field-icon"><i class="fa-solid fa-user"></i></span>
+                        <span class="field-icon"><i class="fa-solid fa-people-group"></i></span>
                         <input id="groupActionUsername" class="with-icon" type="text" placeholder=" " />
-                        <label class="floating-label" for="groupActionUsername" data-i18n="group_username">Group
-                            Username</label>
-                    </div>
-                    <div class="field">
-                        <span class="field-icon"><i class="fa-solid fa-lock"></i></span>
-                        <input id="groupActionPassword" class="with-icon with-toggle" type="password" placeholder=" " />
-                        <label class="floating-label" for="groupActionPassword" data-i18n="group_password">Group
-                            Password</label>
-                        <button class="toggle-pass" type="button" data-target="groupActionPassword"
-                            aria-label="Show or hide password">
-                            <i class="fa-regular fa-eye"></i>
-                        </button>
+                        <label class="floating-label" for="groupActionUsername" data-i18n="group_name">Group
+                            Name</label>
                     </div>
                     <button id="groupActionSubmitBtn" class="btn expense-btn" type="button"><i
                             class="fa-solid fa-paper-plane"></i> <span data-i18n="submit">Submit</span></button>
-                    <p id="groupActionHelpText" class="login-help" data-i18n="group_action_help_join">
-                        Use the exact group username and password from the admin.
+                    <p id="groupActionHelpText" class="login-help" data-i18n="group_action_help_create">
+                        Create a group and invite members using their Google email.
                     </p>
                 </div>
                 <div class="settings-item">
@@ -332,14 +324,6 @@
                 <div class="settings-item">
                     <strong data-i18n="role">Role</strong><br />
                     <span id="accountRoleText">-</span>
-                </div>
-                <div id="adminCredentialCard" class="settings-item hidden">
-                    <strong data-i18n="group_credentials_admin">Group Credentials (Admin)</strong><br />
-                    <div><b>Username:</b> <span id="adminCredentialUsername">-</span></div>
-                    <div style="margin-top:6px;"><b>Password:</b> <span id="adminCredentialPassword">-</span></div>
-                    <button id="copyAdminCredentialBtn" class="btn income-btn" type="button"><i
-                            class="fa-regular fa-copy"></i> <span data-i18n="copy_credentials">Copy
-                            Credentials</span></button>
                 </div>
                 <div id="groupMembersCard" class="settings-item hidden">
                     <strong data-i18n="group_members">Group Members</strong><br />
@@ -514,11 +498,11 @@
         </div>
     </div>
 
-    <script src="js/core/state.js?v=34"></script>
-    <script src="js/core/common.js?v=34"></script>
-    <script src="js/dark-mode.js?v=34"></script>
-    <script src="js/games.js?v=34"></script>
-    <script src="js/app.js?v=34"></script>
+    <script src="js/core/state.js?v=36"></script>
+    <script src="js/core/common.js?v=36"></script>
+    <script src="js/dark-mode.js?v=36"></script>
+    <script src="js/games.js?v=36"></script>
+    <script src="js/app.js?v=36"></script>
 </body>
 
 </html>

@@ -1,7 +1,3 @@
-function normalizeUsername(value) {
-  return value.trim().toLowerCase();
-}
-
 function saveSession() {
   if (currentSession) {
     sessionStorage.setItem(SESSION_KEY, JSON.stringify(currentSession));

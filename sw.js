@@ -1,4 +1,4 @@
-const CACHE_NAME = "jomao-v34";
+const CACHE_NAME = "jomao-v36";
 const ASSETS = [
   "./",
   "./index.html",
@@ -8,6 +8,7 @@ const ASSETS = [
   "./js/core/state.js",
   "./js/core/common.js",
   "./js/dark-mode.js",
+  "./js/games.js",
   "./js/app.js",
   "./assets/i18n/en.json",
   "./assets/i18n/bn.json",
@@ -19,70 +20,89 @@ const ASSETS = [
   "./assets/i18n/de.json",
   "./assets/i18n/tr.json",
   "./assets/i18n/ru.json",
+  "./assets/i18n/game-corner/en.json",
+  "./assets/i18n/game-corner/bn.json",
+  "./assets/i18n/game-corner/ar.json",
+  "./assets/i18n/game-corner/hi.json",
+  "./assets/i18n/game-corner/ur.json",
+  "./assets/i18n/game-corner/es.json",
+  "./assets/i18n/game-corner/fr.json",
+  "./assets/i18n/game-corner/de.json",
+  "./assets/i18n/game-corner/tr.json",
+  "./assets/i18n/game-corner/ru.json",
   "./manifest.webmanifest",
-  "./assets/icons/main-logo.png?v=34"
+  "./assets/icons/main-logo.png"
 ];
 
 self.addEventListener("install", (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS))
-  );
+  event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS)));
   self.skipWaiting();
 });
 
 self.addEventListener("activate", (event) => {
   event.waitUntil(
-    caches.keys().then((keys) =>
-      Promise.all(
-        keys.map((key) => {
-          if (key !== CACHE_NAME) return caches.delete(key);
-          return null;
-        })
-      )
-    )
+    caches.keys().then((keys) => Promise.all(
+      keys.map((key) => key === CACHE_NAME ? null : caches.delete(key))
+    ))
   );
   self.clients.claim();
 });
 
 self.addEventListener("fetch", (event) => {
-  if (event.request.method !== "GET") return;
   const req = event.request;
-  const url = new URL(req.url);
-  const isSameOrigin = url.origin === self.location.origin;
-  const isAppShellFile = isSameOrigin && (
-    url.pathname.endsWith(".html")
-    || url.pathname.endsWith(".css")
-    || url.pathname.endsWith(".js")
-  );
+  if (req.method !== "GET") return;
 
-  // For app shell files prefer fresh network, fallback to cache.
+  const url = new URL(req.url);
+  if (url.origin !== self.location.origin) {
+    event.respondWith(fetch(req));
+    return;
+  }
+
+  const isNavigation = req.mode === "navigate";
+  const isAppShellFile = isNavigation
+    || url.pathname.endsWith(".html")
+    || url.pathname.endsWith(".css")
+    || url.pathname.endsWith(".js");
+
   if (isAppShellFile) {
     event.respondWith(
-      fetch(req)
-        .then((response) => {
+      fetch(req).then((response) => {
+        if (response.ok && response.status === 200) {
           const clone = response.clone();
-          if (response.ok && response.status === 200) {
-            caches.open(CACHE_NAME).then((cache) => cache.put(req, clone)).catch(() => { });
-          }
-          return response;
-        })
-        .catch(() => caches.match(req).then((cached) => cached || caches.match("./index.html")))
+          caches.open(CACHE_NAME).then((cache) => cache.put(req, clone)).catch(() => {});
+        }
+        return response;
+      }).catch(async () => {
+        const cached = await caches.match(req, { ignoreSearch: true });
+        if (cached) return cached;
+        if (isNavigation) {
+          const appShell = await caches.match("./index.html");
+          if (appShell) return appShell;
+        }
+        return new Response("Offline resource unavailable", {
+          status: 503,
+          headers: { "Content-Type": "text/plain; charset=utf-8" }
+        });
+      })
     );
     return;
   }
 
-  event.respondWith(
-    caches.match(req).then((cached) => {
-      if (cached) return cached;
-      return fetch(req)
-        .then((response) => {
-          const clone = response.clone();
-          if (response.ok && response.status === 200) {
-            caches.open(CACHE_NAME).then((cache) => cache.put(req, clone)).catch(() => { });
-          }
-          return response;
-        })
-        .catch(() => caches.match("./index.html"));
-    })
-  );
+  event.respondWith((async () => {
+    const cached = await caches.match(req, { ignoreSearch: true });
+    if (cached) return cached;
+    try {
+      const response = await fetch(req);
+      if (response.ok && response.status === 200) {
+        const clone = response.clone();
+        caches.open(CACHE_NAME).then((cache) => cache.put(req, clone)).catch(() => {});
+      }
+      return response;
+    } catch (_) {
+      return new Response("Offline resource unavailable", {
+        status: 503,
+        headers: { "Content-Type": "text/plain; charset=utf-8" }
+      });
+    }
+  })());
 });

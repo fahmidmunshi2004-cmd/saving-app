@@ -312,6 +312,17 @@ body {
     gap: 10px;
 }
 
+.login-actions .facebook-login-btn {
+    color: #fff;
+    background: #1877f2;
+    border: 1px solid #1877f2;
+}
+
+.login-actions .facebook-login-btn:hover {
+    background: #166fe5;
+    border-color: #166fe5;
+}
+
 .group-login {
     margin-top: 10px;
 }

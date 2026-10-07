@@ -9,120 +9,167 @@ service cloud.firestore {
       return "gmail_" + request.auth.uid;
     }
 
+    function membershipPath(groupId, memberId) {
+      return /databases/$(database)/documents/groupMembers/$(groupId + "__" + memberId);
+    }
+
+    function isGroupOwner(groupId) {
+      return signedIn()
+        && get(/databases/$(database)/documents/groups/$(groupId)).data.createdByUid == request.auth.uid;
+    }
+
+    function hasAcceptedInvite(groupId, memberId, token) {
+      let invitePath = /databases/$(database)/documents/invitations/$(token);
+      return token is string
+        && exists(invitePath)
+        && get(invitePath).data.groupId == groupId
+        && get(invitePath).data.email == request.auth.token.email
+        && get(invitePath).data.status == "accepted"
+        && get(invitePath).data.acceptedAt != null
+        && memberId == myMemberId();
+    }
+
     function isGroupMember(groupId) {
       return signedIn()
-        && exists(/databases/$(database)/documents/groupMembers/$(groupId + "__" + myMemberId()));
+        && exists(membershipPath(groupId, myMemberId()))
+        && get(membershipPath(groupId, myMemberId())).data.groupId == groupId
+        && get(membershipPath(groupId, myMemberId())).data.memberId == myMemberId()
+        && (isGroupOwner(groupId)
+          || hasAcceptedInvite(groupId, myMemberId(), get(membershipPath(groupId, myMemberId())).data.invitationToken));
     }
 
     function isGroupAdmin(groupId) {
-      return signedIn()
-        && get(/databases/$(database)/documents/groupMembers/$(groupId + "__" + myMemberId())).data.role == "admin";
+      return isGroupOwner(groupId);
     }
 
     function canGroupEdit(groupId) {
-      return signedIn()
-        && (
-          isGroupAdmin(groupId)
-          || get(/databases/$(database)/documents/groupMembers/$(groupId + "__" + myMemberId())).data.canEdit == true
-        );
+      return isGroupMember(groupId)
+        && (isGroupAdmin(groupId)
+          || (get(membershipPath(groupId, myMemberId())).data.role == "editor"
+            && get(membershipPath(groupId, myMemberId())).data.canEdit == true
+            && get(membershipPath(groupId, myMemberId())).data.grantedByUid
+              == get(/databases/$(database)/documents/groups/$(groupId)).data.createdByUid));
     }
 
-    match /groupFinance/{groupId} {
-      allow read: if isGroupMember(groupId);
-      allow create: if signedIn()
-        && (
-          canGroupEdit(groupId)
-          || getAfter(/databases/$(database)/documents/groupMembers/$(groupId + "__" + myMemberId())).data.role == "admin"
-          || getAfter(/databases/$(database)/documents/groups/$(groupId)).data.createdByUid == request.auth.uid
-        );
-      allow update: if canGroupEdit(groupId);
-      allow delete: if isGroupAdmin(groupId);
+    function validMemberShape(data, groupId, memberId) {
+      return data.groupId == groupId
+        && data.memberId == memberId
+        && data.type == "gmail"
+        && data.role in ["admin", "editor", "viewer"]
+        && data.canEdit is bool
+        && ((data.role == "admin" || data.role == "editor") == data.canEdit)
+        && (data.role != "editor"
+          || data.grantedByUid
+            == get(/databases/$(database)/documents/groups/$(groupId)).data.createdByUid);
+    }
+
+    function validInvite(groupId, memberId, token) {
+      let invitePath = /databases/$(database)/documents/invitations/$(token);
+      return token is string
+        && exists(invitePath)
+        && get(invitePath).data.groupId == groupId
+        && get(invitePath).data.email == request.auth.token.email
+        && get(invitePath).data.status == "pending"
+        && get(invitePath).data.expiresAt > request.time
+        && getAfter(invitePath).data.status == "accepted"
+        && getAfter(membershipPath(groupId, memberId)).data.invitationToken == token;
     }
 
     match /groups/{groupId} {
-      allow read: if signedIn();
+      allow read: if isGroupMember(groupId)
+        || (signedIn() && resource.data.createdByUid == request.auth.uid);
       allow create: if signedIn()
         && request.resource.data.id == groupId
-        && request.resource.data.createdByUid == request.auth.uid;
-      allow update: if isGroupAdmin(groupId);
+        && request.resource.data.createdByUid == request.auth.uid
+        && request.resource.data.name is string;
+      allow update: if isGroupAdmin(groupId)
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(["name"]);
       allow delete: if isGroupAdmin(groupId);
     }
 
     match /groupMembers/{memberDocId} {
       allow read: if signedIn()
-        && (
-          resource.data.memberId == myMemberId()
-          || isGroupMember(resource.data.groupId)
-        );
+        && (resource.data.memberId == myMemberId()
+          || isGroupMember(resource.data.groupId));
 
       allow create: if signedIn()
-        && request.resource.data.memberId == myMemberId()
+        && memberDocId == request.resource.data.groupId + "__" + myMemberId()
+        && validMemberShape(request.resource.data, request.resource.data.groupId, myMemberId())
         && (
-          (
-            request.resource.data.role == "admin"
-            && (
-              get(/databases/$(database)/documents/groups/$(request.resource.data.groupId)).data.createdByUid == request.auth.uid
-              || getAfter(/databases/$(database)/documents/groups/$(request.resource.data.groupId)).data.createdByUid == request.auth.uid
-            )
-          )
-          || isGroupAdmin(request.resource.data.groupId)
-          || request.resource.data.role == "viewer"
+          (request.resource.data.role == "admin"
+            && getAfter(/databases/$(database)/documents/groups/$(request.resource.data.groupId)).data.createdByUid == request.auth.uid)
+          || (request.resource.data.role == "viewer"
+            && request.resource.data.canEdit == false
+            && validInvite(request.resource.data.groupId, myMemberId(), request.resource.data.invitationToken))
         );
 
-      allow update: if signedIn()
-        && (
-          resource.data.memberId == myMemberId()
-          || isGroupAdmin(resource.data.groupId)
-        );
+      allow update: if (isGroupAdmin(resource.data.groupId)
+          || (isGroupOwner(resource.data.groupId)
+            && resource.data.memberId == myMemberId()
+            && request.resource.data.role == "admin")
+          || (signedIn()
+            && resource.data.memberId == myMemberId()
+            && request.resource.data.role == "viewer"
+            && request.resource.data.canEdit == false
+            && validInvite(resource.data.groupId, myMemberId(), request.resource.data.invitationToken)))
+        && request.resource.data.groupId == resource.data.groupId
+        && request.resource.data.memberId == resource.data.memberId
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(["role", "canEdit", "label", "grantedByUid", "invitationToken"])
+        && validMemberShape(request.resource.data, resource.data.groupId, resource.data.memberId);
 
-      allow delete: if signedIn()
-        && (
-          resource.data.memberId == myMemberId()
-          || isGroupAdmin(resource.data.groupId)
-        );
+      allow delete: if isGroupAdmin(resource.data.groupId)
+        || (signedIn() && resource.data.memberId == myMemberId());
+    }
+
+    match /groupFinance/{groupId} {
+      allow read: if isGroupMember(groupId);
+      allow create: if canGroupEdit(groupId)
+        || (signedIn()
+          && getAfter(/databases/$(database)/documents/groups/$(groupId)).data.createdByUid == request.auth.uid
+          && getAfter(membershipPath(groupId, myMemberId())).data.role == "admin");
+      allow update: if canGroupEdit(groupId);
+      allow delete: if isGroupAdmin(groupId);
     }
 
     match /invitations/{token} {
       allow read: if signedIn()
-        && (
-          isGroupAdmin(resource.data.groupId)
-          || request.auth.token.email == resource.data.email
-        );
-      allow create: if signedIn() && isGroupAdmin(request.resource.data.groupId);
-      allow update: if signedIn()
-        && (
-          isGroupAdmin(resource.data.groupId)
-          || request.auth.token.email == resource.data.email
-        );
-      allow delete: if signedIn() && isGroupAdmin(resource.data.groupId);
+        && (isGroupAdmin(resource.data.groupId)
+          || request.auth.token.email == resource.data.email);
+      allow create: if isGroupAdmin(request.resource.data.groupId)
+        && request.resource.data.token == token
+        && request.resource.data.email is string
+        && request.resource.data.status == "pending"
+        && request.resource.data.expiresAt > request.time;
+      allow update: if isGroupAdmin(resource.data.groupId)
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(["status", "acceptedAt", "expiredAt"])
+        || (signedIn()
+          && request.auth.token.email == resource.data.email
+          && resource.data.status == "pending"
+          && resource.data.expiresAt > request.time
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(["status", "acceptedAt"])
+          && request.resource.data.status == "accepted"
+          && getAfter(membershipPath(resource.data.groupId, myMemberId())).data.invitationToken == token);
+      allow delete: if isGroupAdmin(resource.data.groupId);
     }
 
     match /accessRequests/{requestId} {
-      allow read: if signedIn() && isGroupMember(resource.data.groupId);
+      allow read: if isGroupAdmin(resource.data.groupId)
+        || (signedIn() && resource.data.fromMemberId == myMemberId());
       allow create: if signedIn()
         && request.resource.data.fromMemberId == myMemberId()
-        && isGroupMember(request.resource.data.groupId);
-      allow update: if signedIn() && isGroupAdmin(resource.data.groupId);
-      allow delete: if signedIn()
-        && (
-          isGroupAdmin(resource.data.groupId)
-          || resource.data.fromMemberId == myMemberId()
-        );
+        && isGroupMember(request.resource.data.groupId)
+        && request.resource.data.status == "pending";
+      allow update: if isGroupAdmin(resource.data.groupId)
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(["status"])
+        && request.resource.data.status == "approved";
+      allow delete: if isGroupAdmin(resource.data.groupId)
+        || (signedIn() && resource.data.fromMemberId == myMemberId());
     }
 
-    match /groupUsers/{username} {
-      allow read: if signedIn();
-      allow create: if signedIn() && request.resource.data.memberId == myMemberId();
-      allow update: if signedIn()
-        && (
-          request.resource.data.memberId == myMemberId()
-          || resource.data.memberId == myMemberId()
-        );
-      allow delete: if signedIn()
-        && (
-          resource.data.memberId == myMemberId()
-          || isGroupAdmin(resource.data.groupId)
-        );
+    // Legacy password documents are intentionally inaccessible. Remove old records
+    // from Firestore after deploying these rules.
+    match /groupUsers/{documentId} {
+      allow read, write: if false;
     }
 
     match /userFinance/{uid} {
