@@ -2984,7 +2984,7 @@ input:not(:placeholder-shown)+.floating-label {
     .lang-picker-wrap {
         position: relative;
         inset: auto;
-        z-index: 2;
+        z-index: 2601;
         margin: 14px 0 0;
         width: auto;
         min-width: 0;
@@ -2997,23 +2997,24 @@ input:not(:placeholder-shown)+.floating-label {
     }
 
     .lang-menu {
-        /* Keep the menu attached to the selector and let it open below. */
-        position: absolute;
-        top: calc(100% + 8px);
-        right: 0;
+        /* Escape the header stacking/overflow context on narrow screens. */
+        position: fixed;
+        top: var(--lang-menu-top, 72px);
+        right: auto;
         bottom: auto;
-        left: auto;
+        left: var(--lang-menu-left, 12px);
         width: min(420px, calc(100vw - 24px));
-        max-height: min(72dvh, 560px);
+        max-height: var(--lang-menu-max-height, min(72dvh, 560px));
+        overflow: auto;
         padding: 12px;
         border-radius: 22px;
         box-shadow: 0 20px 50px rgba(21, 30, 48, 0.26);
         gap: 12px;
+        z-index: 2600;
     }
 
     html[dir="rtl"] .lang-menu {
         right: auto;
-        left: 0;
     }
 
     .lang-menu::before {

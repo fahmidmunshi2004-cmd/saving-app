@@ -1,4 +1,4 @@
-const CACHE_NAME = "jomao-v31";
+const CACHE_NAME = "jomao-v34";
 const ASSETS = [
   "./",
   "./index.html",
@@ -20,7 +20,7 @@ const ASSETS = [
   "./assets/i18n/tr.json",
   "./assets/i18n/ru.json",
   "./manifest.webmanifest",
-  "./assets/icons/main-logo.png?v=31"
+  "./assets/icons/main-logo.png?v=34"
 ];
 
 self.addEventListener("install", (event) => {

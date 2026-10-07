@@ -206,13 +206,27 @@ function updateLanguagePickerUI() {
       const triggerRect = langSwitcher?.getBoundingClientRect();
       if (triggerRect) {
         const menuWidth = Math.min(420, window.innerWidth - 24);
-        const left = Math.max(12, Math.min(triggerRect.right - menuWidth, window.innerWidth - menuWidth - 12));
-        langMenu.style.left = `${left}px`;
-        langMenu.style.right = "auto";
+        const margin = 12;
+        const left = Math.max(margin, Math.min(triggerRect.right - menuWidth, window.innerWidth - menuWidth - margin));
+        const bottomNav = document.querySelector(".bottom-nav:not(.hidden)");
+        const bottomLimit = bottomNav ? bottomNav.getBoundingClientRect().top - 12 : window.innerHeight - 12;
+        const topLimit = 12;
+        const gap = 8;
+        const belowTop = triggerRect.bottom + gap;
+        const belowSpace = bottomLimit - belowTop;
+        const aboveSpace = triggerRect.top - gap - topLimit;
+        const openBelow = belowSpace >= aboveSpace || belowSpace >= 220;
+        const available = Math.max(100, openBelow ? belowSpace : aboveSpace);
+        const menuHeight = Math.max(100, Math.min(Math.min(72 * window.innerHeight / 100, 560), available));
+        const top = openBelow ? belowTop : Math.max(topLimit, triggerRect.top - gap - menuHeight);
+        langMenu.style.setProperty("--lang-menu-left", `${left}px`);
+        langMenu.style.setProperty("--lang-menu-top", `${top}px`);
+        langMenu.style.setProperty("--lang-menu-max-height", `${menuHeight}px`);
       }
     } else {
-      langMenu.style.left = "";
-      langMenu.style.right = "";
+      langMenu.style.removeProperty("--lang-menu-left");
+      langMenu.style.removeProperty("--lang-menu-top");
+      langMenu.style.removeProperty("--lang-menu-max-height");
     }
   }
 }
@@ -237,6 +251,13 @@ function toggleLanguageMenu() {
     closeLanguageMenu();
   }
 }
+
+window.addEventListener("resize", () => {
+  if (langMenu && !langMenu.classList.contains("hidden")) updateLanguagePickerUI();
+});
+window.addEventListener("scroll", () => {
+  if (langMenu && !langMenu.classList.contains("hidden")) updateLanguagePickerUI();
+}, true);
 
 function applyLanguage(lang = "en") {
   const option = getLanguageOption(lang);
@@ -1960,7 +1981,7 @@ function initFirebase() {
 function registerServiceWorker() {
   if (!("serviceWorker" in navigator)) return;
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("./sw.js?v=31").catch(() => { });
+    navigator.serviceWorker.register("./sw.js?v=34").catch(() => { });
   });
 }
 
