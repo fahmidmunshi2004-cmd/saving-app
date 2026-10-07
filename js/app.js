@@ -1960,7 +1960,7 @@ function initFirebase() {
 function registerServiceWorker() {
   if (!("serviceWorker" in navigator)) return;
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("./sw.js?v=28").catch(() => { });
+    navigator.serviceWorker.register("./sw.js?v=31").catch(() => { });
   });
 }
 
