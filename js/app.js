@@ -1826,7 +1826,6 @@ function initFirebase() {
   googleProvider = new firebase.auth.GoogleAuthProvider();
   googleProvider.setCustomParameters({ prompt: "select_account" });
   facebookProvider = new firebase.auth.FacebookAuthProvider();
-  facebookProvider.addScope("email");
   auth.onAuthStateChanged((user) => {
     finalizeLoginFlow();
     handleGoogleAuthUser(user).catch((e) => appAlert(e.message || tx("auth_error")));
