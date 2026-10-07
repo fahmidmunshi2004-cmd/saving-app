@@ -933,7 +933,8 @@ h6,
 .game-connect-grid .game-cell { width: min(10vw, 46px); height: min(10vw, 46px); min-width: 32px; min-height: 32px; }
 .game-mole-grid,.game-runner-grid,.game-pattern-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .game-odd-grid { grid-template-columns: repeat(var(--odd-columns, 4), minmax(0, 1fr)); }
-.game-mole-grid .game-cell,.game-runner-grid .game-cell,.game-odd-grid .game-cell,.game-pattern-grid .game-cell { width: min(18vw, 58px); height: min(18vw, 58px); }
+.game-mole-grid .game-cell,.game-runner-grid .game-cell,.game-pattern-grid .game-cell { width: min(18vw, 58px); height: min(18vw, 58px); }
+.game-odd-grid .game-cell { width: clamp(38px, 11vw, 52px); height: clamp(38px, 11vw, 52px); min-width: 0; min-height: 0; padding: 0; border-radius: 11px; font-size: clamp(.95rem, 4.5vw, 1.25rem); }
 .game-lights-grid,.game-mines-grid,.game-fifteen-grid,.game-word-grid,.game-prime-grid,.game-treasure-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); }
 .game-maze-grid { grid-template-columns: repeat(6, minmax(0, 1fr)); }
 .game-fifteen-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
@@ -1065,6 +1066,12 @@ h6,
     font-size: 0.72rem;
     font-weight: 800;
     white-space: nowrap;
+}
+.game-corner-count {
+    padding: 8px 12px;
+    color: var(--brand);
+    font-size: .92rem;
+    font-weight: 900;
 }
 
 .game-corner-grid {
@@ -1199,6 +1206,13 @@ h6,
     font-weight: 900;
     line-height: 1.1;
     text-align: center;
+}
+.game-big[data-odd-progress] {
+    width: 100%;
+    color: var(--brand);
+    font-size: clamp(1rem, 4vw, 1.35rem);
+    line-height: 1.25;
+    overflow-wrap: anywhere;
 }
 
 .game-input {
