@@ -62,6 +62,17 @@ const totalCategory = document.getElementById("totalCategory");
 
 const accountTypeText = document.getElementById("accountTypeText");
 const accountRoleText = document.getElementById("accountRoleText");
+const groupCredentialsCard = document.getElementById("groupCredentialsCard");
+const groupLoginNameValue = document.getElementById("groupLoginNameValue");
+const groupLoginPasswordValue = document.getElementById("groupLoginPasswordValue");
+const groupCredentialsNotice = document.getElementById("groupCredentialsNotice");
+const copyGroupNameBtn = document.getElementById("copyGroupNameBtn");
+const copyGroupPasswordBtn = document.getElementById("copyGroupPasswordBtn");
+const copyGroupCredentialsBtn = document.getElementById("copyGroupCredentialsBtn");
+const toggleGroupPasswordBtn = document.getElementById("toggleGroupPasswordBtn");
+const groupPasswordResetRow = document.getElementById("groupPasswordResetRow");
+const newGroupPasswordInput = document.getElementById("newGroupPasswordInput");
+const saveGroupPasswordBtn = document.getElementById("saveGroupPasswordBtn");
 const groupMembersCard = document.getElementById("groupMembersCard");
 const groupMemberCount = document.getElementById("groupMemberCount");
 const groupMembersList = document.getElementById("groupMembersList");

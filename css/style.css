@@ -2322,6 +2322,54 @@ input:not(:placeholder-shown)+.floating-label {
     display: none !important;
 }
 
+.group-credentials-card {
+    display: grid;
+    gap: 9px;
+}
+
+.group-credentials-card > strong {
+    font-size: 1.05rem;
+}
+
+.group-credentials-help {
+    margin: 0 0 3px;
+    color: var(--muted);
+    line-height: 1.45;
+}
+
+.group-credentials-card > label {
+    font-size: 0.84rem;
+    font-weight: 600;
+}
+
+.group-credential-copy-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.group-credential-copy-row input {
+    min-width: 0;
+    flex: 1;
+    height: 42px;
+    padding: 0 12px;
+    border: 1px solid var(--stroke);
+    border-radius: 12px;
+    color: var(--text);
+    background: var(--surface);
+}
+
+.group-credential-copy-row .btn,
+.group-copy-all-btn {
+    min-height: 40px;
+    padding: 0 14px;
+    white-space: nowrap;
+}
+
+.group-copy-all-btn {
+    justify-self: start;
+}
+
 .txn-table thead th {
     color: #ffffff;
     font-weight: 700;

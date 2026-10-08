@@ -273,6 +273,9 @@ function applyLanguage(lang = "en") {
     accountTypeText.innerText = currentSession.type === "group" ? t("group_account") : t("gmail_account");
     accountRoleText.innerText = t(`role_${currentSession.role || "viewer"}`);
   }
+  if (groupCredentialsCard && groupLoginNameValue?.value) {
+    groupCredentialsCard.classList.toggle("hidden", !isCurrentAdmin() || !currentSession?.groupId);
+  }
   if (!groupActionFormCard?.classList.contains("hidden")) {
     openGroupActionForm(groupActionMode);
   }
@@ -288,6 +291,56 @@ function setGroupActionHelpText(mode = "create") {
   const helpKey = mode === "join" ? "group_action_help_join_password" : "group_action_help_create_password";
   groupActionHelpText.setAttribute("data-i18n", helpKey);
   groupActionHelpText.textContent = t(helpKey);
+}
+
+function showGroupCredentials(groupName, password, { once = false } = {}) {
+  if (!groupCredentialsCard || !isCurrentAdmin() || !currentSession?.groupId) return;
+  groupLoginNameValue.value = groupName || currentSession.displayName || "";
+  groupLoginPasswordValue.value = password || "";
+  groupLoginPasswordValue.type = "password";
+  toggleGroupPasswordBtn?.classList.toggle("hidden", !password);
+  copyGroupPasswordBtn?.classList.toggle("hidden", !password);
+  copyGroupCredentialsBtn?.classList.toggle("hidden", !password);
+  groupPasswordResetRow?.classList.toggle("hidden", !!password);
+  groupCredentialsNotice?.classList.toggle("hidden", !once && !!password);
+  groupCredentialsCard.classList.remove("hidden");
+}
+
+function hideGroupCredentials() {
+  groupCredentialsCard?.classList.add("hidden");
+  if (groupLoginNameValue) groupLoginNameValue.value = "";
+  if (groupLoginPasswordValue) groupLoginPasswordValue.value = "";
+  if (groupCredentialsNotice) groupCredentialsNotice.classList.add("hidden");
+}
+
+async function copyGroupCredentialText(value) {
+  if (!value) return;
+  try {
+    await navigator.clipboard.writeText(value);
+  } catch (_) {
+    const temporaryInput = document.createElement("textarea");
+    temporaryInput.value = value;
+    temporaryInput.style.position = "fixed";
+    temporaryInput.style.opacity = "0";
+    document.body.appendChild(temporaryInput);
+    temporaryInput.select();
+    document.execCommand("copy");
+    temporaryInput.remove();
+  }
+  appAlert(tx("copied_to_clipboard"));
+}
+
+async function updateGroupPassword() {
+  if (!isCurrentAdmin() || !currentSession?.groupId || !firebaseUser) return;
+  const password = String(newGroupPasswordInput?.value || "");
+  if (password.length < 6) {
+    appAlert(tx("group_password_min_length"));
+    return;
+  }
+  await firebaseUser.updatePassword(password);
+  newGroupPasswordInput.value = "";
+  showGroupCredentials(groupLoginNameValue?.value, password, { once: true });
+  appAlert(tx("group_password_updated"));
 }
 
 function getFriendlyGroupError(error, fallback = "Group action failed") {
@@ -356,6 +409,7 @@ async function refreshSettingsPanels() {
     groupMembersList.innerHTML = "";
     groupActionsCard.classList.add("hidden");
     groupActionFormCard.classList.add("hidden");
+    hideGroupCredentials();
     return;
   }
 
@@ -364,6 +418,7 @@ async function refreshSettingsPanels() {
   requestAccessCard.classList.toggle("hidden", !canRequestGroupEdit());
 
   if (!currentSession.groupId || !db) {
+    hideGroupCredentials();
     groupMembersCard.classList.add("hidden");
     inviteCard.classList.add("hidden");
     requestAccessCard.classList.add("hidden");
@@ -374,6 +429,7 @@ async function refreshSettingsPanels() {
     groupActionFormCard.classList.add("hidden");
     return;
   }
+  groupCredentialsCard?.classList.toggle("hidden", !isCurrentAdmin());
 
   // Skip heavy Firestore reads unless Settings view is currently open.
   const isSettingsOpen = document.getElementById("settingsView")?.classList.contains("active");
@@ -1122,10 +1178,12 @@ async function createGroupFromGmail() {
   const email = await getGroupAuthEmail(groupName);
   const pendingSetupKey = "jomao_pending_group_setup";
   sessionStorage.setItem(pendingSetupKey, JSON.stringify({ email, groupName }));
+  sessionStorage.setItem("jomao_pending_group_password", password);
   try {
     await auth.createUserWithEmailAndPassword(email, password);
   } catch (error) {
     sessionStorage.removeItem(pendingSetupKey);
+    sessionStorage.removeItem("jomao_pending_group_password");
     if (error?.code === "auth/email-already-in-use") {
       throw new Error(tx("group_username_exists"));
     }
@@ -1173,6 +1231,9 @@ async function finishGroupAccountSetup(user, pendingSetup) {
   syncTransactionState();
   updateUI();
   applyAuthState();
+  const initialPassword = sessionStorage.getItem("jomao_pending_group_password") || "";
+  sessionStorage.removeItem("jomao_pending_group_password");
+  showGroupCredentials(groupName, initialPassword, { once: true });
   groupActionUsername.value = "";
   groupActionPassword.value = "";
   appAlert(tx("group_account_created"));
@@ -1272,6 +1333,10 @@ async function handleGroupAccountAuth(user) {
     groupId: membership.groupId, memberId,
     role: membership.role || "viewer", canEdit: !!membership.canEdit
   };
+  if (currentSession.role === "admin") {
+    const groupSnap = await db.collection("groups").doc(currentSession.groupId).get();
+    showGroupCredentials(groupSnap.data()?.name || currentSession.displayName, "");
+  }
   saveSession();
   await loadGroupSharedData();
   syncTransactionState();
@@ -2209,7 +2274,7 @@ function initFirebase() {
 function registerServiceWorker() {
   if (!("serviceWorker" in navigator)) return;
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("./sw.js?v=57").catch(() => { });
+    navigator.serviceWorker.register("./sw.js?v=59").catch(() => { });
   });
 }
 
@@ -2266,6 +2331,32 @@ groupActionSubmitBtn.addEventListener("click", async () => {
   } catch (e) {
     appAlert(getFriendlyGroupError(e));
   }
+});
+
+copyGroupNameBtn?.addEventListener("click", () => copyGroupCredentialText(groupLoginNameValue?.value));
+copyGroupPasswordBtn?.addEventListener("click", () => copyGroupCredentialText(groupLoginPasswordValue?.value));
+copyGroupCredentialsBtn?.addEventListener("click", () => {
+  const groupName = groupLoginNameValue?.value || "";
+  const password = groupLoginPasswordValue?.value || "";
+  if (!password) {
+    appAlert(tx("group_password_not_saved"));
+    return;
+  }
+  copyGroupCredentialText(`${t("group_name")}: ${groupName}\n${t("group_password")}: ${password}`);
+});
+toggleGroupPasswordBtn?.addEventListener("click", () => {
+  const showing = groupLoginPasswordValue?.type === "text";
+  if (groupLoginPasswordValue) groupLoginPasswordValue.type = showing ? "password" : "text";
+  toggleGroupPasswordBtn.innerHTML = `<i class="fa-solid fa-eye${showing ? "" : "-slash"}"></i>`;
+});
+saveGroupPasswordBtn?.addEventListener("click", () => {
+  withLoader(tx("saving"), updateGroupPassword).catch((error) => {
+    if (error?.code === "auth/requires-recent-login") {
+      appAlert(tx("group_password_recent_login_required"));
+      return;
+    }
+    appAlert(error?.message || tx("group_password_update_failed"));
+  });
 });
 
 document.addEventListener("click", (event) => {
