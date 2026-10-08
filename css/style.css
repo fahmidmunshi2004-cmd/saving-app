@@ -4024,10 +4024,19 @@ input:not(:placeholder-shown)+.floating-label {
 
 .auth-form-error {
     min-height: 0;
-    margin: -5px 0 0;
+    margin: 7px 0 0;
+    padding: 0;
     color: #bd164c;
     font-size: .82rem;
     line-height: 1.4;
+    overflow-wrap: anywhere;
+}
+
+.auth-form-error:not(:empty) {
+    padding: 10px 12px;
+    border: 1px solid rgba(189, 22, 76, .2);
+    border-radius: 12px;
+    background: rgba(255, 237, 244, .92);
 }
 
 .auth-divider { display: flex; align-items: center; gap: 14px; margin: 18px 0 2px; color: #8b7c85; font-size: .82rem; }

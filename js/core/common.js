@@ -62,6 +62,8 @@ function financeProviderKey() {
   const provider = currentSession?.authProvider || sessionStorage.getItem("vault_auth_provider");
   if (provider === "facebook" || provider === "facebook.com") return "facebook";
   if (provider === "google" || provider === "google.com") return "google";
+  if (provider === "email" || provider === "password") return "email";
+  if (firebaseUser?.providerData?.some((item) => item.providerId === "password")) return "email";
   return firebaseUser?.providerData?.some((item) => item.providerId === "facebook.com") ? "facebook" : "google";
 }
 

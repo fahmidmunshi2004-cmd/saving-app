@@ -178,7 +178,7 @@ service cloud.firestore {
       match /accounts/{provider} {
         allow read, write: if signedIn()
           && request.auth.uid == uid
-          && provider in ["google", "facebook"];
+          && provider in ["google", "facebook", "email"];
       }
     }
 

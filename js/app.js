@@ -796,13 +796,14 @@ function setAuthFormMode(mode = "signin") {
 function getEmailAuthError(error, mode) {
   const code = error?.code || "";
   if (code === "auth/operation-not-allowed") return "Email and password sign-in is not enabled in Firebase Authentication.";
-  if (code === "auth/email-already-in-use") return "An account already uses this email. Please log in instead.";
+  if (code === "auth/email-already-in-use") return "This email already has an account. Switch to Login, or use another email to create an account.";
   if (code === "auth/weak-password") return "Use a password with at least 6 characters.";
   if (code === "auth/invalid-email") return "Enter a valid email address.";
   if (code === "auth/too-many-requests") return "Too many attempts. Please wait a little and try again.";
   if (mode === "signup") return error?.message || "Could not create the account. Please try again.";
-  if (["auth/user-not-found", "auth/wrong-password", "auth/invalid-credential"].includes(code)) {
-    return "Email or password is incorrect.";
+  if (code === "auth/user-not-found") return "No account exists for this email yet. Switch to Sign Up first.";
+  if (["auth/wrong-password", "auth/invalid-credential"].includes(code)) {
+    return "Password does not match this email. Use the password you chose when signing up.";
   }
   return error?.message || "Could not log in. Please try again.";
 }
@@ -817,6 +818,16 @@ async function submitEmailAuth(event) {
     emailAuthError.textContent = authFormMode === "signup"
       ? "Enter your name, email, and password."
       : "Enter your email and password.";
+    return;
+  }
+  if (authFormMode === "signup" && password.length < 6) {
+    emailAuthError.textContent = "Password must be at least 6 characters long.";
+    authPassword.focus();
+    return;
+  }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    emailAuthError.textContent = "Enter an email in a valid format, such as name@example.com.";
+    authEmail.focus();
     return;
   }
   if (!auth) {
