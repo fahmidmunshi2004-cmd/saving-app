@@ -2036,7 +2036,7 @@ input {
     font: inherit;
     font-weight: 600;
     letter-spacing: 0.2px;
-    padding: 10px 14px;
+    padding: 14px 14px;
     outline: none;
     transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
 }
