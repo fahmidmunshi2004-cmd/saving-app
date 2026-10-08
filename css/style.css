@@ -2318,6 +2318,10 @@ input:not(:placeholder-shown)+.floating-label {
     border-bottom: 1px solid var(--stroke);
 }
 
+.txn-table [hidden] {
+    display: none !important;
+}
+
 .txn-table thead th {
     color: #ffffff;
     font-weight: 700;

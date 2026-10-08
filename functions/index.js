@@ -1,8 +1,10 @@
 const crypto = require("node:crypto");
 const admin = require("firebase-admin");
 const { onCall, HttpsError } = require("firebase-functions/v2/https");
+const { defineSecret } = require("firebase-functions/params");
 
 admin.initializeApp();
+const firebaseWebApiKey = defineSecret("FIREBASE_WEB_API_KEY");
 
 function normalizeGroupName(value) {
   return String(value || "")
@@ -17,18 +19,30 @@ function groupAuthEmail(groupName) {
   return `group-${key}@groups.jomao.app`;
 }
 
-exports.joinGroupWithPassword = onCall({ region: "us-central1", maxInstances: 20 }, async (request) => {
+exports.joinGroupWithPassword = onCall({
+  region: "us-central1",
+  maxInstances: 20,
+  secrets: [firebaseWebApiKey]
+}, async (request) => {
   if (!request.auth?.uid) {
     throw new HttpsError("unauthenticated", "Sign in with your own account before joining a group.");
+  }
+  if (String(request.auth.token.email || "").toLowerCase().endsWith("@groups.jomao.app")) {
+    throw new HttpsError("failed-precondition", "Use your personal account before joining a group.");
   }
 
   const groupName = String(request.data?.groupName || "").trim();
   const password = String(request.data?.password || "");
-  const apiKey = String(request.data?.apiKey || "");
-  if (!groupName || !password || !apiKey || apiKey.length > 200) {
+  const apiKey = firebaseWebApiKey.value();
+  if (!groupName || !password) {
     throw new HttpsError("invalid-argument", "Enter the group name and password.");
   }
-
+  if (!apiKey || apiKey.length > 200) {
+    throw new HttpsError("failed-precondition", "Firebase web API key is not configured for group login verification.");
+  }
+  if (groupName.length > 120 || password.length > 128) {
+    throw new HttpsError("invalid-argument", "Group name or password is too long.");
+  }
   let authResult;
   try {
     const response = await fetch(
@@ -82,7 +96,15 @@ exports.joinGroupWithPassword = onCall({ region: "us-central1", maxInstances: 20
 
   await db.runTransaction(async (transaction) => {
     const existing = await transaction.get(memberRef);
-    if (existing.exists) return;
+    if (existing.exists) {
+      if (existing.data()?.role === "admin") {
+        throw new HttpsError("failed-precondition", "Use your personal login to join; the group login belongs to the admin.");
+      }
+      if (existing.data()?.joinedWithGroupPassword !== true) {
+        throw new HttpsError("failed-precondition", "This account joined using an invite and cannot switch join methods.");
+      }
+      return;
+    }
     transaction.create(memberRef, {
       groupId,
       memberId,
@@ -96,5 +118,5 @@ exports.joinGroupWithPassword = onCall({ region: "us-central1", maxInstances: 20
     });
   });
 
-  return { groupId };
+  return { groupId, joined: true };
 });

@@ -35,7 +35,7 @@ async function loadI18n() {
   i18nLoadPromise = Promise.all(
     langCodes.map(async (code) => {
       try {
-        const response = await fetch(`${I18N_DIR}/${code}.json?v=16`, { cache: "no-store" });
+        const response = await fetch(`${I18N_DIR}/${code}.json?v=17`, { cache: "no-store" });
         if (!response.ok) {
           throw new Error(`Failed to load ${code} i18n JSON (${response.status})`);
         }
@@ -361,6 +361,7 @@ async function refreshSettingsPanels() {
 
   accountTypeText.innerText = currentSession.type === "group" ? t("group_account") : t("gmail_account");
   accountRoleText.innerText = t(`role_${currentSession.role || "viewer"}`);
+  requestAccessCard.classList.toggle("hidden", !canRequestGroupEdit());
 
   if (!currentSession.groupId || !db) {
     groupMembersCard.classList.add("hidden");
@@ -485,6 +486,7 @@ async function renderPendingRequests() {
 }
 
 async function approveAccessRequest(requestId, fromMemberId) {
+  if (!isCurrentAdmin() || !currentSession?.groupId) return;
   const memberSnap = await db
     .collection("groupMembers")
     .where("groupId", "==", currentSession.groupId)
@@ -492,20 +494,37 @@ async function approveAccessRequest(requestId, fromMemberId) {
     .limit(1)
     .get();
 
+  const requestSnap = await db.collection("accessRequests").doc(requestId).get();
+  if (!requestSnap.exists
+    || requestSnap.data()?.groupId !== currentSession.groupId
+    || requestSnap.data()?.fromMemberId !== fromMemberId
+    || requestSnap.data()?.status !== "pending") {
+    throw new Error(tx("request_not_found"));
+  }
+
   if (!memberSnap.empty) {
-    await db.collection("groupMembers").doc(memberSnap.docs[0].id).update({
+    const memberDoc = memberSnap.docs[0];
+    const batch = db.batch();
+    batch.update(memberDoc.ref, {
       role: "editor",
       canEdit: true,
       grantedByUid: firebaseUser.uid
     });
+    batch.update(db.collection("accessRequests").doc(requestId), { status: "approved" });
+    await batch.commit();
+  } else {
+    await db.collection("accessRequests").doc(requestId).update({ status: "approved" });
   }
-
-  await db.collection("accessRequests").doc(requestId).update({ status: "approved" });
   await refreshSettingsPanels();
 }
 
 async function requestEditAccess() {
   if (!canRequestGroupEdit()) return;
+  const groupSnap = await db.collection("groups").doc(currentSession.groupId).get();
+  if (!groupSnap.exists || !groupSnap.data()?.createdByUid) {
+    throw new Error(tx("group_join_service_unavailable"));
+  }
+  const groupOwnerUid = groupSnap.data().createdByUid;
   let adminEmail = requestAccessEmailInput.value.trim().toLowerCase();
   if (!adminEmail) {
     const adminSnap = await db
@@ -535,6 +554,7 @@ async function requestEditAccess() {
 
   await db.collection("accessRequests").add({
     groupId: currentSession.groupId,
+    groupOwnerUid,
     fromMemberId: currentSession.memberId,
     fromLabel: currentSession.type === "gmail" ? currentSession.email : currentSession.username,
     toEmail: adminEmail,
@@ -613,9 +633,8 @@ function applyAuthState() {
 
   const editable = isCurrentAdmin() || !!currentSession.canEdit || (!currentSession.groupId && currentSession.type === "gmail");
   setEditAccess(editable);
-  document.querySelectorAll(".txn-table [hidden]").forEach((cell) => {
-    cell.style.display = "none";
-  });
+  renderTransactions();
+  forceHistoryManagerPanel();
   startGroupRealtimeSync();
   if (lastView === "walletView") {
     renderSavingsRateChart(true);
@@ -862,15 +881,17 @@ async function submitEmailAuth(event) {
 
   const isSignup = authFormMode === "signup";
   const previousAuthProvider = sessionStorage.getItem("vault_auth_provider");
+  let authProgressStarted = false;
   emailAuthSubmit.disabled = true;
   emailAuthSubmit.classList.add("is-loading");
-  loginProgress = true;
-  showLoader(getSigningInText("email"));
   try {
     const persistence = authRemember.checked
       ? firebase.auth.Auth.Persistence.LOCAL
       : firebase.auth.Auth.Persistence.SESSION;
     await auth.setPersistence(persistence);
+    authProgressStarted = true;
+    loginProgress = true;
+    showLoader(isSignup ? tx("creating_account") : getSigningInText("email"));
     sessionStorage.setItem("vault_auth_provider", "email");
     if (isSignup) {
       const credential = await auth.createUserWithEmailAndPassword(email, password);
@@ -892,8 +913,10 @@ async function submitEmailAuth(event) {
     }
     emailAuthError.textContent = getEmailAuthError(error, authFormMode);
   } finally {
-    loginProgress = false;
-    hideLoader();
+    if (authProgressStarted) {
+      loginProgress = false;
+      hideLoader();
+    }
     emailAuthSubmit.disabled = false;
     emailAuthSubmit.classList.remove("is-loading");
   }
@@ -1171,9 +1194,10 @@ async function joinGroupWithCredentials() {
     return;
   }
   if (!functions) throw new Error(tx("group_join_service_unavailable"));
+  let groupJoined = false;
   try {
     const joinGroup = functions.httpsCallable("joinGroupWithPassword");
-    const response = await joinGroup({ groupName, password, apiKey: firebaseConfig.apiKey });
+    const response = await joinGroup({ groupName, password });
     const groupId = String(response?.data?.groupId || "");
     if (!groupId) throw new Error(tx("group_username_not_found"));
 
@@ -1203,13 +1227,18 @@ async function joinGroupWithCredentials() {
     applyAuthState();
     groupActionUsername.value = "";
     groupActionPassword.value = "";
+    groupJoined = true;
     appAlert(tx("joined_group_success"));
   } catch (error) {
-    if (["functions/invalid-argument", "functions/not-found", "functions/permission-denied"].includes(error?.code)) {
+    if (groupJoined) throw error;
+    if (["functions/invalid-argument", "functions/permission-denied"].includes(error?.code)) {
       throw new Error(tx("group_join_credentials_invalid"));
     }
     if (error?.code === "functions/failed-precondition") {
       throw new Error(tx("group_join_use_personal_account"));
+    }
+    if (error?.code === "functions/unauthenticated") {
+      throw new Error(tx("group_join_must_login_first"));
     }
     if (["functions/unavailable", "functions/internal", "functions/not-found"].includes(error?.code)) {
       throw new Error(tx("group_join_service_unavailable"));
@@ -1613,6 +1642,8 @@ function renderTransactions() {
   const adminCanManageHistory = canManageHistory();
   const actionHeader = document.getElementById("txnActionHeader");
   if (actionHeader) actionHeader.hidden = !adminCanManageHistory;
+  const footerCell = document.getElementById("txnFooterCell");
+  if (footerCell) footerCell.colSpan = adminCanManageHistory ? 5 : 4;
   tbody.innerHTML = "";
   const fragment = document.createDocumentFragment();
   let totalIncome = 0;
@@ -2168,14 +2199,17 @@ function initFirebase() {
   facebookProvider = new firebase.auth.FacebookAuthProvider();
   auth.onAuthStateChanged((user) => {
     finalizeLoginFlow();
-    handleGoogleAuthUser(user).catch((e) => appAlert(e.message || tx("auth_error")));
+    handleGoogleAuthUser(user).catch((e) => {
+      console.error("Authentication state handling failed", e);
+      appAlert(e.message || tx("auth_error"));
+    });
   });
 }
 
 function registerServiceWorker() {
   if (!("serviceWorker" in navigator)) return;
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("./sw.js?v=56").catch(() => { });
+    navigator.serviceWorker.register("./sw.js?v=57").catch(() => { });
   });
 }
 
@@ -2422,7 +2456,7 @@ clearDataBtn.addEventListener("click", async () => {
         }
 
         const userFinanceRef = db.collection("userFinance").doc(firebaseUser.uid);
-        await Promise.all(["google", "facebook"].map((provider) =>
+        await Promise.all(["google", "facebook", "email"].map((provider) =>
           userFinanceRef.collection("accounts").doc(provider).delete()
         ));
         await userFinanceRef.delete();
