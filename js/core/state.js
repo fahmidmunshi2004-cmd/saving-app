@@ -66,6 +66,7 @@ const addAnotherGroupBtn = document.getElementById("addAnotherGroupBtn");
 const groupActionFormCard = document.getElementById("groupActionFormCard");
 const groupActionTitle = document.getElementById("groupActionTitle");
 const groupActionUsername = document.getElementById("groupActionUsername");
+const groupActionPassword = document.getElementById("groupActionPassword");
 const groupActionSubmitBtn = document.getElementById("groupActionSubmitBtn");
 const groupActionHelpText = document.getElementById("groupActionHelpText");
 const langSwitcher = document.getElementById("langSwitcher");

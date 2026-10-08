@@ -318,30 +318,66 @@ body {
 }
 
 .login-card {
-    width: min(420px, 100%);
-    border-radius: 16px;
+    width: min(620px, 100%);
+    border: 1px solid color-mix(in srgb, var(--brand) 16%, #ffffff);
+    border-radius: 22px;
     background: var(--surface);
-    padding: 16px;
+    padding: 28px;
+    box-shadow: 0 24px 70px rgba(15, 24, 43, 0.24);
 }
 
 .login-card h2 {
-    margin: 0 0 8px;
-    font-size: 1.1rem;
+    margin: 0 0 10px;
+    color: var(--text);
+    font-size: clamp(1.65rem, 4vw, 2.1rem);
+    line-height: 1.15;
+    text-align: center;
 }
 
 .login-help {
-    margin: 8px auto;
-    margin-bottom: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    margin: 0 auto 20px;
+    display: block;
     color: var(--muted);
-    font-size: 0.85rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    text-align: center;
 }
 
 .login-actions {
     display: grid;
-    gap: 10px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.login-actions .btn {
+    min-width: 0;
+    min-height: 56px;
+    height: auto;
+    margin-top: 0;
+    padding: 10px 12px;
+    border-radius: 14px;
+    font-size: 1rem;
+    line-height: 1.2;
+    text-align: center;
+    transition: transform 160ms ease, box-shadow 160ms ease, filter 160ms ease;
+}
+
+.login-actions .btn:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.04);
+    box-shadow: 0 10px 24px rgba(22, 34, 54, 0.18);
+}
+
+.login-provider-logo {
+    display: block;
+    flex: 0 0 22px;
+    width: 22px;
+    height: 22px;
+    object-fit: contain;
+}
+
+.facebook-provider-logo {
+    border-radius: 50%;
 }
 
 .login-actions .facebook-login-btn {
@@ -3024,6 +3060,22 @@ input:not(:placeholder-shown)+.floating-label {
 
 @media (max-width: 620px) {
 
+    .login-card {
+        padding: 24px 20px;
+        border-radius: 20px;
+    }
+
+    .login-actions {
+        gap: 9px;
+    }
+
+    .login-actions .btn {
+        min-height: 52px;
+        padding: 9px 8px;
+        gap: 7px;
+        font-size: 0.9rem;
+    }
+
     .lang-picker-wrap {
         position: relative;
         inset: auto;
@@ -3486,6 +3538,12 @@ input:not(:placeholder-shown)+.floating-label {
     #groupMembersList .btn {
         min-width: 78px;
         padding: 7px 10px;
+    }
+}
+
+@media (max-width: 360px) {
+    .login-actions {
+        grid-template-columns: 1fr;
     }
 }
 

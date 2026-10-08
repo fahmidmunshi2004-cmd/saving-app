@@ -284,7 +284,7 @@ function applyLanguage(lang = "en") {
 
 function setGroupActionHelpText(mode = "create") {
   if (!groupActionHelpText) return;
-  const helpKey = mode === "join" ? "group_action_help_join" : "group_action_help_create";
+  const helpKey = mode === "join" ? "group_action_help_join_password" : "group_action_help_create_password";
   groupActionHelpText.setAttribute("data-i18n", helpKey);
   groupActionHelpText.textContent = t(helpKey);
 }
@@ -571,7 +571,18 @@ function applyAuthState() {
     photo.src = photoURL;
     photo.alt = "";
     photo.referrerPolicy = "no-referrer";
-    photo.onerror = showAvatarFallback;
+    photo.onerror = () => {
+      const providerId = loginProvider === "facebook" ? "facebook.com" : "google.com";
+      const providerPhoto = firebaseUser?.providerData?.find((provider) => provider.providerId === providerId)?.photoURL
+        || firebaseUser?.photoURL
+        || "";
+      if (providerPhoto && photo.src !== providerPhoto) {
+        photo.onerror = showAvatarFallback;
+        photo.src = providerPhoto;
+      } else {
+        showAvatarFallback();
+      }
+    };
     avatar.appendChild(photo);
   } else {
     showAvatarFallback();
@@ -760,6 +771,7 @@ let pendingSocialCredential = null;
 let activeSocialProviderName = "";
 
 function resolveAuthProviderName(user) {
+  if (user?.email?.endsWith("@groups.jomao.app")) return "group";
   if (activeSocialProviderName === "facebook" || activeSocialProviderName === "google") {
     return activeSocialProviderName;
   }
@@ -769,6 +781,7 @@ function resolveAuthProviderName(user) {
 }
 
 function getAuthDisplayName(user, providerName) {
+  if (providerName === "group") return user?.displayName || "";
   const providerId = providerName === "facebook" ? "facebook.com" : "google.com";
   return user?.providerData?.find((provider) => provider.providerId === providerId)?.displayName
     || user?.displayName
@@ -776,6 +789,12 @@ function getAuthDisplayName(user, providerName) {
 }
 
 function getAuthPhotoURL(user, providerName) {
+  if (providerName === "facebook") {
+    const facebookProfile = user?.providerData?.find((provider) => provider.providerId === "facebook.com");
+    if (facebookProfile?.uid) {
+      return `https://graph.facebook.com/${encodeURIComponent(facebookProfile.uid)}/picture?type=large`;
+    }
+  }
   const providerId = providerName === "facebook" ? "facebook.com" : "google.com";
   return user?.providerData?.find((provider) => provider.providerId === providerId)?.photoURL
     || user?.photoURL
@@ -813,6 +832,14 @@ async function handleGoogleAuthUser(user) {
 
     const authProvider = resolveAuthProviderName(firebaseUser);
     sessionStorage.setItem("vault_auth_provider", authProvider);
+    if (authProvider === "group") {
+      if (currentSession?.uid !== firebaseUser.uid) {
+        currentSession = null;
+        saveSession();
+      }
+      await handleGroupAccountAuth(firebaseUser);
+      return;
+    }
     const previousSession = currentSession ? { ...currentSession } : null;
     const sameGoogleAccount = previousSession?.type === "gmail"
       && previousSession.uid === firebaseUser.uid
@@ -891,114 +918,157 @@ async function handleGoogleAuthUser(user) {
 }
 
 function openGroupActionForm(mode = "create") {
-  groupActionMode = "create";
+  groupActionMode = mode === "join" ? "join" : "create";
   groupActionFormCard.classList.remove("hidden");
-  groupActionTitle.innerText = t("create_group_account");
-  groupActionSubmitBtn.innerHTML = `<i class="fa-solid fa-people-group"></i> ${t("create_group_account")}`;
+  groupActionTitle.innerText = t(groupActionMode === "join" ? "join_group" : "create_group_account");
+  groupActionSubmitBtn.innerHTML = groupActionMode === "join"
+    ? `<i class="fa-solid fa-right-to-bracket"></i> ${t("join_group")}`
+    : `<i class="fa-solid fa-people-group"></i> ${t("create_group_account")}`;
   setGroupActionHelpText(groupActionMode);
 }
 
+async function getGroupAuthEmail(groupName) {
+  const normalizedName = String(groupName || "").normalize("NFKC").trim().toLocaleLowerCase().replace(/\s+/g, " ");
+  const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(normalizedName));
+  const nameKey = Array.from(new Uint8Array(digest), (value) => value.toString(16).padStart(2, "0")).join("");
+  return `group-${nameKey}@groups.jomao.app`;
+}
+
 async function createGroupFromGmail() {
-  if (!firebaseUser || !db) {
+  if (!auth || !db) {
     appAlert(tx("login_first"));
     return;
   }
-  const groupName = groupActionUsername.value.trim() || `${firebaseUser.displayName || firebaseUser.email || t("group_account")}`;
-  const memberId = `gmail_${firebaseUser.uid}`;
-  const ownedGroupQuery = db
-    .collection("groups")
-    .where("createdByUid", "==", firebaseUser.uid)
-    .limit(1);
-  let ownedGroupSnap;
-  try {
-    ownedGroupSnap = await ownedGroupQuery.get();
-  } catch (e) {
-    throw new Error(`Group pre-check failed: ${e?.message || e}`);
-  }
-
-  if (!ownedGroupSnap.empty) {
-    const ownedGroupId = ownedGroupSnap.docs[0].id;
-    const ownedMemberRef = db.collection("groupMembers").doc(`${ownedGroupId}__${memberId}`);
-    const ownedMemberSnap = await ownedMemberRef.get();
-    const memberData = {
-      groupId: ownedGroupId,
-      memberId,
-      type: "gmail",
-      label: firebaseUser.email || "Admin",
-      role: "admin",
-      canEdit: true
-    };
-    if (ownedMemberSnap.exists) {
-      await ownedMemberRef.update(memberData);
-    } else {
-      await ownedMemberRef.set({
-        ...memberData,
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-      });
-    }
-
-    currentSession = {
-      type: "gmail", uid: firebaseUser.uid, email: firebaseUser.email,
-      groupId: ownedGroupId, memberId, role: "admin", canEdit: true
-    };
-    saveSession();
-    await loadGroupSharedData();
-    syncTransactionState();
-    updateUI();
-    applyAuthState();
-    groupActionUsername.value = "";
-    appAlert(tx("group_account_recovered"));
+  const groupName = groupActionUsername.value.trim();
+  const password = groupActionPassword.value;
+  if (!groupName || !password) {
+    appAlert(tx("username_password_required"));
     return;
   }
+  if (password.length < 6) {
+    appAlert(tx("group_password_min_length"));
+    return;
+  }
+  const email = await getGroupAuthEmail(groupName);
+  const pendingSetupKey = "jomao_pending_group_setup";
+  sessionStorage.setItem(pendingSetupKey, JSON.stringify({ email, groupName }));
+  try {
+    await auth.createUserWithEmailAndPassword(email, password);
+  } catch (error) {
+    sessionStorage.removeItem(pendingSetupKey);
+    if (error?.code === "auth/email-already-in-use") {
+      throw new Error(tx("group_username_exists"));
+    }
+    if (error?.code === "auth/operation-not-allowed") {
+      throw new Error(tx("group_password_provider_disabled"));
+    }
+    throw error;
+  }
+}
 
+async function finishGroupAccountSetup(user, pendingSetup) {
+  const { groupName } = pendingSetup;
+  await user.updateProfile({ displayName: groupName });
+  const memberId = `gmail_${user.uid}`;
   const groupRef = db.collection("groups").doc();
   const groupId = groupRef.id;
   const memberRef = db.collection("groupMembers").doc(`${groupId}__${memberId}`);
   const financeRef = db.collection("groupFinance").doc(groupId);
   const now = firebase.firestore.FieldValue.serverTimestamp();
-
   const batch = db.batch();
   batch.set(groupRef, {
     id: groupId,
     name: groupName,
-    createdByEmail: (firebaseUser.email || "").toLowerCase(),
-    createdByUid: firebaseUser.uid,
+    createdByEmail: (user.email || "").toLowerCase(),
+    createdByUid: user.uid,
     createdAt: now
   });
   batch.set(memberRef, {
-    groupId, memberId, type: "gmail", label: firebaseUser.email || groupName,
+    groupId, memberId, type: "gmail", label: groupName,
     role: "admin", canEdit: true, createdAt: now
   });
   batch.set(financeRef, {
     income: 0, expense: 0, breakdown: {}, transactions: [],
     deletedTransactions: [], createdAt: now, updatedAt: now
   });
-  try {
-    await batch.commit();
-  } catch (e) {
-    throw new Error(`Group create failed: ${e?.message || e}`);
-  }
-
+  await batch.commit();
+  sessionStorage.removeItem("jomao_pending_group_setup");
+  sessionStorage.setItem("vault_auth_provider", "group");
   currentSession = {
-    type: "gmail",
-    uid: firebaseUser.uid,
-    email: firebaseUser.email,
-    groupId,
-    memberId,
-    role: "admin",
-    canEdit: true
+    type: "gmail", uid: user.uid, email: user.email, authProvider: "group",
+    displayName: groupName, groupId, memberId, role: "admin", canEdit: true
   };
   saveSession();
-  income = 0;
-  expense = 0;
-  Object.keys(breakdown).forEach((k) => delete breakdown[k]);
-  transactions.length = 0;
-  deletedTransactions.length = 0;
+  await loadGroupSharedData();
   syncTransactionState();
   updateUI();
   applyAuthState();
   groupActionUsername.value = "";
+  groupActionPassword.value = "";
   appAlert(tx("group_account_created"));
+}
+
+async function joinGroupWithCredentials() {
+  if (!auth) {
+    appAlert(tx("login_first"));
+    return;
+  }
+  const groupName = groupActionUsername.value.trim();
+  const password = groupActionPassword.value;
+  if (!groupName || !password) {
+    appAlert(tx("username_password_required"));
+    return;
+  }
+  const email = await getGroupAuthEmail(groupName);
+  try {
+    await auth.signInWithEmailAndPassword(email, password);
+  } catch (error) {
+    if (error?.code === "auth/user-not-found" || error?.code === "auth/invalid-email") {
+      throw new Error(tx("group_username_not_found"));
+    }
+    if (error?.code === "auth/wrong-password" || error?.code === "auth/invalid-credential") {
+      throw new Error(tx("wrong_password"));
+    }
+    if (error?.code === "auth/operation-not-allowed") {
+      throw new Error(tx("group_password_provider_disabled"));
+    }
+    throw error;
+  }
+}
+
+async function handleGroupAccountAuth(user) {
+  const pendingRaw = sessionStorage.getItem("jomao_pending_group_setup");
+  if (pendingRaw) {
+    let pendingSetup;
+    try { pendingSetup = JSON.parse(pendingRaw); } catch (_) { pendingSetup = null; }
+    if (pendingSetup?.email === user.email) {
+      await finishGroupAccountSetup(user, pendingSetup);
+      return;
+    }
+  }
+  const memberId = `gmail_${user.uid}`;
+  const membership = await resolveMembershipForUser(memberId);
+  if (!membership) {
+    currentSession = null;
+    saveSession();
+    await auth.signOut();
+    throw new Error(tx("group_username_not_found"));
+  }
+  sessionStorage.setItem("vault_auth_provider", "group");
+  currentSession = {
+    type: "gmail", uid: user.uid, email: user.email, authProvider: "group",
+    displayName: user.displayName || membership.label || t("group_account"),
+    groupId: membership.groupId, memberId,
+    role: membership.role || "viewer", canEdit: !!membership.canEdit
+  };
+  saveSession();
+  await loadGroupSharedData();
+  syncTransactionState();
+  updateUI();
+  applyAuthState();
+  groupActionUsername.value = "";
+  groupActionPassword.value = "";
+  appAlert(tx("joined_group_success"));
 }
 
 async function sendInviteToGmail() {
@@ -1920,7 +1990,7 @@ function initFirebase() {
 function registerServiceWorker() {
   if (!("serviceWorker" in navigator)) return;
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("./sw.js?v=43").catch(() => { });
+    navigator.serviceWorker.register("./sw.js?v=45").catch(() => { });
   });
 }
 
@@ -1969,10 +2039,11 @@ requestAccessBtn.addEventListener("click", () => {
 });
 
 createGroupBtn.addEventListener("click", () => openGroupActionForm("create"));
-addAnotherGroupBtn?.addEventListener("click", () => appAlert(tx("group_action_help_join"), tx("join_group")));
+addAnotherGroupBtn?.addEventListener("click", () => openGroupActionForm("join"));
 groupActionSubmitBtn.addEventListener("click", async () => {
   try {
-    await withLoader(tx("creating_group"), createGroupFromGmail);
+    const joining = groupActionMode === "join";
+    await withLoader(tx(joining ? "joining_group" : "creating_group"), joining ? joinGroupWithCredentials : createGroupFromGmail);
   } catch (e) {
     appAlert(getFriendlyGroupError(e));
   }
