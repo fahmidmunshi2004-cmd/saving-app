@@ -318,7 +318,7 @@ body {
 }
 
 .login-card {
-    width: min(620px, 100%);
+    width: max-content;
     border: 1px solid color-mix(in srgb, var(--brand) 16%, #ffffff);
     border-radius: 22px;
     background: var(--surface);
