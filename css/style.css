@@ -2062,8 +2062,8 @@ input:focus {
 .floating-label {
     position: absolute;
     left: 12px;
-    top: 8px;
-    padding: 1px 6px;
+    top: 11px;
+    padding: 3px 6px;
     color: var(--muted);
     font-size: 0.88rem;
     pointer-events: none;
