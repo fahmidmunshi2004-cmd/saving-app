@@ -35,7 +35,9 @@ service cloud.firestore {
         && get(membershipPath(groupId, myMemberId())).data.groupId == groupId
         && get(membershipPath(groupId, myMemberId())).data.memberId == myMemberId()
         && (isGroupOwner(groupId)
-          || hasAcceptedInvite(groupId, myMemberId(), get(membershipPath(groupId, myMemberId())).data.invitationToken));
+          || hasAcceptedInvite(groupId, myMemberId(), get(membershipPath(groupId, myMemberId())).data.invitationToken)
+          || (get(membershipPath(groupId, myMemberId())).data.joinedWithGroupPassword == true
+            && !isGroupOwner(groupId)));
     }
 
     function isGroupAdmin(groupId) {
@@ -127,7 +129,15 @@ service cloud.firestore {
         || (signedIn()
           && getAfter(/databases/$(database)/documents/groups/$(groupId)).data.createdByUid == request.auth.uid
           && getAfter(membershipPath(groupId, myMemberId())).data.role == "admin");
-      allow update: if canGroupEdit(groupId);
+      allow update: if isGroupAdmin(groupId)
+        || (canGroupEdit(groupId)
+          && get(membershipPath(groupId, myMemberId())).data.role == "editor"
+          && request.resource.data.diff(resource.data).affectedKeys()
+            .hasOnly(["income", "expense", "breakdown", "transactions", "updatedAt"])
+          && request.resource.data.deletedTransactions == resource.data.deletedTransactions
+          && request.resource.data.transactions is list
+          && resource.data.transactions is list
+          && request.resource.data.transactions.hasAll(resource.data.transactions));
       allow delete: if isGroupAdmin(groupId);
     }
 
