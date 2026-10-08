@@ -1,6 +1,6 @@
-@font-face {
+﻿@font-face {
     font-family: "Nohemi";
-    src: url("../assets/font/Nohemi-Regular-BF6a4e01a26b011.ttf") format("truetype");
+    src: url("../assets/font/Nohemi-Regular-BF6a4e01a26b011.ttf?v=53") format("truetype");
     font-style: normal;
     font-weight: 400;
     font-display: swap;
@@ -8,7 +8,7 @@
 
 @font-face {
     font-family: "Nohemi";
-    src: url("../assets/font/Nohemi-Medium-BF6a4e01a26b011.ttf") format("truetype");
+    src: url("../assets/font/Nohemi-Medium-BF6a4e01a26b011.ttf?v=53") format("truetype");
     font-style: normal;
     font-weight: 500 900;
     font-display: swap;
@@ -2093,6 +2093,61 @@ input:focus {
     color: var(--brand);
 }
 
+.group-field-icon {
+    display: block;
+    width: 19px;
+    height: 19px;
+    pointer-events: none;
+}
+
+.group-name-icon::before,
+.group-name-icon::after {
+    position: absolute;
+    left: 50%;
+    display: block;
+    border: 1.8px solid currentColor;
+    content: "";
+    transform: translateX(-50%);
+}
+
+.group-name-icon::before {
+    top: 1px;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+}
+
+.group-name-icon::after {
+    bottom: 1px;
+    width: 13px;
+    height: 7px;
+    border-radius: 8px 8px 3px 3px;
+}
+
+.group-password-icon::before {
+    position: absolute;
+    top: 1px;
+    left: 50%;
+    width: 8px;
+    height: 9px;
+    border: 1.8px solid currentColor;
+    border-bottom: 0;
+    border-radius: 7px 7px 0 0;
+    content: "";
+    transform: translateX(-50%);
+}
+
+.group-password-icon::after {
+    position: absolute;
+    right: 1px;
+    bottom: 1px;
+    left: 1px;
+    height: 10px;
+    border-radius: 3px;
+    background: currentColor;
+    content: "";
+}
+
 input:focus+.floating-label,
 input:not(:placeholder-shown)+.floating-label {
     top: -9px;
@@ -3923,6 +3978,7 @@ input:not(:placeholder-shown)+.floating-label {
 }
 
 .auth-input-wrap {
+    position: relative;
     display: flex;
     min-height: 54px;
     align-items: center;
@@ -3933,16 +3989,32 @@ input:not(:placeholder-shown)+.floating-label {
     color: #a14c6d;
     background: rgba(255, 255, 255, .84);
     box-shadow: 0 4px 13px rgba(65, 30, 48, .035), inset 0 1px 1px #fff;
-    transition: border-color .2s ease, box-shadow .2s ease, transform .2s ease;
+    transition: border-color .24s ease, box-shadow .24s ease, transform .24s cubic-bezier(.2,.8,.2,1), background-color .24s ease;
+    will-change: transform;
 }
 
 .auth-input-wrap:focus-within {
     border-color: color-mix(in srgb, var(--brand) 60%, #fff);
-    box-shadow: 0 0 0 4px color-mix(in srgb, var(--brand) 10%, transparent), 0 8px 20px rgba(65, 30, 48, .06);
-    transform: translateY(-1px);
+    background: #fff;
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--brand) 11%, transparent), 0 10px 24px rgba(65, 30, 48, .075);
+    transform: translateY(-2px) scale(1.008);
 }
 
-.auth-input-wrap > i { flex: 0 0 auto; font-size: 1.08rem; }
+.auth-input-wrap:hover:not(:focus-within) {
+    border-color: color-mix(in srgb, var(--brand) 34%, #eadce3);
+    box-shadow: 0 6px 17px rgba(65, 30, 48, .06);
+}
+
+.auth-input-wrap > i {
+    flex: 0 0 auto;
+    font-size: 1.08rem;
+    transition: color .2s ease, transform .24s cubic-bezier(.2,.8,.2,1);
+}
+
+.auth-input-wrap:focus-within > i {
+    color: var(--brand);
+    transform: scale(1.12);
+}
 
 .auth-input-wrap input {
     width: 100%;
@@ -3956,6 +4028,7 @@ input:not(:placeholder-shown)+.floating-label {
     box-shadow: none;
     font: inherit;
     font-size: .95rem;
+    transition: color .2s ease, background-color .2s ease;
 }
 
 .auth-input-wrap input::placeholder { color: #a99aa3; opacity: 1; }
@@ -4123,6 +4196,7 @@ input:not(:placeholder-shown)+.floating-label {
     .auth-form-content.is-animating { animation-duration: .01ms !important; }
     .login-actions .btn,
     .auth-input-wrap,
+    .auth-input-wrap > i,
     .auth-submit,
     .auth-mode-toggle i { transition-duration: .01ms !important; }
 }

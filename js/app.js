@@ -1,4 +1,4 @@
-async function getCurrentMemberDoc() {
+﻿async function getCurrentMemberDoc() {
   if (!currentSession?.groupId || !currentSession?.memberId || !db) return null;
   const snap = await db
     .collection("groupMembers")
@@ -14,15 +14,15 @@ const LANG_STORAGE_KEY = "vault_lang";
 let currentLang = "en";
 const LANGUAGE_OPTIONS = [
   { code: "en", name: "English", native: "English", flagCode: "us", locale: "en-US", dir: "ltr" },
-  { code: "bn", name: "Bengali", native: "বাংলা", flagCode: "bd", locale: "bn-BD", dir: "ltr" },
-  { code: "ar", name: "Arabic", native: "العربية", flagCode: "sa", locale: "ar-SA", dir: "rtl" },
-  { code: "hi", name: "Hindi", native: "हिन्दी", flagCode: "in", locale: "hi-IN", dir: "ltr" },
-  { code: "ur", name: "Urdu", native: "اردو", flagCode: "pk", locale: "ur-PK", dir: "rtl" },
-  { code: "es", name: "Spanish", native: "Español", flagCode: "es", locale: "es-ES", dir: "ltr" },
-  { code: "fr", name: "French", native: "Français", flagCode: "fr", locale: "fr-FR", dir: "ltr" },
+  { code: "bn", name: "Bengali", native: "à¦¬à¦¾à¦‚à¦²à¦¾", flagCode: "bd", locale: "bn-BD", dir: "ltr" },
+  { code: "ar", name: "Arabic", native: "Ø§Ù„Ø¹Ø±Ø¨ÙŠØ©", flagCode: "sa", locale: "ar-SA", dir: "rtl" },
+  { code: "hi", name: "Hindi", native: "à¤¹à¤¿à¤¨à¥à¤¦à¥€", flagCode: "in", locale: "hi-IN", dir: "ltr" },
+  { code: "ur", name: "Urdu", native: "Ø§Ø±Ø¯Ùˆ", flagCode: "pk", locale: "ur-PK", dir: "rtl" },
+  { code: "es", name: "Spanish", native: "EspaÃ±ol", flagCode: "es", locale: "es-ES", dir: "ltr" },
+  { code: "fr", name: "French", native: "FranÃ§ais", flagCode: "fr", locale: "fr-FR", dir: "ltr" },
   { code: "de", name: "German", native: "Deutsch", flagCode: "de", locale: "de-DE", dir: "ltr" },
-  { code: "tr", name: "Turkish", native: "Türkçe", flagCode: "tr", locale: "tr-TR", dir: "ltr" },
-  { code: "ru", name: "Russian", native: "Русский", flagCode: "ru", locale: "ru-RU", dir: "ltr" }
+  { code: "tr", name: "Turkish", native: "TÃ¼rkÃ§e", flagCode: "tr", locale: "tr-TR", dir: "ltr" },
+  { code: "ru", name: "Russian", native: "Ð ÑƒÑÑÐºÐ¸Ð¹", flagCode: "ru", locale: "ru-RU", dir: "ltr" }
 ];
 let langSearchQuery = "";
 let i18n = {};
@@ -35,7 +35,7 @@ async function loadI18n() {
   i18nLoadPromise = Promise.all(
     langCodes.map(async (code) => {
       try {
-        const response = await fetch(`${I18N_DIR}/${code}.json?v=15`, { cache: "no-store" });
+        const response = await fetch(`${I18N_DIR}/${code}.json?v=16`, { cache: "no-store" });
         if (!response.ok) {
           throw new Error(`Failed to load ${code} i18n JSON (${response.status})`);
         }
@@ -772,6 +772,14 @@ let pendingSocialCredential = null;
 let activeSocialProviderName = "";
 let authFormMode = "signin";
 
+function getSigningInText(providerName) {
+  const names = { google: "Google", facebook: "Facebook", email: "Email" };
+  const providerLabel = names[providerName] || names.email;
+  return currentLang === "bn"
+    ? `${providerLabel} à¦¦à¦¿à¦¯à¦¼à§‡ à¦¸à¦¾à¦‡à¦¨ à¦‡à¦¨ à¦•à¦°à¦¾ à¦¹à¦šà§à¦›à§‡...`
+    : `Signing in with ${providerLabel}...`;
+}
+
 function setAuthFormMode(mode = "signin") {
   authFormMode = mode === "signup" ? "signup" : "signin";
   const isSignup = authFormMode === "signup";
@@ -839,6 +847,8 @@ async function submitEmailAuth(event) {
   const previousAuthProvider = sessionStorage.getItem("vault_auth_provider");
   emailAuthSubmit.disabled = true;
   emailAuthSubmit.classList.add("is-loading");
+  loginProgress = true;
+  showLoader(getSigningInText("email"));
   try {
     const persistence = authRemember.checked
       ? firebase.auth.Auth.Persistence.LOCAL
@@ -865,6 +875,8 @@ async function submitEmailAuth(event) {
     }
     emailAuthError.textContent = getEmailAuthError(error, authFormMode);
   } finally {
+    loginProgress = false;
+    hideLoader();
     emailAuthSubmit.disabled = false;
     emailAuthSubmit.classList.remove("is-loading");
   }
@@ -909,9 +921,9 @@ function getAuthDisplayName(user, providerName) {
 function getAuthPhotoURL(user, providerName) {
   if (providerName === "facebook") {
     const facebookProfile = user?.providerData?.find((provider) => provider.providerId === "facebook.com");
-    if (facebookProfile?.uid) {
-      return `https://graph.facebook.com/${encodeURIComponent(facebookProfile.uid)}/picture?type=large`;
-    }
+    return facebookProfile?.photoURL || user?.photoURL || (facebookProfile?.uid
+      ? `https://graph.facebook.com/${encodeURIComponent(facebookProfile.uid)}/picture?type=large`
+      : "");
   }
   const providerId = providerName === "facebook" ? "facebook.com" : "google.com";
   return user?.providerData?.find((provider) => provider.providerId === providerId)?.photoURL
@@ -1353,11 +1365,11 @@ function renderDeletedTransactions() {
     const deletedAtText = item.deletedAt ? new Date(item.deletedAt).toLocaleString("en-BD") : "-";
     const head = document.createElement("div");
     head.className = "deleted-head";
-    head.textContent = `${txn.type || "-"} • ${txn.category || "-"}`;
+    head.textContent = `${txn.type || "-"} â€¢ ${txn.category || "-"}`;
 
     const meta = document.createElement("div");
     meta.className = "deleted-meta";
-    meta.textContent = `${amountText} • Deleted: ${deletedAtText}`;
+    meta.textContent = `${amountText} â€¢ Deleted: ${deletedAtText}`;
 
     li.appendChild(head);
     li.appendChild(meta);
@@ -2013,7 +2025,7 @@ function downloadReportPdf() {
   const totalRecords = Number(transactions.length || 0);
 
   const rows = [...transactions].reverse().map((txn) => {
-    const typeLabel = txn.type === "income" ? "ইনকাম" : "খরচ";
+    const typeLabel = txn.type === "income" ? "à¦‡à¦¨à¦•à¦¾à¦®" : "à¦–à¦°à¦š";
     return `<tr>
       <td>${escapeHtml(txn.time || "-")}</td>
       <td>${escapeHtml(typeLabel)}</td>
@@ -2067,10 +2079,10 @@ function downloadReportPdf() {
   </table>
   <div class="totals">
     <div class="totals-row">
-      <div>মোট ইনকাম<strong>${escapeHtml(formatMoney(totalIncome))}</strong></div>
-      <div>মোট খরচ<strong>${escapeHtml(formatMoney(totalExpense))}</strong></div>
-      <div>মোট ব্যালেন্স<strong>${escapeHtml(formatMoney(totalBalance))}</strong></div>
-      <div>মোট রেকর্ড<strong>${escapeHtml(String(totalRecords))}</strong></div>
+      <div>à¦®à§‹à¦Ÿ à¦‡à¦¨à¦•à¦¾à¦®<strong>${escapeHtml(formatMoney(totalIncome))}</strong></div>
+      <div>à¦®à§‹à¦Ÿ à¦–à¦°à¦š<strong>${escapeHtml(formatMoney(totalExpense))}</strong></div>
+      <div>à¦®à§‹à¦Ÿ à¦¬à§à¦¯à¦¾à¦²à§‡à¦¨à§à¦¸<strong>${escapeHtml(formatMoney(totalBalance))}</strong></div>
+      <div>à¦®à§‹à¦Ÿ à¦°à§‡à¦•à¦°à§à¦¡<strong>${escapeHtml(String(totalRecords))}</strong></div>
     </div>
   </div>
 </body>
@@ -2108,7 +2120,7 @@ function initFirebase() {
 function registerServiceWorker() {
   if (!("serviceWorker" in navigator)) return;
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("./sw.js?v=51").catch(() => { });
+    navigator.serviceWorker.register("./sw.js?v=53").catch(() => { });
   });
 }
 
@@ -2211,7 +2223,7 @@ async function startSocialLogin(provider, button, providerName) {
     }, 30000);
     button.disabled = true;
     button.style.opacity = "0.7";
-    showLoader(tx("signing_in"));
+    showLoader(getSigningInText(providerName));
     await auth.setPersistence(authRemember.checked
       ? firebase.auth.Auth.Persistence.LOCAL
       : firebase.auth.Auth.Persistence.SESSION);
