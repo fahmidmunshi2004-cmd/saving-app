@@ -429,6 +429,15 @@ async function refreshSettingsPanels() {
     groupActionFormCard.classList.add("hidden");
     return;
   }
+  if (isCurrentAdmin() && !groupLoginNameValue?.value) {
+    try {
+      const groupDoc = await db.collection("groups").doc(currentSession.groupId).get();
+      showGroupCredentials(groupDoc.data()?.name || currentSession.displayName, "");
+    } catch (_) {
+      showGroupCredentials(currentSession.displayName, "");
+    }
+  }
+  if (!isCurrentAdmin()) hideGroupCredentials();
   groupCredentialsCard?.classList.toggle("hidden", !isCurrentAdmin());
 
   // Skip heavy Firestore reads unless Settings view is currently open.
@@ -2274,7 +2283,7 @@ function initFirebase() {
 function registerServiceWorker() {
   if (!("serviceWorker" in navigator)) return;
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("./sw.js?v=59").catch(() => { });
+    navigator.serviceWorker.register("./sw.js?v=60").catch(() => { });
   });
 }
 
