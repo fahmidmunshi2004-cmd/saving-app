@@ -1,4 +1,4 @@
-const CACHE_NAME = "jomao-v40";
+const CACHE_NAME = "jomao-v42";
 const ASSETS = [
   "./",
   "./index.html",
@@ -31,7 +31,13 @@ const ASSETS = [
   "./assets/i18n/game-corner/tr.json",
   "./assets/i18n/game-corner/ru.json",
   "./manifest.webmanifest",
-  "./assets/icons/main-logo.png"
+  "./assets/icons/main-logo.png",
+  "./assets/icons/favicon-16.png",
+  "./assets/icons/favicon-32.png",
+  "./assets/icons/favicon-48.png",
+  "./assets/icons/app-icon-192.png",
+  "./assets/icons/app-icon-180.png",
+  "./assets/icons/app-icon-512.png"
 ];
 
 self.addEventListener("install", (event) => {

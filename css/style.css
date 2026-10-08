@@ -151,8 +151,23 @@ body {
 }
 
 .auth-info {
-    font-size: 0.88rem;
-    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 40px;
+    font-size: 1.12rem;
+    font-weight: 700;
+    color: var(--text);
+}
+
+.auth-info .fa-facebook-f {
+    color: #1877f2;
+    font-size: 1.35rem;
+}
+
+.auth-info .fa-google {
+    color: #4285f4;
+    font-size: 1.3rem;
 }
 
 .hidden {
@@ -251,13 +266,14 @@ body {
     content: "";
     position: absolute;
     top: 0;
-    width: 30%;
-    height: 100%;
     left: 0;
+    height: 100%;
     border-radius: inherit;
     background: linear-gradient(90deg, var(--brand), #1BA2DB);
-    width: 0;
-    animation: bootProgress 1.2s ease-out forwards;
+    width: var(--boot-progress, 5%);
+    transform: none;
+    animation: none;
+    transition: width 0.45s cubic-bezier(.22, 1, .36, 1);
 }
 
 .app-boot-overlay.is-complete .app-boot-line.native::after {
@@ -268,7 +284,7 @@ body {
 
 @media (prefers-reduced-motion: reduce) {
     .app-boot-line.native::after {
-        animation-duration: .01ms;
+        transition-duration: .01ms;
     }
 }
 

@@ -535,6 +535,7 @@ async function requestEditAccess() {
 function applyAuthState() {
   if (!currentSession) {
     stopGroupRealtimeSync();
+    authInfo.setAttribute("data-i18n", "private_mode_login_first");
     authInfo.innerText = tx("private_mode_login_first");
     views.forEach((view) => view.classList.remove("active"));
     document.querySelector(".bottom-nav").classList.add("hidden");
@@ -550,12 +551,22 @@ function applyAuthState() {
   }
 
   const loginProvider = currentSession.authProvider || sessionStorage.getItem("vault_auth_provider");
-  const loginLabel = loginProvider === "facebook"
-    ? (currentSession.displayName || firebaseUser?.displayName || currentSession.email)
-    : currentSession.email;
-  authInfo.innerText = currentSession.type === "gmail"
-    ? tx("logged_in_as_email", { email: loginLabel })
-    : tx("logged_in_as_group_user", { username: currentSession.username });
+  const loginLabel = currentSession.displayName
+    || (firebaseUser ? getAuthDisplayName(firebaseUser, loginProvider) : "")
+    || currentSession.username
+    || currentSession.email
+    || "";
+  authInfo.replaceChildren();
+  authInfo.removeAttribute("data-i18n");
+  if (loginProvider === "facebook" || loginProvider === "google") {
+    const providerIcon = document.createElement("i");
+    providerIcon.className = loginProvider === "facebook" ? "fa-brands fa-facebook-f" : "fa-brands fa-google";
+    providerIcon.setAttribute("aria-hidden", "true");
+    authInfo.appendChild(providerIcon);
+  }
+  const name = document.createElement("span");
+  name.textContent = loginLabel;
+  authInfo.appendChild(name);
 
   const lastView = sessionStorage.getItem("vault_active_view") || "homeView";
   showView(lastView);
@@ -573,13 +584,28 @@ function applyAuthState() {
 
 let bootOverlayClosed = false;
 const BOOT_MIN_SHOW_MS = 1200;
+const BOOT_COMPLETE_ANIMATION_MS = 520;
 const bootOverlayShownAt = Date.now();
+let bootProgress = 5;
+const bootProgressBar = appBootOverlay?.querySelector(".app-boot-line.native");
+if (bootProgressBar) {
+  bootProgressBar.style.setProperty("--boot-progress", `${bootProgress}%`);
+}
+const bootProgressTimer = window.setInterval(() => {
+  if (bootOverlayClosed || !bootProgressBar) {
+    window.clearInterval(bootProgressTimer);
+    return;
+  }
+  bootProgress = Math.min(88, bootProgress + Math.max(0.15, (88 - bootProgress) * 0.035));
+  bootProgressBar.style.setProperty("--boot-progress", `${bootProgress}%`);
+}, 100);
 
 function hideBootOverlay() {
   if (bootOverlayClosed || !appBootOverlay) return;
   appBootOverlay.classList.add("is-complete");
+  window.clearInterval(bootProgressTimer);
   const elapsed = Date.now() - bootOverlayShownAt;
-  const waitMs = Math.max(0, BOOT_MIN_SHOW_MS - elapsed);
+  const waitMs = Math.max(BOOT_COMPLETE_ANIMATION_MS, BOOT_MIN_SHOW_MS - elapsed);
   setTimeout(() => {
     if (bootOverlayClosed || !appBootOverlay) return;
     bootOverlayClosed = true;
@@ -1871,7 +1897,7 @@ function initFirebase() {
 function registerServiceWorker() {
   if (!("serviceWorker" in navigator)) return;
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("./sw.js?v=40").catch(() => { });
+    navigator.serviceWorker.register("./sw.js?v=42").catch(() => { });
   });
 }
 
