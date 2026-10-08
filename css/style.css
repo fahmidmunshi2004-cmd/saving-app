@@ -347,19 +347,19 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 16px;
+    gap: 8px;
 }
 
 .login-actions .btn {
-    flex: 1 1 0;
-    width: min(240px, 50%);
+    flex: 0 1 112px;
+    width: 112px;
     min-width: 0;
-    min-height: 76px;
-    height: 76px;
+    min-height: 44px;
+    height: 44px;
     margin-top: 0;
-    padding: 8px 14px;
+    padding: 5px 8px;
     border: 1px solid #e1e7f0;
-    border-radius: 16px;
+    border-radius: 13px;
     background: #ffffff;
     box-shadow: 0 8px 20px rgba(26, 39, 61, 0.08);
     transition: transform 160ms ease, box-shadow 160ms ease, filter 160ms ease;
@@ -373,14 +373,14 @@ body {
 
 .login-provider-logo {
     display: block;
-    width: min(100%, 190px);
-    max-height: 58px;
+    width: min(100%, 78px);
+    max-height: 28px;
     object-fit: contain;
 }
 
 .facebook-provider-logo {
-    width: min(100%, 205px);
-    max-height: 48px;
+    width: min(100%, 92px);
+    max-height: 22px;
 }
 
 .login-actions .facebook-login-btn {
@@ -3073,10 +3073,9 @@ input:not(:placeholder-shown)+.floating-label {
     }
 
     .login-actions .btn {
-        min-height: 52px;
-        padding: 9px 8px;
-        gap: 7px;
-        font-size: 0.9rem;
+        min-height: 40px;
+        height: 40px;
+        padding: 4px 7px;
     }
 
     .lang-picker-wrap {
