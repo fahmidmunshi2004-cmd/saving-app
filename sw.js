@@ -1,4 +1,4 @@
-﻿const CACHE_NAME = "jomao-v53";
+﻿const CACHE_NAME = "jomao-v54";
 const ASSETS = [
   "./",
   "./index.html",
@@ -32,6 +32,7 @@ const ASSETS = [
   "./assets/i18n/game-corner/ru.json",
   "./manifest.webmanifest",
   "./assets/icons/main-logo.png",
+  "./assets/icons/login-wallet.svg",
   "./assets/icons/favicon-16.png",
   "./assets/icons/favicon-32.png",
   "./assets/icons/favicon-48.png",

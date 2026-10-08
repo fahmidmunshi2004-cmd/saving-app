@@ -33,14 +33,14 @@
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="apple-mobile-web-app-title" content="Jomao" />
-    <link rel="manifest" href="manifest.webmanifest?v=53" />
-    <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/app-icon-180.png?v=53" />
-    <link rel="icon" type="image/png" sizes="16x16" href="assets/icons/favicon-16.png?v=53" />
-    <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png?v=53" />
-    <link rel="icon" type="image/png" sizes="48x48" href="assets/icons/favicon-48.png?v=53" />
-    <link rel="shortcut icon" href="assets/icons/favicon-32.png?v=53" />
-    <link rel="preload" href="assets/font/Nohemi-Regular-BF6a4e01a26b011.ttf?v=53" as="font" type="font/ttf" crossorigin />
-    <link rel="preload" href="assets/font/Nohemi-Medium-BF6a4e01a26b011.ttf?v=53" as="font" type="font/ttf" crossorigin />
+    <link rel="manifest" href="manifest.webmanifest?v=54" />
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/app-icon-180.png?v=54" />
+    <link rel="icon" type="image/png" sizes="16x16" href="assets/icons/favicon-16.png?v=54" />
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png?v=54" />
+    <link rel="icon" type="image/png" sizes="48x48" href="assets/icons/favicon-48.png?v=54" />
+    <link rel="shortcut icon" href="assets/icons/favicon-32.png?v=54" />
+    <link rel="preload" href="assets/font/Nohemi-Regular-BF6a4e01a26b011.ttf?v=54" as="font" type="font/ttf" crossorigin />
+    <link rel="preload" href="assets/font/Nohemi-Medium-BF6a4e01a26b011.ttf?v=54" as="font" type="font/ttf" crossorigin />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -48,9 +48,9 @@
     <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore-compat.js"></script>
 
-    <link rel="stylesheet" href="css/style.css?v=53" />
-    <link rel="stylesheet" href="css/modal.css?v=53" />
-    <link rel="stylesheet" href="css/dark-mode.css?v=53" />
+    <link rel="stylesheet" href="css/style.css?v=54" />
+    <link rel="stylesheet" href="css/modal.css?v=54" />
+    <link rel="stylesheet" href="css/dark-mode.css?v=54" />
 </head>
 
 <body>
@@ -58,7 +58,7 @@
     <section id="appBootOverlay" class="app-boot-overlay" aria-live="polite" aria-label="App is loading">
         <div class="app-boot-card">
             <div class="app-boot-lottie-wrap" aria-hidden="true">
-                <img class="boot-brand-icon" src="assets/icons/main-logo.png?v=53" alt="" />
+                <img class="boot-brand-icon" src="assets/icons/main-logo.png?v=54" alt="" />
             </div>
             <h2>Jomao</h2>
             <p>Preparing your secure workspace...</p>
@@ -81,7 +81,7 @@
             <div class="login-card">
                 <aside class="login-visual" aria-label="Jomao introduction">
                     <div class="login-brand-row">
-                        <img src="assets/icons/main-logo.png?v=53" alt="" />
+                        <img src="assets/icons/main-logo.png?v=54" alt="" />
                         <strong>Jomao</strong>
                         <span class="login-brand-note"><span data-i18n="auth_small_steps">Small steps</span><br /><span
                                 data-i18n="auth_big_dreams">Big dreams</span></span>
@@ -95,13 +95,8 @@
                     <div class="login-3d-scene" aria-hidden="true">
                         <div class="login-orbit login-orbit-one"></div>
                         <div class="login-orbit login-orbit-two"></div>
-                        <div class="login-float-card"></div>
-                        <div class="login-coin login-coin-one">৳</div>
-                        <div class="login-coin login-coin-two">৳</div>
                         <div class="login-wallet">
-                            <div class="login-wallet-leaf"><i class="fa-solid fa-seedling"></i></div>
-                            <div class="login-wallet-coins"><i class="fa-solid fa-coins"></i></div>
-                            <div class="login-wallet-clasp"></div>
+                            <img src="assets/icons/login-wallet.svg?v=54" alt="" />
                         </div>
                         <span class="login-spark login-spark-one">✦</span>
                         <span class="login-spark login-spark-two">✧</span>
@@ -118,8 +113,8 @@
                         <strong id="authModeAction" data-i18n="auth_sign_up">Sign Up</strong>
                         <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
                     </button>
-                    <div id="authFormContent" class="auth-form-content">
-                        <img class="auth-form-logo" src="assets/icons/main-logo.png?v=53" alt="" />
+                    <div id="authFormContent" class="auth-form-content" data-mode="signin">
+                        <img class="auth-form-logo" src="assets/icons/main-logo.png?v=54" alt="" />
                         <h2 id="authFormTitle" data-i18n="auth_welcome_back">Welcome Back!</h2>
                         <p id="authFormSubtitle" data-i18n="auth_login_subtitle">Log in to continue your financial journey.</p>
                         <form id="emailAuthForm" novalidate>
@@ -157,12 +152,12 @@
                             <button id="googleLoginBtn" class="btn expense-btn" type="button"
                                 aria-label="Sign in with Google">
                                 <img class="login-provider-logo google-provider-logo"
-                                    src="assets/icons/google.png?v=53" alt="Google" />
+                                    src="assets/icons/google.png?v=54" alt="Google" />
                             </button>
                             <button id="facebookLoginBtn" class="btn facebook-login-btn" type="button"
                                 aria-label="Sign in with Facebook">
                                 <img class="login-provider-logo facebook-provider-logo"
-                                    src="assets/icons/facebook.png?v=53" alt="Facebook" />
+                                    src="assets/icons/facebook.png?v=54" alt="Facebook" />
                             </button>
                         </div>
                         <p class="auth-security-note"><i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
@@ -177,7 +172,7 @@
         <section id="homeView" class="view active">
             <div class="hero">
                 <div class="brand">
-                    <div class="logo"><img width="45" height="45" src="./assets/icons/main-logo.png?v=53" alt=""></div>
+                    <div class="logo"><img width="45" height="45" src="./assets/icons/main-logo.png?v=54" alt=""></div>
                     <div>
                         <h1 data-i18n="app_title">Jomao</h1>
                         <p class="sub" data-i18n="app_subtitle">Clean finance tracker with secure visual identity</p>
@@ -590,11 +585,11 @@
         </div>
     </div>
 
-    <script src="js/core/state.js?v=53"></script>
-    <script src="js/core/common.js?v=53"></script>
-    <script src="js/dark-mode.js?v=53"></script>
-    <script src="js/games.js?v=53"></script>
-    <script src="js/app.js?v=53"></script>
+    <script src="js/core/state.js?v=54"></script>
+    <script src="js/core/common.js?v=54"></script>
+    <script src="js/dark-mode.js?v=54"></script>
+    <script src="js/games.js?v=54"></script>
+    <script src="js/app.js?v=54"></script>
 </body>
 
 </html>

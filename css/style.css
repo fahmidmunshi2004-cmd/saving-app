@@ -3757,61 +3757,19 @@ input:not(:placeholder-shown)+.floating-label {
     position: absolute;
     top: 50%;
     left: 50%;
-    display: grid;
-    width: clamp(150px, 19vw, 215px);
-    height: clamp(118px, 15vw, 168px);
-    place-items: center;
-    border: 1px solid rgba(255, 255, 255, .58);
-    border-radius: 25px;
-    background: linear-gradient(145deg, #ff9bb9, #f54a83 52%, #ce175c);
-    box-shadow: 14px 24px 0 rgba(109, 0, 43, .2), 0 32px 48px rgba(82, 0, 37, .3), inset 0 2px 1px rgba(255, 255, 255, .64);
-    transform: translate(-50%, -42%) rotateX(12deg) rotateY(-18deg) rotateZ(-8deg);
+    width: min(92%, 329px);
+    aspect-ratio: 329 / 183;
+    transform: translate(-50%, -42%) rotateX(12deg) rotateY(-14deg) rotateZ(-4deg);
+    transform-style: preserve-3d;
     animation: loginWalletFloat 5s ease-in-out infinite;
+    filter: drop-shadow(0 25px 22px rgba(75, 0, 34, .28));
 }
 
-.login-wallet::before {
-    position: absolute;
-    right: -10px;
-    bottom: 21px;
-    left: -10px;
-    height: 58px;
-    border: 1px solid rgba(255, 255, 255, .38);
-    border-radius: 15px;
-    background: linear-gradient(110deg, #ffcad9, #ff6b99 52%, #e32d6a);
-    box-shadow: 0 9px 16px rgba(119, 0, 41, .2), inset 0 2px 2px rgba(255, 255, 255, .64);
-    content: "";
-}
-
-.login-wallet-leaf {
-    z-index: 1;
-    margin-top: -25px;
-    color: #fff;
-    font-size: 2.4rem;
-    filter: drop-shadow(0 4px 5px rgba(116, 0, 43, .25));
-}
-
-.login-wallet-coins {
-    position: absolute;
-    z-index: 2;
-    bottom: 10px;
-    left: 22px;
-    color: #ffce63;
-    font-size: 2.5rem;
-    text-shadow: 0 4px 0 #d88928, 0 8px 12px rgba(87, 27, 0, .3);
-    transform: rotate(-13deg);
-}
-
-.login-wallet-clasp {
-    position: absolute;
-    z-index: 3;
-    right: 14px;
-    bottom: 35px;
-    width: 28px;
-    height: 28px;
-    border: 3px solid #ffe9b0;
-    border-radius: 50%;
-    background: linear-gradient(145deg, #ffcf72, #f08a49);
-    box-shadow: 0 4px 8px rgba(99, 14, 0, .25);
+.login-wallet img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
 }
 
 .login-coin {
@@ -3940,9 +3898,11 @@ input:not(:placeholder-shown)+.floating-label {
     width: min(100%, 470px);
     margin: auto;
     transform-style: preserve-3d;
+    backface-visibility: hidden;
 }
 
-.auth-form-content.is-animating { animation: authFormFlip .58s cubic-bezier(.2, .75, .25, 1); }
+.auth-form-content.is-animating { animation: authFormFlipIn .68s cubic-bezier(.2, .75, .25, 1) both; }
+.auth-form-content.is-animating[data-mode="signup"] { animation-name: authFormFlipInReverse; }
 
 .auth-form-logo {
     display: block;
@@ -4119,8 +4079,8 @@ input:not(:placeholder-shown)+.floating-label {
 .auth-security-note i { color: #b35475; }
 
 @keyframes loginWalletFloat {
-    0%, 100% { transform: translate(-50%, -42%) rotateX(12deg) rotateY(-18deg) rotateZ(-8deg); }
-    50% { transform: translate(-50%, -49%) rotateX(8deg) rotateY(-10deg) rotateZ(-4deg); }
+    0%, 100% { transform: translate(-50%, -42%) rotateX(12deg) rotateY(-14deg) rotateZ(-4deg); }
+    50% { transform: translate(-50%, -49%) rotateX(7deg) rotateY(12deg) rotateZ(2deg); }
 }
 
 @keyframes loginCoinFloat {
@@ -4138,9 +4098,16 @@ input:not(:placeholder-shown)+.floating-label {
     50% { opacity: 1; scale: 1.12; }
 }
 
-@keyframes authFormFlip {
-    0% { opacity: .35; transform: perspective(900px) rotateY(-13deg) translateX(12px); }
-    100% { opacity: 1; transform: perspective(900px) rotateY(0) translateX(0); }
+@keyframes authFormFlipIn {
+    0% { opacity: 0; transform: perspective(1000px) rotateY(-72deg) translateX(35px) translateZ(-38px); }
+    48% { opacity: .75; transform: perspective(1000px) rotateY(8deg) translateX(-4px) translateZ(8px); }
+    100% { opacity: 1; transform: perspective(1000px) rotateY(0) translateX(0) translateZ(0); }
+}
+
+@keyframes authFormFlipInReverse {
+    0% { opacity: 0; transform: perspective(1000px) rotateY(72deg) translateX(-35px) translateZ(-38px); }
+    48% { opacity: .75; transform: perspective(1000px) rotateY(-8deg) translateX(4px) translateZ(8px); }
+    100% { opacity: 1; transform: perspective(1000px) rotateY(0) translateX(0) translateZ(0); }
 }
 
 @keyframes authArrowPulse { to { transform: translateX(4px); } }

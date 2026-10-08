@@ -783,6 +783,7 @@ function getSigningInText(providerName) {
 function setAuthFormMode(mode = "signin") {
   authFormMode = mode === "signup" ? "signup" : "signin";
   const isSignup = authFormMode === "signup";
+  authFormContent.dataset.mode = authFormMode;
   authNameField.classList.toggle("hidden", !isSignup);
   authSignInOptions.classList.toggle("hidden", isSignup);
   authPassword.autocomplete = isSignup ? "new-password" : "current-password";
@@ -2120,7 +2121,7 @@ function initFirebase() {
 function registerServiceWorker() {
   if (!("serviceWorker" in navigator)) return;
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("./sw.js?v=53").catch(() => { });
+    navigator.serviceWorker.register("./sw.js?v=54").catch(() => { });
   });
 }
 

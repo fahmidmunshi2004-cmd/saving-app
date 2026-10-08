@@ -1,0 +1,139 @@
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 329 183" width="329" height="183" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="329" y2="183" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F51550"/>
+      <stop offset="1" stop-color="#C92870"/>
+    </linearGradient>
+    <linearGradient id="walletBack" x1="85" y1="22" x2="264" y2="159" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FF8BB5"/>
+      <stop offset=".48" stop-color="#F74787"/>
+      <stop offset="1" stop-color="#B91D5A"/>
+    </linearGradient>
+    <linearGradient id="walletTop" x1="94" y1="20" x2="228" y2="117" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FF6DA0"/>
+      <stop offset=".52" stop-color="#F74A89"/>
+      <stop offset="1" stop-color="#E82D75"/>
+    </linearGradient>
+    <linearGradient id="walletFlap" x1="82" y1="113" x2="237" y2="173" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FF9DBD"/>
+      <stop offset=".5" stop-color="#FF6C9D"/>
+      <stop offset="1" stop-color="#E83A79"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="64" y1="29" x2="103" y2="75" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFF0A0"/>
+      <stop offset=".48" stop-color="#FFC94D"/>
+      <stop offset="1" stop-color="#D98216"/>
+    </linearGradient>
+    <linearGradient id="gold2" x1="213" y1="49" x2="250" y2="88" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFF0A0"/>
+      <stop offset=".5" stop-color="#FFC94B"/>
+      <stop offset="1" stop-color="#E58D18"/>
+    </linearGradient>
+    <linearGradient id="stack" x1="82" y1="131" x2="113" y2="177" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFE56F"/>
+      <stop offset=".6" stop-color="#FFC53C"/>
+      <stop offset="1" stop-color="#D98B18"/>
+    </linearGradient>
+    <filter id="shadow" x="27" y="0" width="272" height="197" filterUnits="userSpaceOnUse">
+      <feGaussianBlur stdDeviation="7"/>
+    </filter>
+    <filter id="coinShadow" x="47" y="21" width="69" height="73" filterUnits="userSpaceOnUse">
+      <feGaussianBlur stdDeviation="4"/>
+    </filter>
+    <g id="coin">
+      <circle r="21" fill="#A52A50" opacity=".25" transform="translate(2 5)"/>
+      <circle r="21" fill="#F4A627"/>
+      <circle r="18.5" fill="url(#gold)" stroke="#FFF0A1" stroke-width="1.5"/>
+      <circle r="14.5" stroke="#E99C24" stroke-width="1.2"/>
+      <circle r="12.5" stroke="#FFF0A0" stroke-opacity=".7"/>
+      <path d="M-5-7Q-1-12 5-8M-5-5H5M0-10V9M-5 1Q-1 5 4 1" stroke="#A96215" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M-4-7Q0-10 4-7" stroke="#FFF4B0" stroke-width="1.2" stroke-linecap="round"/>
+    </g>
+    <g id="sparkle">
+      <path d="M0-10Q1-2 8 0Q1 2 0 10Q-1 2-8 0Q-1-2 0-10Z" fill="#FFF5A0"/>
+    </g>
+  </defs>
+
+  <!-- Pink background -->
+  <rect width="329" height="183" fill="url(#bg)"/>
+  <path d="M0 14C46-3 73 0 117 13S211 30 266 9Q303-4 329 5V0H0Z" fill="#FF477B" opacity=".45"/>
+  <path d="M0 176H329" stroke="#FFB1C8" stroke-opacity=".55"/>
+
+  <!-- Fine orbit lines -->
+  <path d="M48 43C40 14 82 4 132 19L250 49C282 58 278 82 256 103" stroke="#FFD2DF" stroke-opacity=".55" stroke-width="1.1"/>
+  <path d="M21 117C2 133 25 147 54 133L89 117" stroke="#FFE0E8" stroke-opacity=".55"/>
+  <path d="M235 26C263 25 279 40 270 60" stroke="#FFD2DF" stroke-opacity=".7"/>
+
+  <!-- Drop shadow -->
+  <path d="M70 42L207 13Q225 9 235 25L266 51Q276 59 270 76L257 144Q254 158 239 161L91 181Q76 183 70 169L52 75Q49 54 70 42Z"
+        fill="#79113F" opacity=".42" filter="url(#shadow)"/>
+
+  <!-- Back wallet body -->
+  <path d="M64 39L207 9Q223 5 233 19L267 45Q276 53 271 68L253 143Q250 155 236 158L84 178Q68 180 64 164L49 61Q47 44 64 39Z"
+        fill="url(#walletBack)" stroke="#FFB1CD" stroke-width="1.4"/>
+
+  <!-- Back upper rim -->
+  <path d="M56 53Q52 38 68 33L209 9Q224 6 233 20L265 45Q272 51 269 61L253 127"
+        stroke="#FFD0E0" stroke-width="1.5" stroke-linecap="round"/>
+
+  <!-- Main upper flap -->
+  <path d="M56 53Q53 36 70 31L207 9Q224 5 233 20L253 118Q256 132 242 137L88 165Q72 168 68 152Z"
+        fill="url(#walletTop)" stroke="#FFAAC7" stroke-width="1.5"/>
+
+  <!-- Upper surface highlight -->
+  <path d="M72 37L208 11Q222 8 230 22L248 100"
+        stroke="#FFD1E0" stroke-opacity=".65" stroke-width="1.7" stroke-linecap="round"/>
+
+  <!-- Wallet front flap -->
+  <path d="M67 110L224 82Q237 79 243 91L258 128Q263 141 250 149L91 180Q77 183 72 169L56 132Q52 118 67 110Z"
+        fill="#9E174E" opacity=".38" transform="translate(0 3)"/>
+  <path d="M65 109L220 81Q233 78 239 89L256 126Q261 139 248 147L90 178Q76 181 70 168L56 133Q51 117 65 109Z"
+        fill="url(#walletFlap)" stroke="#FFC0D5" stroke-width="1.5"/>
+
+  <!-- Front flap light -->
+  <path d="M63 119L221 90Q234 87 239 98" stroke="#FFE0E9" stroke-opacity=".75" stroke-width="1.5" stroke-linecap="round"/>
+  <path d="M58 133Q60 147 72 170" stroke="#FFD8E4" stroke-opacity=".6" stroke-width="1.2"/>
+
+  <!-- Plant sprout -->
+  <path d="M145 99Q144 87 143 76" stroke="#FFFDFE" stroke-width="3.5" stroke-linecap="round"/>
+  <path d="M143 82C130 80 126 71 130 66C140 66 146 73 143 82Z" fill="#FFFDFE"/>
+  <path d="M145 79C144 66 151 62 161 64C162 75 154 81 145 79Z" fill="#FFFDFE"/>
+  <path d="M145 79L157 66" stroke="#F8C5D7" stroke-width="1" stroke-linecap="round"/>
+
+  <!-- Wallet clasp -->
+  <circle cx="221" cy="113" r="12" fill="#CF4D7B" opacity=".4" transform="translate(1 2)"/>
+  <circle cx="221" cy="113" r="11.7" fill="#FFE2A0"/>
+  <circle cx="221" cy="113" r="9.5" fill="url(#gold2)"/>
+  <circle cx="218" cy="110" r="2.3" fill="#FFF2BD" opacity=".8"/>
+
+  <!-- Coin stack -->
+  <g>
+    <path d="M85 157L100 149Q105 147 110 152L115 157Q118 161 112 165L98 173Q92 176 87 171L82 166Q79 161 85 157Z"
+          fill="#C77913" opacity=".6"/>
+    <path d="M85 152L99 145Q105 143 111 148Q116 152 110 156L96 164Q90 166 85 162Q80 157 85 152Z"
+          fill="url(#stack)" stroke="#FFE58B" stroke-width="1.1"/>
+    <path d="M85 158L99 151Q105 149 111 154" stroke="#FFF1A1" stroke-width="1.1" stroke-linecap="round"/>
+    <path d="M84 163L98 156Q104 154 110 159L114 163Q117 167 111 171L97 179Q91 181 86 176L82 171Q79 166 84 163Z"
+          fill="url(#stack)" stroke="#FFE38B" stroke-width="1"/>
+    <path d="M83 169L97 162Q104 160 111 165" stroke="#FFF1A1" stroke-width="1.1" stroke-linecap="round"/>
+    <path d="M87 173L101 166Q107 164 112 168L114 171Q116 174 110 178L98 184Q92 186 87 181L84 178Q82 175 87 173Z"
+          fill="url(#stack)" stroke="#F8C85B" stroke-width="1"/>
+    <path d="M85 177L99 170Q105 168 112 172" stroke="#FFF0A0" stroke-width="1.1" stroke-linecap="round"/>
+  </g>
+
+  <!-- Floating gold coins -->
+  <g transform="translate(83 51)">
+    <circle r="23" fill="#8E1648" opacity=".3" transform="translate(1 4)"/>
+    <use href="#coin"/>
+  </g>
+  <g transform="translate(234 66) scale(.86)">
+    <circle r="22" fill="#8E1648" opacity=".25" transform="translate(1 4)"/>
+    <use href="#coin"/>
+  </g>
+
+  <!-- Sparkles -->
+  <use href="#sparkle" transform="translate(278 53) scale(1.05)"/>
+  <use href="#sparkle" transform="translate(26 121) scale(.75)"/>
+  <path d="M18 121L33 121M26 113V129" stroke="#FFF5A0" stroke-width=".8" opacity=".8"/>
+</svg>
