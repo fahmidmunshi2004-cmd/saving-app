@@ -670,3 +670,35 @@ html[data-theme="dark"] .mini-btn:hover {
         animation-iteration-count: 1 !important;
     }
 }
+
+html[data-theme="dark"] .login-card {
+    padding: 0;
+    border: 1px solid rgba(255, 255, 255, .78);
+    background: #fff;
+}
+
+html[data-theme="dark"] .login-form-panel {
+    background:
+        radial-gradient(ellipse at 100% 0%, rgba(255, 1, 79, .055), transparent 42%),
+        linear-gradient(160deg, #fff 0%, #fffafd 100%);
+}
+
+html[data-theme="dark"] .login-card .auth-form-content h2 { color: #251521; }
+html[data-theme="dark"] .login-card .auth-form-content > p { color: #8d7d88; }
+html[data-theme="dark"] .login-card .auth-input-wrap {
+    border-color: #eadce3;
+    color: #a14c6d;
+    background: rgba(255, 255, 255, .84);
+}
+
+html[data-theme="dark"] .login-card .auth-input-wrap input {
+    border: 0;
+    color: #30232c;
+    background: transparent;
+    box-shadow: none;
+}
+
+html[data-theme="dark"] .login-card .auth-mode-toggle,
+html[data-theme="dark"] .login-card .auth-options,
+html[data-theme="dark"] .login-card .auth-divider,
+html[data-theme="dark"] .login-card .auth-security-note { color: #847680; }

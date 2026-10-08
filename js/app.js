@@ -35,7 +35,7 @@ async function loadI18n() {
   i18nLoadPromise = Promise.all(
     langCodes.map(async (code) => {
       try {
-        const response = await fetch(`${I18N_DIR}/${code}.json?v=14`, { cache: "no-store" });
+        const response = await fetch(`${I18N_DIR}/${code}.json?v=15`, { cache: "no-store" });
         if (!response.ok) {
           throw new Error(`Failed to load ${code} i18n JSON (${response.status})`);
         }
@@ -268,6 +268,7 @@ function applyLanguage(lang = "en") {
     const key = el.getAttribute("data-i18n");
     if (key) el.textContent = t(key);
   });
+  if (authFormContent && authModeToggle) setAuthFormMode(authFormMode);
   if (currentSession && accountTypeText && accountRoleText) {
     accountTypeText.innerText = currentSession.type === "group" ? t("group_account") : t("gmail_account");
     accountRoleText.innerText = t(`role_${currentSession.role || "viewer"}`);
@@ -769,6 +770,110 @@ let loginProgress = false;
 let loginProgressTimer = 0;
 let pendingSocialCredential = null;
 let activeSocialProviderName = "";
+let authFormMode = "signin";
+
+function setAuthFormMode(mode = "signin") {
+  authFormMode = mode === "signup" ? "signup" : "signin";
+  const isSignup = authFormMode === "signup";
+  authNameField.classList.toggle("hidden", !isSignup);
+  authSignInOptions.classList.toggle("hidden", isSignup);
+  authPassword.autocomplete = isSignup ? "new-password" : "current-password";
+  authFormTitle.textContent = t(isSignup ? "auth_create_account_title" : "auth_welcome_back");
+  authFormSubtitle.textContent = t(isSignup ? "auth_signup_subtitle" : "auth_login_subtitle");
+  authDisplayName.placeholder = t("auth_name_placeholder");
+  authEmail.placeholder = t("auth_email_placeholder");
+  authPassword.placeholder = t("auth_password_placeholder");
+  authModePrompt.textContent = t(isSignup ? "auth_already_have_account" : "auth_dont_have_account");
+  authModeAction.textContent = t(isSignup ? "auth_login" : "auth_sign_up");
+  emailAuthSubmit.querySelector("span").textContent = t(isSignup ? "auth_create_account" : "auth_login");
+  emailAuthError.textContent = "";
+  authFormContent.classList.remove("is-animating");
+  void authFormContent.offsetWidth;
+  authFormContent.classList.add("is-animating");
+  window.setTimeout(() => authFormContent.classList.remove("is-animating"), 700);
+}
+
+function getEmailAuthError(error, mode) {
+  const code = error?.code || "";
+  if (code === "auth/operation-not-allowed") return "Email and password sign-in is not enabled in Firebase Authentication.";
+  if (code === "auth/email-already-in-use") return "An account already uses this email. Please log in instead.";
+  if (code === "auth/weak-password") return "Use a password with at least 6 characters.";
+  if (code === "auth/invalid-email") return "Enter a valid email address.";
+  if (code === "auth/too-many-requests") return "Too many attempts. Please wait a little and try again.";
+  if (mode === "signup") return error?.message || "Could not create the account. Please try again.";
+  if (["auth/user-not-found", "auth/wrong-password", "auth/invalid-credential"].includes(code)) {
+    return "Email or password is incorrect.";
+  }
+  return error?.message || "Could not log in. Please try again.";
+}
+
+async function submitEmailAuth(event) {
+  event.preventDefault();
+  emailAuthError.textContent = "";
+  const email = authEmail.value.trim().toLowerCase();
+  const password = authPassword.value;
+  const displayName = authDisplayName.value.trim();
+  if (!email || !password || (authFormMode === "signup" && !displayName)) {
+    emailAuthError.textContent = authFormMode === "signup"
+      ? "Enter your name, email, and password."
+      : "Enter your email and password.";
+    return;
+  }
+  if (!auth) {
+    emailAuthError.textContent = tx("auth_error");
+    return;
+  }
+
+  const isSignup = authFormMode === "signup";
+  const previousAuthProvider = sessionStorage.getItem("vault_auth_provider");
+  emailAuthSubmit.disabled = true;
+  emailAuthSubmit.classList.add("is-loading");
+  try {
+    const persistence = authRemember.checked
+      ? firebase.auth.Auth.Persistence.LOCAL
+      : firebase.auth.Auth.Persistence.SESSION;
+    await auth.setPersistence(persistence);
+    sessionStorage.setItem("vault_auth_provider", "email");
+    if (isSignup) {
+      const credential = await auth.createUserWithEmailAndPassword(email, password);
+      await credential.user.updateProfile({ displayName });
+      if (currentSession?.uid === credential.user.uid) {
+        currentSession.displayName = displayName;
+        currentSession.email = credential.user.email || email;
+        currentSession.authProvider = "email";
+        saveSession();
+        applyAuthState();
+      }
+    } else {
+      await auth.signInWithEmailAndPassword(email, password);
+    }
+  } catch (error) {
+    if (firebaseUser) {
+      if (previousAuthProvider) sessionStorage.setItem("vault_auth_provider", previousAuthProvider);
+      else sessionStorage.removeItem("vault_auth_provider");
+    }
+    emailAuthError.textContent = getEmailAuthError(error, authFormMode);
+  } finally {
+    emailAuthSubmit.disabled = false;
+    emailAuthSubmit.classList.remove("is-loading");
+  }
+}
+
+async function sendAuthPasswordReset() {
+  const email = authEmail.value.trim().toLowerCase();
+  emailAuthError.textContent = "";
+  if (!email) {
+    emailAuthError.textContent = "Enter your email address first.";
+    authEmail.focus();
+    return;
+  }
+  try {
+    await auth.sendPasswordResetEmail(email);
+    emailAuthError.textContent = "Password reset email sent. Check your inbox.";
+  } catch (error) {
+    emailAuthError.textContent = getEmailAuthError(error, "signin");
+  }
+}
 
 function resolveAuthProviderName(user) {
   if (user?.email?.endsWith("@groups.jomao.app")) return "group";
@@ -777,7 +882,9 @@ function resolveAuthProviderName(user) {
   }
   const savedProvider = sessionStorage.getItem("vault_auth_provider");
   if (savedProvider === "facebook" || savedProvider === "google") return savedProvider;
-  return user?.providerData?.some((provider) => provider.providerId === "facebook.com") ? "facebook" : "google";
+  if (user?.providerData?.some((provider) => provider.providerId === "facebook.com")) return "facebook";
+  if (user?.providerData?.some((provider) => provider.providerId === "google.com")) return "google";
+  return "email";
 }
 
 function getAuthDisplayName(user, providerName) {
@@ -1990,7 +2097,7 @@ function initFirebase() {
 function registerServiceWorker() {
   if (!("serviceWorker" in navigator)) return;
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("./sw.js?v=48").catch(() => { });
+    navigator.serviceWorker.register("./sw.js?v=51").catch(() => { });
   });
 }
 
@@ -2094,6 +2201,9 @@ async function startSocialLogin(provider, button, providerName) {
     button.disabled = true;
     button.style.opacity = "0.7";
     showLoader(tx("signing_in"));
+    await auth.setPersistence(authRemember.checked
+      ? firebase.auth.Auth.Persistence.LOCAL
+      : firebase.auth.Auth.Persistence.SESSION);
     activeSocialProviderName = providerName;
     const result = await auth.signInWithPopup(provider);
     sessionStorage.setItem("vault_auth_provider", providerName);
@@ -2147,6 +2257,9 @@ async function startSocialLogin(provider, button, providerName) {
   }
 }
 
+authModeToggle.addEventListener("click", () => setAuthFormMode(authFormMode === "signin" ? "signup" : "signin"));
+emailAuthForm.addEventListener("submit", submitEmailAuth);
+authForgotPassword.addEventListener("click", sendAuthPasswordReset);
 googleLoginBtn.addEventListener("click", () => startSocialLogin(googleProvider, googleLoginBtn, "google"));
 facebookLoginBtn.addEventListener("click", () => startSocialLogin(facebookProvider, facebookLoginBtn, "facebook"));
 

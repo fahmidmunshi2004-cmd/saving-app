@@ -33,12 +33,12 @@
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="apple-mobile-web-app-title" content="Jomao" />
-    <link rel="manifest" href="manifest.webmanifest?v=48" />
-    <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/app-icon-180.png?v=48" />
-    <link rel="icon" type="image/png" sizes="16x16" href="assets/icons/favicon-16.png?v=48" />
-    <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png?v=48" />
-    <link rel="icon" type="image/png" sizes="48x48" href="assets/icons/favicon-48.png?v=48" />
-    <link rel="shortcut icon" href="assets/icons/favicon-32.png?v=48" />
+    <link rel="manifest" href="manifest.webmanifest?v=51" />
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/app-icon-180.png?v=51" />
+    <link rel="icon" type="image/png" sizes="16x16" href="assets/icons/favicon-16.png?v=51" />
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png?v=51" />
+    <link rel="icon" type="image/png" sizes="48x48" href="assets/icons/favicon-48.png?v=51" />
+    <link rel="shortcut icon" href="assets/icons/favicon-32.png?v=51" />
     <link rel="preload" href="assets/font/Nohemi-Regular-BF6a4e01a26b011.ttf" as="font" type="font/ttf" crossorigin />
     <link rel="preload" href="assets/font/Nohemi-Medium-BF6a4e01a26b011.ttf" as="font" type="font/ttf" crossorigin />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
@@ -48,9 +48,9 @@
     <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore-compat.js"></script>
 
-    <link rel="stylesheet" href="css/style.css?v=48" />
-    <link rel="stylesheet" href="css/modal.css?v=48" />
-    <link rel="stylesheet" href="css/dark-mode.css?v=48" />
+    <link rel="stylesheet" href="css/style.css?v=51" />
+    <link rel="stylesheet" href="css/modal.css?v=51" />
+    <link rel="stylesheet" href="css/dark-mode.css?v=51" />
 </head>
 
 <body>
@@ -79,18 +79,97 @@
 
         <section id="loginOverlay" class="login-overlay">
             <div class="login-card">
-                <h2 data-i18n="login_required">Login Required</h2>
-                <p class="login-help" data-i18n="login_help">Continue with Google or Facebook to access the app.</p>
-                <div class="login-actions">
-                    <button id="googleLoginBtn" class="btn expense-btn" type="button" aria-label="Sign in with Google">
-                        <img class="login-provider-logo google-provider-logo" src="assets/icons/google.png?v=48"
-                            alt="Google" />
+                <aside class="login-visual" aria-label="Jomao introduction">
+                    <div class="login-brand-row">
+                        <img src="assets/icons/main-logo.png" alt="" />
+                        <strong>Jomao</strong>
+                        <span class="login-brand-note"><span data-i18n="auth_small_steps">Small steps</span><br /><span
+                                data-i18n="auth_big_dreams">Big dreams</span></span>
+                    </div>
+                    <div class="login-visual-copy">
+                        <p data-i18n="auth_visual_money">YOUR MONEY,</p>
+                        <h2 data-i18n="auth_visual_future">YOUR FUTURE</h2>
+                        <span><span data-i18n="auth_visual_save">Save smarter. Live better.</span><br /><span
+                                data-i18n="auth_visual_start">Start your journey today.</span></span>
+                    </div>
+                    <div class="login-3d-scene" aria-hidden="true">
+                        <div class="login-orbit login-orbit-one"></div>
+                        <div class="login-orbit login-orbit-two"></div>
+                        <div class="login-float-card"></div>
+                        <div class="login-coin login-coin-one">৳</div>
+                        <div class="login-coin login-coin-two">৳</div>
+                        <div class="login-wallet">
+                            <div class="login-wallet-leaf"><i class="fa-solid fa-seedling"></i></div>
+                            <div class="login-wallet-coins"><i class="fa-solid fa-coins"></i></div>
+                            <div class="login-wallet-clasp"></div>
+                        </div>
+                        <span class="login-spark login-spark-one">✦</span>
+                        <span class="login-spark login-spark-two">✧</span>
+                    </div>
+                    <div class="login-benefits">
+                        <span><i class="fa-solid fa-shield-halved"></i> <span data-i18n="auth_secure_safe">Secure &amp; safe</span></span>
+                        <span><i class="fa-solid fa-bolt"></i> <span data-i18n="auth_fast_access">Fast access</span></span>
+                        <span><i class="fa-regular fa-heart"></i> <span data-i18n="auth_better_tomorrow">Better tomorrow</span></span>
+                    </div>
+                </aside>
+                <div class="login-form-panel">
+                    <button id="authModeToggle" class="auth-mode-toggle" type="button">
+                        <span id="authModePrompt" data-i18n="auth_dont_have_account">Don’t have an account?</span>
+                        <strong id="authModeAction" data-i18n="auth_sign_up">Sign Up</strong>
+                        <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
                     </button>
-                    <button id="facebookLoginBtn" class="btn facebook-login-btn" type="button"
-                        aria-label="Sign in with Facebook">
-                        <img class="login-provider-logo facebook-provider-logo" src="assets/icons/facebook.png?v=48"
-                            alt="Facebook" />
-                    </button>
+                    <div id="authFormContent" class="auth-form-content">
+                        <img class="auth-form-logo" src="assets/icons/main-logo.png" alt="" />
+                        <h2 id="authFormTitle" data-i18n="auth_welcome_back">Welcome Back!</h2>
+                        <p id="authFormSubtitle" data-i18n="auth_login_subtitle">Log in to continue your financial journey.</p>
+                        <form id="emailAuthForm" novalidate>
+                            <div id="authNameField" class="auth-input-wrap hidden">
+                                <i class="fa-regular fa-user" aria-hidden="true"></i>
+                                <input id="authDisplayName" type="text" placeholder="Your name" autocomplete="name"
+                                    aria-label="Your name" />
+                            </div>
+                            <div class="auth-input-wrap">
+                                <i class="fa-regular fa-envelope" aria-hidden="true"></i>
+                                <input id="authEmail" type="email" placeholder="Email address" autocomplete="email"
+                                    aria-label="Email address" required />
+                            </div>
+                            <div class="auth-input-wrap">
+                                <i class="fa-solid fa-lock" aria-hidden="true"></i>
+                                <input id="authPassword" type="password" placeholder="Password"
+                                    autocomplete="current-password" aria-label="Password" required />
+                                <button class="toggle-pass auth-password-toggle" type="button"
+                                    data-target="authPassword" aria-label="Show password">
+                                    <i class="fa-regular fa-eye" aria-hidden="true"></i>
+                                </button>
+                            </div>
+                            <div id="authSignInOptions" class="auth-options">
+                                <label class="auth-remember"><input id="authRemember" type="checkbox" checked />
+                                    <span data-i18n="auth_remember_me">Remember me</span></label>
+                                <button id="authForgotPassword" data-i18n="auth_forgot_password" type="button">Forgot password?</button>
+                            </div>
+                            <button id="emailAuthSubmit" class="auth-submit" type="submit">
+                                <span data-i18n="auth_login">Login</span><i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+                            </button>
+                            <p id="emailAuthError" class="auth-form-error" role="status" aria-live="polite"></p>
+                        </form>
+                        <div class="auth-divider"><span data-i18n="auth_or_continue">or continue with</span></div>
+                        <div class="login-actions">
+                            <button id="googleLoginBtn" class="btn expense-btn" type="button"
+                                aria-label="Sign in with Google">
+                                <img class="login-provider-logo google-provider-logo"
+                                    src="assets/icons/google.png?v=51" alt="Google" />
+                            </button>
+                            <button id="facebookLoginBtn" class="btn facebook-login-btn" type="button"
+                                aria-label="Sign in with Facebook">
+                                <img class="login-provider-logo facebook-provider-logo"
+                                    src="assets/icons/facebook.png?v=51" alt="Facebook" />
+                            </button>
+                        </div>
+                        <p class="auth-security-note"><i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
+                            <span data-i18n="auth_private_secure">Your data stays private and secure</span>
+                            <i class="fa-solid fa-lock" aria-hidden="true"></i>
+                        </p>
+                    </div>
                 </div>
             </div>
         </section>
@@ -511,11 +590,11 @@
         </div>
     </div>
 
-    <script src="js/core/state.js?v=48"></script>
-    <script src="js/core/common.js?v=48"></script>
-    <script src="js/dark-mode.js?v=48"></script>
-    <script src="js/games.js?v=48"></script>
-    <script src="js/app.js?v=48"></script>
+    <script src="js/core/state.js?v=51"></script>
+    <script src="js/core/common.js?v=51"></script>
+    <script src="js/dark-mode.js?v=51"></script>
+    <script src="js/games.js?v=51"></script>
+    <script src="js/app.js?v=51"></script>
 </body>
 
 </html>
