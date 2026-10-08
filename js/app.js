@@ -558,12 +558,25 @@ function applyAuthState() {
     || "";
   authInfo.replaceChildren();
   authInfo.removeAttribute("data-i18n");
-  if (loginProvider === "facebook" || loginProvider === "google") {
-    const providerIcon = document.createElement("i");
-    providerIcon.className = loginProvider === "facebook" ? "fa-brands fa-facebook-f" : "fa-brands fa-google";
-    providerIcon.setAttribute("aria-hidden", "true");
-    authInfo.appendChild(providerIcon);
+  const avatar = document.createElement("span");
+  avatar.className = "auth-avatar";
+  const fallbackLetter = (loginLabel.trim()[0] || currentSession.email?.trim()[0] || "?").toLocaleUpperCase();
+  const photoURL = (firebaseUser ? getAuthPhotoURL(firebaseUser, loginProvider) : "") || currentSession.photoURL || "";
+  const showAvatarFallback = () => {
+    avatar.classList.add("auth-avatar-fallback");
+    avatar.textContent = fallbackLetter;
+  };
+  if (photoURL) {
+    const photo = document.createElement("img");
+    photo.src = photoURL;
+    photo.alt = "";
+    photo.referrerPolicy = "no-referrer";
+    photo.onerror = showAvatarFallback;
+    avatar.appendChild(photo);
+  } else {
+    showAvatarFallback();
   }
+  authInfo.appendChild(avatar);
   const name = document.createElement("span");
   name.textContent = loginLabel;
   authInfo.appendChild(name);
@@ -762,6 +775,13 @@ function getAuthDisplayName(user, providerName) {
     || "";
 }
 
+function getAuthPhotoURL(user, providerName) {
+  const providerId = providerName === "facebook" ? "facebook.com" : "google.com";
+  return user?.providerData?.find((provider) => provider.providerId === providerId)?.photoURL
+    || user?.photoURL
+    || "";
+}
+
 function finalizeLoginFlow() {
   window.clearTimeout(loginProgressTimer);
   loginProgressTimer = 0;
@@ -807,6 +827,7 @@ async function handleGoogleAuthUser(user) {
     if (sameGoogleAccount && currentSession?.type === "gmail" && currentSession.uid === firebaseUser.uid) {
       currentSession.authProvider = authProvider;
       currentSession.displayName = getAuthDisplayName(firebaseUser, authProvider);
+      currentSession.photoURL = getAuthPhotoURL(firebaseUser, authProvider);
       currentSession.email = firebaseUser.email || currentSession.email;
       if (currentSession.groupId) {
         const latestMember = await resolveMembershipForUser(`gmail_${firebaseUser.uid}`, currentSession.groupId);
@@ -839,6 +860,7 @@ async function handleGoogleAuthUser(user) {
         email: firebaseUser.email,
         authProvider,
         displayName: getAuthDisplayName(firebaseUser, authProvider),
+        photoURL: getAuthPhotoURL(firebaseUser, authProvider),
         groupId: m.groupId,
         memberId,
         role: m.role || "viewer",
@@ -851,6 +873,7 @@ async function handleGoogleAuthUser(user) {
           email: firebaseUser.email,
           authProvider,
           displayName: getAuthDisplayName(firebaseUser, authProvider),
+          photoURL: getAuthPhotoURL(firebaseUser, authProvider),
           role: "personal",
         canEdit: true
       };
@@ -1897,7 +1920,7 @@ function initFirebase() {
 function registerServiceWorker() {
   if (!("serviceWorker" in navigator)) return;
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("./sw.js?v=42").catch(() => { });
+    navigator.serviceWorker.register("./sw.js?v=43").catch(() => { });
   });
 }
 
@@ -2017,6 +2040,7 @@ async function startSocialLogin(provider, button, providerName) {
         if (currentSession?.uid === linkedResult.user.uid) {
           currentSession.authProvider = pending.providerName;
           currentSession.displayName = getAuthDisplayName(linkedResult.user, pending.providerName);
+          currentSession.photoURL = getAuthPhotoURL(linkedResult.user, pending.providerName);
           currentSession.email = linkedResult.user.email || currentSession.email;
           saveSession();
           await loadGroupSharedData();
