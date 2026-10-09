@@ -292,6 +292,10 @@ function setGroupActionHelpText(mode = "create") {
 
 function getFriendlyGroupError(error, fallback = "Group action failed") {
   const message = String(error?.message || error || "").toLowerCase();
+  const code = String(error?.code || "").toLowerCase();
+  if (message.includes("join_group_backend_missing")) return t("group_join_backend_missing");
+  if (code.includes("functions/not-found") || code.includes("functions/internal")) return t("group_join_backend_missing");
+  if (code.includes("functions/unauthenticated")) return t("group_join_invalid_credentials");
   if (message.includes("permission")) {
     return t("group_action_permission_tip");
   }
@@ -1182,7 +1186,18 @@ async function joinGroupWithCredentials() {
     appAlert(tx("username_password_required"));
     return;
   }
-  const result = await functions.httpsCallable("joinGroupWithPassword")({ groupName, password });
+  let result;
+  try {
+    result = await functions.httpsCallable("joinGroupWithPassword")({ groupName, password });
+  } catch (error) {
+    if (["functions/not-found", "functions/internal", "functions/unavailable"].includes(error?.code)) {
+      throw new Error(tx("group_join_backend_missing"));
+    }
+    if (error?.code === "functions/unauthenticated") {
+      throw new Error(tx("group_join_invalid_credentials"));
+    }
+    throw error;
+  }
   const { groupId, role, canEdit } = result.data || {};
   if (!groupId || role !== "viewer" || canEdit !== false) throw new Error(tx("group_join_failed"));
   const memberId = `gmail_${firebaseUser.uid}`;
@@ -2155,7 +2170,7 @@ function initFirebase() {
 function registerServiceWorker() {
   if (!("serviceWorker" in navigator)) return;
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("./sw.js?v=57").catch(() => { });
+    navigator.serviceWorker.register("./sw.js?v=58").catch(() => { });
   });
 }
 
