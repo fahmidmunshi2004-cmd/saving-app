@@ -127,7 +127,7 @@
     "group_join_credentials_invalid": "Group name or password is incorrect.",
     "group_join_use_personal_account": "Sign in with your own account before joining the group.",
     "group_join_must_login_first": "Sign in with your own account before joining a group.",
-    "group_join_service_unavailable": "Group join needs the Firebase join function deployed before it can be used.",
+    "group_join_service_unavailable": "Group service is not set up yet. Deploy the free backend and add its URL to the app configuration.",
     "group_action_help_create_password": "Create a shared group login with a name and password. Other people can use them, or you can invite them by email.",
     "group_password_min_length": "Group password must be at least 6 characters.",
     "group_password_provider_disabled": "Enable Email/Password sign-in in Firebase Authentication to use group passwords.",

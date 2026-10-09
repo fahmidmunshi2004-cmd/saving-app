@@ -127,7 +127,7 @@
     "group_join_credentials_invalid": "গ্রুপের নাম অথবা পাসওয়ার্ড ভুল।",
     "group_join_use_personal_account": "গ্রুপে যোগ দিতে নিজের account দিয়ে সাইন ইন করুন।",
     "group_join_must_login_first": "গ্রুপে যোগ দেওয়ার আগে নিজের account দিয়ে সাইন ইন করুন।",
-    "group_join_service_unavailable": "Group join চালু করতে Firebase join function deploy করতে হবে।",
+    "group_join_service_unavailable": "Group backend এখনো সেটআপ করা হয়নি। Free backend deploy করে তার URL app configuration-এ যোগ করুন।",
     "group_action_help_create_password": "নাম ও পাসওয়ার্ড দিয়ে শেয়ার করা গ্রুপ লগইন তৈরি করুন। অন্যরা এই তথ্য দিয়ে ঢুকতে পারবে, অথবা ইমেইলে আমন্ত্রণ পাঠাতে পারবেন।",
     "group_password_min_length": "গ্রুপ পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে।",
     "group_password_provider_disabled": "গ্রুপ পাসওয়ার্ড ব্যবহার করতে Firebase Authentication-এ Email/Password sign-in চালু করুন।",

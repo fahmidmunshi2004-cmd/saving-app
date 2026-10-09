@@ -110,10 +110,12 @@ const firebaseConfig = {
   appId: "1:989914118071:web:6ee7e72b5eda7c7f311a32",
   measurementId: "G-8T0TCWSVCM"
 };
+// Set this to the deployed Cloudflare Worker URL after deployment, e.g.
+// https://jomao-group-api.<your-account>.workers.dev
+const groupApiBaseUrl = "";
 
 let auth = null;
 let db = null;
-let functions = null;
 let googleProvider = null;
 let facebookProvider = null;
 let firebaseUser = null;

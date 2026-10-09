@@ -1263,16 +1263,24 @@ async function joinGroupWithCredentials() {
     appAlert(tx("username_password_required"));
     return;
   }
-  // Group-password joins must be checked by the deployed server function.
-  // Never move this credential check into browser-only Firestore writes.
-  // Password membership must be verified by a server function. A browser-only
-  // Firestore write would let users forge group membership.
-  if (!functions) throw new Error(tx("group_join_service_unavailable"));
+  if (!groupApiBaseUrl) throw new Error(tx("group_join_service_unavailable"));
   let groupJoined = false;
   try {
-    const joinGroup = functions.httpsCallable("joinGroupWithPassword");
-    const response = await joinGroup({ groupName, password });
-    const groupId = String(response?.data?.groupId || "");
+    const idToken = await firebaseUser.getIdToken();
+    const joinResponse = await fetch(`${groupApiBaseUrl.replace(/\/$/, "")}/join`, {
+      method: "POST",
+      headers: { "content-type": "application/json", authorization: `Bearer ${idToken}` },
+      body: JSON.stringify({ groupName, password })
+    });
+    const response = await joinResponse.json().catch(() => ({}));
+    if (!joinResponse.ok) {
+      const error = new Error(response.error || tx("group_join_service_unavailable"));
+      error.code = joinResponse.status === 401 ? "functions/unauthenticated"
+        : joinResponse.status === 412 ? "functions/failed-precondition"
+          : joinResponse.status === 400 ? "functions/invalid-argument" : "functions/unavailable";
+      throw error;
+    }
+    const groupId = String(response?.groupId || "");
     if (!groupId) throw new Error(tx("group_username_not_found"));
 
     const memberId = `gmail_${firebaseUser.uid}`;
@@ -2280,7 +2288,6 @@ function initFirebase() {
   firebase.initializeApp(firebaseConfig);
   auth = firebase.auth();
   db = firebase.firestore();
-  functions = firebase.app().functions("us-central1");
   googleProvider = new firebase.auth.GoogleAuthProvider();
   googleProvider.setCustomParameters({ prompt: "select_account" });
   facebookProvider = new firebase.auth.FacebookAuthProvider();
@@ -2510,73 +2517,19 @@ logoutBtn?.addEventListener("click", async () => {
 clearDataBtn.addEventListener("click", async () => {
   const ok = await appConfirm(tx("clear_data_confirm"), tx("clear_data_title"));
   if (!ok) return;
-  let remoteClearError = "";
+  if (!groupApiBaseUrl || !firebaseUser) {
+    appAlert(tx("group_join_service_unavailable"));
+    return;
+  }
   showLoader(tx("resetting_data"));
   try {
-    try {
-      if (db && firebaseUser?.uid) {
-        const myMemberId = `gmail_${firebaseUser.uid}`;
-
-        // Delete all groups owned by this Gmail, even if the current session is not inside that group.
-        const ownedGroupsSnap = await db
-          .collection("groups")
-          .where("createdByUid", "==", firebaseUser.uid)
-          .get();
-
-        for (const groupDoc of ownedGroupsSnap.docs) {
-          const groupId = groupDoc.id;
-          const myMembershipRef = db.collection("groupMembers").doc(`${groupId}__${myMemberId}`);
-
-          // Restore the owner's admin membership only if a legacy group is missing it.
-          const myMembershipSnap = await myMembershipRef.get();
-          if (!myMembershipSnap.exists) {
-            await myMembershipRef.set({
-              groupId,
-              memberId: myMemberId,
-              type: "gmail",
-              label: firebaseUser.email || "Admin",
-              role: "admin",
-              canEdit: true,
-              createdAt: firebase.firestore.FieldValue.serverTimestamp()
-            });
-          } else if (myMembershipSnap.data()?.role !== "admin") {
-            await myMembershipRef.update({ role: "admin", canEdit: true });
-          }
-
-          const inviteSnap = await db.collection("invitations").where("groupId", "==", groupId).get();
-          for (const doc of inviteSnap.docs) await doc.ref.delete();
-
-          const reqSnap = await db.collection("accessRequests").where("groupId", "==", groupId).get();
-          for (const doc of reqSnap.docs) await doc.ref.delete();
-
-          const membersSnap = await db.collection("groupMembers").where("groupId", "==", groupId).get();
-          const selfMemberDocId = `${groupId}__${myMemberId}`;
-          for (const doc of membersSnap.docs) {
-            if (doc.id !== selfMemberDocId) {
-              await doc.ref.delete();
-            }
-          }
-
-          await db.collection("groupFinance").doc(groupId).delete();
-          await db.collection("groups").doc(groupId).delete();
-          await myMembershipRef.delete();
-        }
-
-        // Remove any remaining memberships/credentials linked to this Gmail (joined groups etc.).
-        const myMembershipsSnap = await db.collection("groupMembers").where("memberId", "==", myMemberId).get();
-        for (const doc of myMembershipsSnap.docs) {
-          await doc.ref.delete();
-        }
-
-        const userFinanceRef = db.collection("userFinance").doc(firebaseUser.uid);
-        await Promise.all(["google", "facebook", "email"].map((provider) =>
-          userFinanceRef.collection("accounts").doc(provider).delete()
-        ));
-        await userFinanceRef.delete();
-      }
-    } catch (err) {
-      remoteClearError = err?.message || "Remote clear failed";
-    }
+    const idToken = await firebaseUser.getIdToken();
+    const response = await fetch(`${groupApiBaseUrl.replace(/\/$/, "")}/clear-account`, {
+      method: "POST",
+      headers: { authorization: `Bearer ${idToken}` }
+    });
+    const result = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(result.error || tx("group_join_service_unavailable"));
 
     income = 0;
     expense = 0;
@@ -2599,11 +2552,9 @@ clearDataBtn.addEventListener("click", async () => {
     applyAuthState();
     if (groupActionFormCard) groupActionFormCard.classList.add("hidden");
     if (inviteStatusText) inviteStatusText.innerText = "";
-    if (remoteClearError) {
-      appAlert(tx("local_reset_remote_failed", { error: remoteClearError }));
-    } else {
-      appAlert(tx("clear_all_data_complete"));
-    }
+    appAlert(tx("clear_all_data_complete"));
+  } catch (error) {
+    appAlert(error.message || tx("group_join_service_unavailable"));
   } finally {
     hideLoader();
   }

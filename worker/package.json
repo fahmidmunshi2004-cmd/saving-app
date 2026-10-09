@@ -1,0 +1,13 @@
+{
+  "name": "jomao-group-api",
+  "private": true,
+  "scripts": {
+    "deploy": "wrangler deploy"
+  },
+  "dependencies": {
+    "jose": "^5.9.6"
+  },
+  "devDependencies": {
+    "wrangler": "^4.12.0"
+  }
+}

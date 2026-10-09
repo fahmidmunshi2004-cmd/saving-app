@@ -1,0 +1,8 @@
+name = "jomao-group-api"
+main = "src/index.js"
+compatibility_date = "2026-10-09"
+
+[vars]
+FIREBASE_PROJECT_ID = "saving-app-da3b7"
+FIREBASE_WEB_API_KEY = "AIzaSyDDGb1bNysz2Vszt116K2a3GGL9Rzsx9II"
+GOOGLE_SERVICE_ACCOUNT_EMAIL = "REPLACE_WITH_SERVICE_ACCOUNT_CLIENT_EMAIL"
