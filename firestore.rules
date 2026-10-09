@@ -35,7 +35,6 @@ service cloud.firestore {
         && get(membershipPath(groupId, myMemberId())).data.groupId == groupId
         && get(membershipPath(groupId, myMemberId())).data.memberId == myMemberId()
         && (isGroupOwner(groupId)
-          || get(membershipPath(groupId, myMemberId())).data.joinedWithGroupPassword == true
           || hasAcceptedInvite(groupId, myMemberId(), get(membershipPath(groupId, myMemberId())).data.invitationToken));
     }
 
@@ -101,32 +100,34 @@ service cloud.firestore {
             && getAfter(/databases/$(database)/documents/groups/$(request.resource.data.groupId)).data.createdByUid == request.auth.uid)
           || (request.resource.data.role == "viewer"
             && request.resource.data.canEdit == false
-            && !request.resource.data.keys().hasAny(["joinedWithGroupPassword"])
             && validInvite(request.resource.data.groupId, myMemberId(), request.resource.data.invitationToken))
         );
 
-      allow update: if isGroupAdmin(resource.data.groupId)
+      allow update: if (isGroupAdmin(resource.data.groupId)
+          || (isGroupOwner(resource.data.groupId)
+            && resource.data.memberId == myMemberId()
+            && request.resource.data.role == "admin")
+          || (signedIn()
+            && resource.data.memberId == myMemberId()
+            && request.resource.data.role == "viewer"
+            && request.resource.data.canEdit == false
+            && validInvite(resource.data.groupId, myMemberId(), request.resource.data.invitationToken)))
         && request.resource.data.groupId == resource.data.groupId
         && request.resource.data.memberId == resource.data.memberId
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(["role", "canEdit", "label", "grantedByUid", "invitationToken"])
         && validMemberShape(request.resource.data, resource.data.groupId, resource.data.memberId);
 
-      allow delete: if isGroupAdmin(resource.data.groupId);
+      allow delete: if isGroupAdmin(resource.data.groupId)
+        || (signedIn() && resource.data.memberId == myMemberId());
     }
 
     match /groupFinance/{groupId} {
       allow read: if isGroupMember(groupId);
-      allow create: if isGroupAdmin(groupId);
-      allow update: if isGroupAdmin(groupId)
-          || (canGroupEdit(groupId)
-            && get(membershipPath(groupId, myMemberId())).data.role == "editor"
-            && request.resource.data.diff(resource.data).affectedKeys()
-              .hasOnly(["income", "expense", "breakdown", "transactions", "updatedAt"])
-            && request.resource.data.get("deletedTransactions", []) == resource.data.get("deletedTransactions", [])
-            && request.resource.data.transactions is list
-            && resource.data.transactions is list
-            && request.resource.data.transactions.size() == resource.data.transactions.size() + 1
-            && request.resource.data.transactions.hasAll(resource.data.transactions));
+      allow create: if canGroupEdit(groupId)
+        || (signedIn()
+          && getAfter(/databases/$(database)/documents/groups/$(groupId)).data.createdByUid == request.auth.uid
+          && getAfter(membershipPath(groupId, myMemberId())).data.role == "admin");
+      allow update: if canGroupEdit(groupId);
       allow delete: if isGroupAdmin(groupId);
     }
 
@@ -140,8 +141,14 @@ service cloud.firestore {
         && request.resource.data.status == "pending"
         && request.resource.data.expiresAt > request.time;
       allow update: if isGroupAdmin(resource.data.groupId)
-        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(["status", "acceptedAt", "expiredAt"])
-        && request.resource.data.status in ["accepted", "expired"];
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(["status", "acceptedAt", "expiredAt"])
+        || (signedIn()
+          && request.auth.token.email == resource.data.email
+          && resource.data.status == "pending"
+          && resource.data.expiresAt > request.time
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(["status", "acceptedAt"])
+          && request.resource.data.status == "accepted"
+          && getAfter(membershipPath(resource.data.groupId, myMemberId())).data.invitationToken == token);
       allow delete: if isGroupAdmin(resource.data.groupId);
     }
 
@@ -151,14 +158,12 @@ service cloud.firestore {
       allow create: if signedIn()
         && request.resource.data.fromMemberId == myMemberId()
         && isGroupMember(request.resource.data.groupId)
-        && request.resource.data.get("groupOwnerUid", "")
-          == get(/databases/$(database)/documents/groups/$(request.resource.data.groupId)).data.createdByUid
         && request.resource.data.status == "pending";
       allow update: if isGroupAdmin(resource.data.groupId)
-        && resource.data.groupOwnerUid == request.auth.uid
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(["status"])
         && request.resource.data.status == "approved";
-      allow delete: if isGroupAdmin(resource.data.groupId);
+      allow delete: if isGroupAdmin(resource.data.groupId)
+        || (signedIn() && resource.data.fromMemberId == myMemberId());
     }
 
     // Legacy password documents are intentionally inaccessible. Remove old records

@@ -59,7 +59,6 @@ function financeStorageKey(key) {
 }
 
 function financeProviderKey() {
-  if (currentSession?.groupId) return "group";
   const provider = currentSession?.authProvider || sessionStorage.getItem("vault_auth_provider");
   if (provider === "facebook" || provider === "facebook.com") return "facebook";
   if (provider === "google" || provider === "google.com") return "google";
@@ -233,21 +232,19 @@ function saveData(syncRemote = true) {
 
   const canSyncGroupFinance = syncRemote && currentSession?.groupId && db && (isCurrentAdmin() || !!currentSession?.canEdit);
   if (canSyncGroupFinance) {
-    const financeUpdate = {
+    db.collection("groupFinance").doc(currentSession.groupId).set({
       income,
       expense,
       breakdown,
       transactions,
+      deletedTransactions,
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-    };
-    if (isCurrentAdmin()) financeUpdate.deletedTransactions = deletedTransactions;
-    db.collection("groupFinance").doc(currentSession.groupId).set(financeUpdate, { merge: true }).catch(() => { });
+    }, { merge: true }).catch(() => { });
     return;
   }
 
   if (syncRemote && currentSession?.uid && !currentSession?.groupId && db) {
-    const provider = financeProviderKey();
-    db.collection("userFinance").doc(currentSession.uid).collection("accounts").doc(provider).set({
+    db.collection("userFinance").doc(currentSession.uid).collection("accounts").doc(financeProviderKey()).set({
       income,
       expense,
       breakdown,

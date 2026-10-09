@@ -62,17 +62,6 @@ const totalCategory = document.getElementById("totalCategory");
 
 const accountTypeText = document.getElementById("accountTypeText");
 const accountRoleText = document.getElementById("accountRoleText");
-const groupCredentialsCard = document.getElementById("groupCredentialsCard");
-const groupLoginNameValue = document.getElementById("groupLoginNameValue");
-const groupLoginPasswordValue = document.getElementById("groupLoginPasswordValue");
-const groupCredentialsNotice = document.getElementById("groupCredentialsNotice");
-const copyGroupNameBtn = document.getElementById("copyGroupNameBtn");
-const copyGroupPasswordBtn = document.getElementById("copyGroupPasswordBtn");
-const copyGroupCredentialsBtn = document.getElementById("copyGroupCredentialsBtn");
-const toggleGroupPasswordBtn = document.getElementById("toggleGroupPasswordBtn");
-const groupPasswordResetRow = document.getElementById("groupPasswordResetRow");
-const newGroupPasswordInput = document.getElementById("newGroupPasswordInput");
-const saveGroupPasswordBtn = document.getElementById("saveGroupPasswordBtn");
 const groupMembersCard = document.getElementById("groupMembersCard");
 const groupMemberCount = document.getElementById("groupMemberCount");
 const groupMembersList = document.getElementById("groupMembersList");
@@ -110,9 +99,6 @@ const firebaseConfig = {
   appId: "1:989914118071:web:6ee7e72b5eda7c7f311a32",
   measurementId: "G-8T0TCWSVCM"
 };
-// Set this to the deployed Cloudflare Worker URL after deployment, e.g.
-// https://jomao-group-api.<your-account>.workers.dev
-const groupApiBaseUrl = "";
 
 let auth = null;
 let db = null;

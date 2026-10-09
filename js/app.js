@@ -35,7 +35,7 @@ async function loadI18n() {
   i18nLoadPromise = Promise.all(
     langCodes.map(async (code) => {
       try {
-        const response = await fetch(`${I18N_DIR}/${code}.json?v=17`, { cache: "no-store" });
+        const response = await fetch(`${I18N_DIR}/${code}.json?v=16`, { cache: "no-store" });
         if (!response.ok) {
           throw new Error(`Failed to load ${code} i18n JSON (${response.status})`);
         }
@@ -273,9 +273,6 @@ function applyLanguage(lang = "en") {
     accountTypeText.innerText = currentSession.type === "group" ? t("group_account") : t("gmail_account");
     accountRoleText.innerText = t(`role_${currentSession.role || "viewer"}`);
   }
-  if (groupCredentialsCard && groupLoginNameValue?.value) {
-    groupCredentialsCard.classList.toggle("hidden", !isCurrentAdmin() || !currentSession?.groupId);
-  }
   if (!groupActionFormCard?.classList.contains("hidden")) {
     openGroupActionForm(groupActionMode);
   }
@@ -291,56 +288,6 @@ function setGroupActionHelpText(mode = "create") {
   const helpKey = mode === "join" ? "group_action_help_join_password" : "group_action_help_create_password";
   groupActionHelpText.setAttribute("data-i18n", helpKey);
   groupActionHelpText.textContent = t(helpKey);
-}
-
-function showGroupCredentials(groupName, password, { once = false } = {}) {
-  if (!groupCredentialsCard || !isCurrentAdmin() || !currentSession?.groupId) return;
-  groupLoginNameValue.value = groupName || currentSession.displayName || "";
-  groupLoginPasswordValue.value = password || "";
-  groupLoginPasswordValue.type = "password";
-  toggleGroupPasswordBtn?.classList.toggle("hidden", !password);
-  copyGroupPasswordBtn?.classList.toggle("hidden", !password);
-  copyGroupCredentialsBtn?.classList.toggle("hidden", !password);
-  groupPasswordResetRow?.classList.toggle("hidden", !!password);
-  groupCredentialsNotice?.classList.toggle("hidden", !once && !!password);
-  groupCredentialsCard.classList.remove("hidden");
-}
-
-function hideGroupCredentials() {
-  groupCredentialsCard?.classList.add("hidden");
-  if (groupLoginNameValue) groupLoginNameValue.value = "";
-  if (groupLoginPasswordValue) groupLoginPasswordValue.value = "";
-  if (groupCredentialsNotice) groupCredentialsNotice.classList.add("hidden");
-}
-
-async function copyGroupCredentialText(value) {
-  if (!value) return;
-  try {
-    await navigator.clipboard.writeText(value);
-  } catch (_) {
-    const temporaryInput = document.createElement("textarea");
-    temporaryInput.value = value;
-    temporaryInput.style.position = "fixed";
-    temporaryInput.style.opacity = "0";
-    document.body.appendChild(temporaryInput);
-    temporaryInput.select();
-    document.execCommand("copy");
-    temporaryInput.remove();
-  }
-  appAlert(tx("copied_to_clipboard"));
-}
-
-async function updateGroupPassword() {
-  if (!isCurrentAdmin() || !currentSession?.groupId || !firebaseUser) return;
-  const password = String(newGroupPasswordInput?.value || "");
-  if (password.length < 6) {
-    appAlert(tx("group_password_min_length"));
-    return;
-  }
-  await firebaseUser.updatePassword(password);
-  newGroupPasswordInput.value = "";
-  showGroupCredentials(groupLoginNameValue?.value, password, { once: true });
-  appAlert(tx("group_password_updated"));
 }
 
 function getFriendlyGroupError(error, fallback = "Group action failed") {
@@ -369,21 +316,8 @@ function playButtonClickSound() {
 function canManageHistory() {
   if (!currentSession) return false;
   if (isCurrentAdmin()) return true;
-  if (!currentSession.groupId && ["gmail", "personal"].includes(currentSession.type)) return true;
+  if (!currentSession.groupId && currentSession.type === "gmail") return true;
   return false;
-}
-
-function canUseGroupActionTools() {
-  return currentSession?.type === "gmail"
-    && currentSession.authProvider !== "group"
-    && !String(currentSession.email || "").endsWith("@groups.jomao.app")
-    && !currentSession.groupId;
-}
-
-function canRequestGroupEdit() {
-  return !!currentSession?.groupId
-    && !isCurrentAdmin()
-    && !currentSession.canEdit;
 }
 
 function forceHistoryManagerPanel() {
@@ -409,47 +343,34 @@ async function refreshSettingsPanels() {
     groupMembersList.innerHTML = "";
     groupActionsCard.classList.add("hidden");
     groupActionFormCard.classList.add("hidden");
-    hideGroupCredentials();
     return;
   }
 
   accountTypeText.innerText = currentSession.type === "group" ? t("group_account") : t("gmail_account");
   accountRoleText.innerText = t(`role_${currentSession.role || "viewer"}`);
-  requestAccessCard.classList.toggle("hidden", !canRequestGroupEdit());
 
   if (!currentSession.groupId || !db) {
-    hideGroupCredentials();
     groupMembersCard.classList.add("hidden");
     inviteCard.classList.add("hidden");
     requestAccessCard.classList.add("hidden");
     pendingRequestsCard.classList.add("hidden");
     forceHistoryManagerPanel();
     groupMembersList.innerHTML = "";
-    groupActionsCard.classList.toggle("hidden", !canUseGroupActionTools());
+    groupActionsCard.classList.toggle("hidden", currentSession.type !== "gmail");
     groupActionFormCard.classList.add("hidden");
     return;
   }
-  if (isCurrentAdmin() && !groupLoginNameValue?.value) {
-    try {
-      const groupDoc = await db.collection("groups").doc(currentSession.groupId).get();
-      showGroupCredentials(groupDoc.data()?.name || currentSession.displayName, "");
-    } catch (_) {
-      showGroupCredentials(currentSession.displayName, "");
-    }
-  }
-  if (!isCurrentAdmin()) hideGroupCredentials();
-  groupCredentialsCard?.classList.toggle("hidden", !isCurrentAdmin());
 
   // Skip heavy Firestore reads unless Settings view is currently open.
   const isSettingsOpen = document.getElementById("settingsView")?.classList.contains("active");
   if (!isSettingsOpen) {
-    groupActionsCard.classList.toggle("hidden", !canUseGroupActionTools());
+    groupActionsCard.classList.toggle("hidden", currentSession.type !== "gmail");
     groupActionFormCard.classList.add("hidden");
     groupMembersCard.classList.remove("hidden");
     inviteCard.classList.toggle("hidden", !isCurrentAdmin());
     pendingRequestsCard.classList.toggle("hidden", !isCurrentAdmin());
     forceHistoryManagerPanel();
-    requestAccessCard.classList.toggle("hidden", !canRequestGroupEdit());
+    requestAccessCard.classList.toggle("hidden", isCurrentAdmin());
     return;
   }
 
@@ -496,8 +417,8 @@ async function refreshSettingsPanels() {
   inviteCard.classList.toggle("hidden", !isCurrentAdmin());
   pendingRequestsCard.classList.toggle("hidden", !isCurrentAdmin());
   forceHistoryManagerPanel();
-  requestAccessCard.classList.toggle("hidden", !canRequestGroupEdit());
-  groupActionsCard.classList.toggle("hidden", !canUseGroupActionTools());
+  requestAccessCard.classList.toggle("hidden", isCurrentAdmin());
+  groupActionsCard.classList.toggle("hidden", currentSession.type !== "gmail");
   groupActionFormCard.classList.add("hidden");
 
   await renderPendingRequests();
@@ -551,7 +472,6 @@ async function renderPendingRequests() {
 }
 
 async function approveAccessRequest(requestId, fromMemberId) {
-  if (!isCurrentAdmin() || !currentSession?.groupId) return;
   const memberSnap = await db
     .collection("groupMembers")
     .where("groupId", "==", currentSession.groupId)
@@ -559,37 +479,20 @@ async function approveAccessRequest(requestId, fromMemberId) {
     .limit(1)
     .get();
 
-  const requestSnap = await db.collection("accessRequests").doc(requestId).get();
-  if (!requestSnap.exists
-    || requestSnap.data()?.groupId !== currentSession.groupId
-    || requestSnap.data()?.fromMemberId !== fromMemberId
-    || requestSnap.data()?.status !== "pending") {
-    throw new Error(tx("request_not_found"));
-  }
-
   if (!memberSnap.empty) {
-    const memberDoc = memberSnap.docs[0];
-    const batch = db.batch();
-    batch.update(memberDoc.ref, {
+    await db.collection("groupMembers").doc(memberSnap.docs[0].id).update({
       role: "editor",
       canEdit: true,
       grantedByUid: firebaseUser.uid
     });
-    batch.update(db.collection("accessRequests").doc(requestId), { status: "approved" });
-    await batch.commit();
-  } else {
-    await db.collection("accessRequests").doc(requestId).update({ status: "approved" });
   }
+
+  await db.collection("accessRequests").doc(requestId).update({ status: "approved" });
   await refreshSettingsPanels();
 }
 
 async function requestEditAccess() {
-  if (!canRequestGroupEdit()) return;
-  const groupSnap = await db.collection("groups").doc(currentSession.groupId).get();
-  if (!groupSnap.exists || !groupSnap.data()?.createdByUid) {
-    throw new Error(tx("group_join_service_unavailable"));
-  }
-  const groupOwnerUid = groupSnap.data().createdByUid;
+  if (!currentSession?.groupId) return;
   let adminEmail = requestAccessEmailInput.value.trim().toLowerCase();
   if (!adminEmail) {
     const adminSnap = await db
@@ -619,7 +522,6 @@ async function requestEditAccess() {
 
   await db.collection("accessRequests").add({
     groupId: currentSession.groupId,
-    groupOwnerUid,
     fromMemberId: currentSession.memberId,
     fromLabel: currentSession.type === "gmail" ? currentSession.email : currentSession.username,
     toEmail: adminEmail,
@@ -698,8 +600,6 @@ function applyAuthState() {
 
   const editable = isCurrentAdmin() || !!currentSession.canEdit || (!currentSession.groupId && currentSession.type === "gmail");
   setEditAccess(editable);
-  renderTransactions();
-  forceHistoryManagerPanel();
   startGroupRealtimeSync();
   if (lastView === "walletView") {
     renderSavingsRateChart(true);
@@ -946,17 +846,15 @@ async function submitEmailAuth(event) {
 
   const isSignup = authFormMode === "signup";
   const previousAuthProvider = sessionStorage.getItem("vault_auth_provider");
-  let authProgressStarted = false;
   emailAuthSubmit.disabled = true;
   emailAuthSubmit.classList.add("is-loading");
+  loginProgress = true;
+  showLoader(getSigningInText("email"));
   try {
     const persistence = authRemember.checked
       ? firebase.auth.Auth.Persistence.LOCAL
       : firebase.auth.Auth.Persistence.SESSION;
     await auth.setPersistence(persistence);
-    authProgressStarted = true;
-    loginProgress = true;
-    showLoader(isSignup ? tx("creating_account") : getSigningInText("email"));
     sessionStorage.setItem("vault_auth_provider", "email");
     if (isSignup) {
       const credential = await auth.createUserWithEmailAndPassword(email, password);
@@ -978,10 +876,8 @@ async function submitEmailAuth(event) {
     }
     emailAuthError.textContent = getEmailAuthError(error, authFormMode);
   } finally {
-    if (authProgressStarted) {
-      loginProgress = false;
-      hideLoader();
-    }
+    loginProgress = false;
+    hideLoader();
     emailAuthSubmit.disabled = false;
     emailAuthSubmit.classList.remove("is-loading");
   }
@@ -1187,12 +1083,10 @@ async function createGroupFromGmail() {
   const email = await getGroupAuthEmail(groupName);
   const pendingSetupKey = "jomao_pending_group_setup";
   sessionStorage.setItem(pendingSetupKey, JSON.stringify({ email, groupName }));
-  sessionStorage.setItem("jomao_pending_group_password", password);
   try {
     await auth.createUserWithEmailAndPassword(email, password);
   } catch (error) {
     sessionStorage.removeItem(pendingSetupKey);
-    sessionStorage.removeItem("jomao_pending_group_password");
     if (error?.code === "auth/email-already-in-use") {
       throw new Error(tx("group_username_exists"));
     }
@@ -1240,22 +1134,15 @@ async function finishGroupAccountSetup(user, pendingSetup) {
   syncTransactionState();
   updateUI();
   applyAuthState();
-  const initialPassword = sessionStorage.getItem("jomao_pending_group_password") || "";
-  sessionStorage.removeItem("jomao_pending_group_password");
-  showGroupCredentials(groupName, initialPassword, { once: true });
   groupActionUsername.value = "";
   groupActionPassword.value = "";
   appAlert(tx("group_account_created"));
 }
 
 async function joinGroupWithCredentials() {
-  if (!auth || !firebaseUser || !currentSession) {
+  if (!auth) {
     appAlert(tx("login_first"));
     return;
-  }
-  if (currentSession.authProvider === "group"
-    || String(firebaseUser.email || "").endsWith("@groups.jomao.app")) {
-    throw new Error(tx("group_join_use_personal_account"));
   }
   const groupName = groupActionUsername.value.trim();
   const password = groupActionPassword.value;
@@ -1263,67 +1150,18 @@ async function joinGroupWithCredentials() {
     appAlert(tx("username_password_required"));
     return;
   }
-  if (!groupApiBaseUrl) throw new Error(tx("group_join_service_unavailable"));
-  let groupJoined = false;
+  const email = await getGroupAuthEmail(groupName);
   try {
-    const idToken = await firebaseUser.getIdToken();
-    const joinResponse = await fetch(`${groupApiBaseUrl.replace(/\/$/, "")}/join`, {
-      method: "POST",
-      headers: { "content-type": "application/json", authorization: `Bearer ${idToken}` },
-      body: JSON.stringify({ groupName, password })
-    });
-    const response = await joinResponse.json().catch(() => ({}));
-    if (!joinResponse.ok) {
-      const error = new Error(response.error || tx("group_join_service_unavailable"));
-      error.code = joinResponse.status === 401 ? "functions/unauthenticated"
-        : joinResponse.status === 412 ? "functions/failed-precondition"
-          : joinResponse.status === 400 ? "functions/invalid-argument" : "functions/unavailable";
-      throw error;
-    }
-    const groupId = String(response?.groupId || "");
-    if (!groupId) throw new Error(tx("group_username_not_found"));
-
-    const memberId = `gmail_${firebaseUser.uid}`;
-    const memberSnap = await db.collection("groupMembers").doc(`${groupId}__${memberId}`).get();
-    if (!memberSnap.exists) throw new Error(tx("group_join_service_unavailable"));
-    const memberData = memberSnap.data() || {};
-    const authProvider = resolveAuthProviderName(firebaseUser);
-    currentSession = {
-      type: "gmail",
-      uid: firebaseUser.uid,
-      email: firebaseUser.email || "",
-      authProvider,
-      displayName: getAuthDisplayName(firebaseUser, authProvider)
-        || firebaseUser.email
-        || t("group_account"),
-      photoURL: getAuthPhotoURL(firebaseUser, authProvider),
-      groupId,
-      memberId,
-      role: memberData.role || "viewer",
-      canEdit: !!memberData.canEdit
-    };
-    saveSession();
-    await loadGroupSharedData();
-    syncTransactionState();
-    updateUI();
-    applyAuthState();
-    groupActionUsername.value = "";
-    groupActionPassword.value = "";
-    groupJoined = true;
-    appAlert(tx("joined_group_success"));
+    await auth.signInWithEmailAndPassword(email, password);
   } catch (error) {
-    if (groupJoined) throw error;
-    if (["functions/invalid-argument", "functions/permission-denied"].includes(error?.code)) {
-      throw new Error(tx("group_join_credentials_invalid"));
+    if (error?.code === "auth/user-not-found" || error?.code === "auth/invalid-email") {
+      throw new Error(tx("group_username_not_found"));
     }
-    if (error?.code === "functions/failed-precondition") {
-      throw new Error(tx("group_join_use_personal_account"));
+    if (error?.code === "auth/wrong-password" || error?.code === "auth/invalid-credential") {
+      throw new Error(tx("wrong_password"));
     }
-    if (error?.code === "functions/unauthenticated") {
-      throw new Error(tx("group_join_must_login_first"));
-    }
-    if (["functions/unavailable", "functions/internal", "functions/not-found"].includes(error?.code)) {
-      throw new Error(tx("group_join_service_unavailable"));
+    if (error?.code === "auth/operation-not-allowed") {
+      throw new Error(tx("group_password_provider_disabled"));
     }
     throw error;
   }
@@ -1354,10 +1192,6 @@ async function handleGroupAccountAuth(user) {
     groupId: membership.groupId, memberId,
     role: membership.role || "viewer", canEdit: !!membership.canEdit
   };
-  if (currentSession.role === "admin") {
-    const groupSnap = await db.collection("groups").doc(currentSession.groupId).get();
-    showGroupCredentials(groupSnap.data()?.name || currentSession.displayName, "");
-  }
   saveSession();
   await loadGroupSharedData();
   syncTransactionState();
@@ -1599,18 +1433,13 @@ function closeEditModalCleanup() {
 
 function openTransactionEditModal(txnId) {
   return new Promise((resolve) => {
-    if (!canManageHistory()) {
-      appAlert(tx("admin_only_edit"));
-      resolve(false);
-      return;
-    }
     const txn = transactions.find((t) => t.id === txnId);
     if (!txn) {
       resolve(false);
       return;
     }
     if (!canManageHistory()) {
-      appAlert(tx("admin_only_edit"));
+    appAlert(tx("admin_only_edit"));
       resolve(false);
       return;
     }
@@ -1655,10 +1484,6 @@ function openTransactionEditModal(txnId) {
     };
 
     const onSave = async () => {
-      if (!canManageHistory()) {
-        if (errorNode) errorNode.innerText = tx("admin_only_edit");
-        return;
-      }
       const nextAmount = Number(amountInput?.value);
       const nextCategory = String(categoryInputEl?.value || "").trim();
       if (!nextAmount || nextAmount < 0) {
@@ -1734,11 +1559,6 @@ function renderTransactions() {
   const txnCount = document.getElementById("txnCount");
   const txnTotalIncome = document.getElementById("txnTotalIncome");
   const txnTotalExpense = document.getElementById("txnTotalExpense");
-  const adminCanManageHistory = canManageHistory();
-  const actionHeader = document.getElementById("txnActionHeader");
-  if (actionHeader) actionHeader.hidden = !adminCanManageHistory;
-  const footerCell = document.getElementById("txnFooterCell");
-  if (footerCell) footerCell.colSpan = adminCanManageHistory ? 5 : 4;
   tbody.innerHTML = "";
   const fragment = document.createDocumentFragment();
   let totalIncome = 0;
@@ -1776,8 +1596,7 @@ function renderTransactions() {
       totalExpense += Number(txn.amount || 0);
     }
 
-    action.hidden = !adminCanManageHistory;
-    if (adminCanManageHistory) {
+    if (canManageHistory()) {
       const actionGroup = document.createElement("div");
       actionGroup.className = "txn-action-group";
 
@@ -1803,6 +1622,8 @@ function renderTransactions() {
       actionGroup.appendChild(editBtn);
       actionGroup.appendChild(deleteBtn);
       action.appendChild(actionGroup);
+    } else {
+      action.innerText = "-";
     }
     action.setAttribute("data-label", t("action"));
 
@@ -2293,17 +2114,14 @@ function initFirebase() {
   facebookProvider = new firebase.auth.FacebookAuthProvider();
   auth.onAuthStateChanged((user) => {
     finalizeLoginFlow();
-    handleGoogleAuthUser(user).catch((e) => {
-      console.error("Authentication state handling failed", e);
-      appAlert(e.message || tx("auth_error"));
-    });
+    handleGoogleAuthUser(user).catch((e) => appAlert(e.message || tx("auth_error")));
   });
 }
 
 function registerServiceWorker() {
   if (!("serviceWorker" in navigator)) return;
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("./sw.js?v=60").catch(() => { });
+    navigator.serviceWorker.register("./sw.js?v=56").catch(() => { });
   });
 }
 
@@ -2360,32 +2178,6 @@ groupActionSubmitBtn.addEventListener("click", async () => {
   } catch (e) {
     appAlert(getFriendlyGroupError(e));
   }
-});
-
-copyGroupNameBtn?.addEventListener("click", () => copyGroupCredentialText(groupLoginNameValue?.value));
-copyGroupPasswordBtn?.addEventListener("click", () => copyGroupCredentialText(groupLoginPasswordValue?.value));
-copyGroupCredentialsBtn?.addEventListener("click", () => {
-  const groupName = groupLoginNameValue?.value || "";
-  const password = groupLoginPasswordValue?.value || "";
-  if (!password) {
-    appAlert(tx("group_password_not_saved"));
-    return;
-  }
-  copyGroupCredentialText(`${t("group_name")}: ${groupName}\n${t("group_password")}: ${password}`);
-});
-toggleGroupPasswordBtn?.addEventListener("click", () => {
-  const showing = groupLoginPasswordValue?.type === "text";
-  if (groupLoginPasswordValue) groupLoginPasswordValue.type = showing ? "password" : "text";
-  toggleGroupPasswordBtn.innerHTML = `<i class="fa-solid fa-eye${showing ? "" : "-slash"}"></i>`;
-});
-saveGroupPasswordBtn?.addEventListener("click", () => {
-  withLoader(tx("saving"), updateGroupPassword).catch((error) => {
-    if (error?.code === "auth/requires-recent-login") {
-      appAlert(tx("group_password_recent_login_required"));
-      return;
-    }
-    appAlert(error?.message || tx("group_password_update_failed"));
-  });
 });
 
 document.addEventListener("click", (event) => {
@@ -2517,19 +2309,73 @@ logoutBtn?.addEventListener("click", async () => {
 clearDataBtn.addEventListener("click", async () => {
   const ok = await appConfirm(tx("clear_data_confirm"), tx("clear_data_title"));
   if (!ok) return;
-  if (!groupApiBaseUrl || !firebaseUser) {
-    appAlert(tx("group_join_service_unavailable"));
-    return;
-  }
+  let remoteClearError = "";
   showLoader(tx("resetting_data"));
   try {
-    const idToken = await firebaseUser.getIdToken();
-    const response = await fetch(`${groupApiBaseUrl.replace(/\/$/, "")}/clear-account`, {
-      method: "POST",
-      headers: { authorization: `Bearer ${idToken}` }
-    });
-    const result = await response.json().catch(() => ({}));
-    if (!response.ok) throw new Error(result.error || tx("group_join_service_unavailable"));
+    try {
+      if (db && firebaseUser?.uid) {
+        const myMemberId = `gmail_${firebaseUser.uid}`;
+
+        // Delete all groups owned by this Gmail, even if the current session is not inside that group.
+        const ownedGroupsSnap = await db
+          .collection("groups")
+          .where("createdByUid", "==", firebaseUser.uid)
+          .get();
+
+        for (const groupDoc of ownedGroupsSnap.docs) {
+          const groupId = groupDoc.id;
+          const myMembershipRef = db.collection("groupMembers").doc(`${groupId}__${myMemberId}`);
+
+          // Restore the owner's admin membership only if a legacy group is missing it.
+          const myMembershipSnap = await myMembershipRef.get();
+          if (!myMembershipSnap.exists) {
+            await myMembershipRef.set({
+              groupId,
+              memberId: myMemberId,
+              type: "gmail",
+              label: firebaseUser.email || "Admin",
+              role: "admin",
+              canEdit: true,
+              createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+          } else if (myMembershipSnap.data()?.role !== "admin") {
+            await myMembershipRef.update({ role: "admin", canEdit: true });
+          }
+
+          const inviteSnap = await db.collection("invitations").where("groupId", "==", groupId).get();
+          for (const doc of inviteSnap.docs) await doc.ref.delete();
+
+          const reqSnap = await db.collection("accessRequests").where("groupId", "==", groupId).get();
+          for (const doc of reqSnap.docs) await doc.ref.delete();
+
+          const membersSnap = await db.collection("groupMembers").where("groupId", "==", groupId).get();
+          const selfMemberDocId = `${groupId}__${myMemberId}`;
+          for (const doc of membersSnap.docs) {
+            if (doc.id !== selfMemberDocId) {
+              await doc.ref.delete();
+            }
+          }
+
+          await db.collection("groupFinance").doc(groupId).delete();
+          await db.collection("groups").doc(groupId).delete();
+          await myMembershipRef.delete();
+        }
+
+        // Remove any remaining memberships/credentials linked to this Gmail (joined groups etc.).
+        const myMembershipsSnap = await db.collection("groupMembers").where("memberId", "==", myMemberId).get();
+        for (const doc of myMembershipsSnap.docs) {
+          await doc.ref.delete();
+        }
+
+        const userFinanceRef = db.collection("userFinance").doc(firebaseUser.uid);
+        await Promise.all(["google", "facebook"].map((provider) =>
+          userFinanceRef.collection("accounts").doc(provider).delete()
+        ));
+        await userFinanceRef.delete();
+      }
+    } catch (err) {
+      remoteClearError = err?.message || "Remote clear failed";
+    }
 
     income = 0;
     expense = 0;
@@ -2552,9 +2398,11 @@ clearDataBtn.addEventListener("click", async () => {
     applyAuthState();
     if (groupActionFormCard) groupActionFormCard.classList.add("hidden");
     if (inviteStatusText) inviteStatusText.innerText = "";
-    appAlert(tx("clear_all_data_complete"));
-  } catch (error) {
-    appAlert(error.message || tx("group_join_service_unavailable"));
+    if (remoteClearError) {
+      appAlert(tx("local_reset_remote_failed", { error: remoteClearError }));
+    } else {
+      appAlert(tx("clear_all_data_complete"));
+    }
   } finally {
     hideLoader();
   }
