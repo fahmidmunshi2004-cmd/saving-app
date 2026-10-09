@@ -125,8 +125,8 @@ service cloud.firestore {
             && request.resource.data.get("deletedTransactions", []) == resource.data.get("deletedTransactions", [])
             && request.resource.data.transactions is list
             && resource.data.transactions is list
-            && request.resource.data.transactions.size() >= resource.data.transactions.size()
-            && request.resource.data.transactions.size() <= resource.data.transactions.size() + 1);
+            && request.resource.data.transactions.size() == resource.data.transactions.size() + 1
+            && request.resource.data.transactions.hasAll(resource.data.transactions));
       allow delete: if isGroupAdmin(groupId);
     }
 

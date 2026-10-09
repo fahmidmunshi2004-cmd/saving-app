@@ -369,7 +369,7 @@ function playButtonClickSound() {
 function canManageHistory() {
   if (!currentSession) return false;
   if (isCurrentAdmin()) return true;
-  if (!currentSession.groupId && currentSession.type === "gmail") return true;
+  if (!currentSession.groupId && ["gmail", "personal"].includes(currentSession.type)) return true;
   return false;
 }
 
@@ -1587,13 +1587,18 @@ function closeEditModalCleanup() {
 
 function openTransactionEditModal(txnId) {
   return new Promise((resolve) => {
+    if (!canManageHistory()) {
+      appAlert(tx("admin_only_edit"));
+      resolve(false);
+      return;
+    }
     const txn = transactions.find((t) => t.id === txnId);
     if (!txn) {
       resolve(false);
       return;
     }
     if (!canManageHistory()) {
-    appAlert(tx("admin_only_edit"));
+      appAlert(tx("admin_only_edit"));
       resolve(false);
       return;
     }
@@ -1638,6 +1643,10 @@ function openTransactionEditModal(txnId) {
     };
 
     const onSave = async () => {
+      if (!canManageHistory()) {
+        if (errorNode) errorNode.innerText = tx("admin_only_edit");
+        return;
+      }
       const nextAmount = Number(amountInput?.value);
       const nextCategory = String(categoryInputEl?.value || "").trim();
       if (!nextAmount || nextAmount < 0) {
