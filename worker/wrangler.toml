@@ -5,4 +5,20 @@ compatibility_date = "2026-10-09"
 [vars]
 FIREBASE_PROJECT_ID = "saving-app-da3b7"
 FIREBASE_API_KEY = "AIzaSyDDGb1bNysz2Vszt116K2a3GGL9Rzsx9II"
-APP_ORIGIN = "*"
+APP_ORIGIN = "https://saving-app-sigma.vercel.app"
+
+[[ratelimits]]
+name = "GROUP_JOIN_LIMITER"
+namespace_id = "59020261009"
+
+  [ratelimits.simple]
+  limit = 10
+  period = 60
+
+[[ratelimits]]
+name = "GROUP_JOIN_IP_LIMITER"
+namespace_id = "59020261010"
+
+  [ratelimits.simple]
+  limit = 30
+  period = 60

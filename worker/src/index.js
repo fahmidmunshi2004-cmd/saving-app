@@ -70,6 +70,9 @@ async function verifyUser(request, env) {
   if (!payload.sub || payload.firebase?.sign_in_provider === "anonymous") {
     throw Object.assign(new Error("Use a Google, Facebook, or email account first."), { status: 401, code: "unauthenticated" });
   }
+  if (String(payload.email || "").toLowerCase().endsWith("@groups.jomao.app")) {
+    throw Object.assign(new Error("Sign in with your personal Google, Facebook, or email account."), { status: 401, code: "unauthenticated" });
+  }
   return payload;
 }
 
@@ -80,7 +83,6 @@ async function googleAccessToken(env) {
   const assertion = await new SignJWT({ scope: "https://www.googleapis.com/auth/datastore" })
     .setProtectedHeader({ alg: "RS256", typ: "JWT" })
     .setIssuer(env.FIREBASE_SERVICE_ACCOUNT_EMAIL)
-    .setSubject(env.FIREBASE_SERVICE_ACCOUNT_EMAIL)
     .setAudience("https://oauth2.googleapis.com/token")
     .setIssuedAt(now)
     .setExpirationTime(now + 300)
@@ -111,6 +113,15 @@ async function handleJoin(request, env, origin) {
     user = await verifyUser(request, env);
   } catch (error) {
     return reply(error.status || 401, { error: error.code || "unauthenticated", message: error.message }, origin);
+  }
+  if (env.GROUP_JOIN_LIMITER) {
+    const rate = await env.GROUP_JOIN_LIMITER.limit({ key: user.sub });
+    if (!rate.success) return reply(429, { error: "rate-limited", message: "Too many join attempts. Wait one minute and try again." }, origin);
+  }
+  if (env.GROUP_JOIN_IP_LIMITER) {
+    const ip = request.headers.get("cf-connecting-ip") || "unknown";
+    const rate = await env.GROUP_JOIN_IP_LIMITER.limit({ key: ip });
+    if (!rate.success) return reply(429, { error: "rate-limited", message: "Too many join attempts from this network. Wait one minute and try again." }, origin);
   }
 
   let input;

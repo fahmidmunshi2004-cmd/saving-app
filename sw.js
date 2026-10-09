@@ -1,4 +1,4 @@
-const CACHE_NAME = "jomao-v58";
+const CACHE_NAME = "jomao-v59";
 const ASSETS = [
   "./",
   "./index.html",
@@ -10,6 +10,7 @@ const ASSETS = [
   "./js/dark-mode.js",
   "./js/games.js",
   "./js/app.js",
+  "./js/group-join-config.js",
   "./assets/i18n/en.json",
   "./assets/i18n/bn.json",
   "./assets/i18n/ar.json",

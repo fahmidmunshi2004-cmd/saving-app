@@ -213,7 +213,7 @@
     "social_account_linked": "Both sign-in methods are now linked to this account.",
     "social_link_email_mismatch": "Sign in with the account that uses this email, then retry the other sign-in method.",
     "social_link_failed": "Could not link the sign-in methods.",
-  "group_join_backend_missing": "Group joining is not enabled yet. The app owner must deploy the Firebase join function.",
+  "group_join_backend_missing": "Group join service is not configured yet. Deploy the Cloudflare Worker and add its URL in js/group-join-config.js.",
   "group_join_personal_login_required": "Sign in with your own Google, Facebook, or email account before joining a group.",
   "group_join_failed": "Could not join the group. Please check the group details and try again.",
   "make_editor": "Allow adding transactions",
@@ -224,5 +224,7 @@
   "admin_only": "Only the group admin can do this.",
   "reject": "Reject",
   "group_action_help_join_password": "Sign in with your own Google, Facebook, or email account first. Then enter the group name and password to join as a viewer.",
-  "group_join_invalid_credentials": "The group name or password is incorrect."
+  "group_join_invalid_credentials": "The group name or password is incorrect.",
+  "group_join_service_error": "The group join service had a problem. Please try again later.",
+  "group_already_admin": "You are already the admin of this group."
 }

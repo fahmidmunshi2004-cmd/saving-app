@@ -1,3 +1,2 @@
-// Set this to the deployed Cloudflare Worker origin, for example:
-// https://jomao-group-join.<your-cloudflare-subdomain>.workers.dev
-window.GROUP_JOIN_API_URL = "";
+// Cloudflare Worker endpoint used for secure group joins.
+window.GROUP_JOIN_API_URL = "https://jomao-group-join.fahmidmunshi2004.workers.dev";

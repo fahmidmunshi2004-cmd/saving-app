@@ -293,7 +293,6 @@ function setGroupActionHelpText(mode = "create") {
 
 function getFriendlyGroupError(error, fallback = "Group action failed") {
   const message = String(error?.message || error || "").toLowerCase();
-  const code = String(error?.code || "").toLowerCase();
   if (message.includes("join_group_backend_missing")) return t("group_join_backend_missing");
   if (message.includes("permission")) {
     return t("group_action_permission_tip");
@@ -1198,8 +1197,9 @@ async function joinGroupWithCredentials() {
   }
   const responseData = await response.json().catch(() => ({}));
   if (!response.ok) {
-    if (["wrong-password", "unauthenticated"].includes(responseData.error)) throw new Error(tx("group_join_invalid_credentials"));
+    if (["wrong-password"].includes(responseData.error)) throw new Error(tx("group_join_invalid_credentials"));
     if (["already-admin"].includes(responseData.error)) throw new Error(tx("group_already_admin"));
+    if (["unauthenticated"].includes(responseData.error)) throw new Error(tx("group_join_personal_login_required"));
     if (response.status >= 500) throw new Error(tx("group_join_service_error"));
     throw new Error(responseData.message || tx("group_join_failed"));
   }
@@ -2174,7 +2174,7 @@ function initFirebase() {
 function registerServiceWorker() {
   if (!("serviceWorker" in navigator)) return;
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("./sw.js?v=58").catch(() => { });
+    navigator.serviceWorker.register("./sw.js?v=59").catch(() => { });
   });
 }
 
