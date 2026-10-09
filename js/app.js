@@ -1263,6 +1263,10 @@ async function joinGroupWithCredentials() {
     appAlert(tx("username_password_required"));
     return;
   }
+  // Group-password joins must be checked by the deployed server function.
+  // Never move this credential check into browser-only Firestore writes.
+  // Password membership must be verified by a server function. A browser-only
+  // Firestore write would let users forge group membership.
   if (!functions) throw new Error(tx("group_join_service_unavailable"));
   let groupJoined = false;
   try {
