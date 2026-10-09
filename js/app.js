@@ -1,4 +1,4 @@
-﻿async function getCurrentMemberDoc() {
+async function getCurrentMemberDoc() {
   if (!currentSession?.groupId || !currentSession?.memberId || !db) return null;
   const snap = await db
     .collection("groupMembers")
@@ -395,6 +395,17 @@ async function refreshSettingsPanels() {
     row.appendChild(meta);
     li.appendChild(row);
 
+    if (isCurrentAdmin() && role === "editor") {
+      const accessBtn = document.createElement("button");
+      accessBtn.className = "btn income-btn";
+      accessBtn.style.marginTop = "8px";
+      accessBtn.innerHTML = `<i class="fa-solid fa-eye"></i> ${tx("make_viewer")}`;
+      accessBtn.onclick = () => withLoader(tx("updating_member_role"), async () => {
+        await setMemberEditRole(doc.id, false);
+      }).catch((error) => appAlert(error.message || tx("role_update_failed")));
+      li.appendChild(accessBtn);
+    }
+
     if (isCurrentAdmin()) {
       const isSelf = m.memberId === currentSession.memberId;
       const isAdminMember = role === "admin";
@@ -459,19 +470,25 @@ async function renderPendingRequests() {
     seenRequesters.add(requesterKey);
     const li = document.createElement("li");
     const info = document.createElement("div");
+    const actions = document.createElement("div");
     const btn = document.createElement("button");
+    const rejectBtn = document.createElement("button");
     info.innerText = req.fromLabel ? `${req.fromLabel} (${t("request_access")})` : t("request_access");
     btn.className = "btn income-btn";
-    btn.style.marginTop = "8px";
     btn.innerHTML = `<i class="fa-solid fa-check"></i> ${tx("approve")}`;
     btn.onclick = () => approveAccessRequest(doc.id, req.fromMemberId);
-    li.appendChild(info);
-    li.appendChild(btn);
+    rejectBtn.className = "btn danger-btn";
+    rejectBtn.innerHTML = `<i class="fa-solid fa-xmark"></i> ${tx("reject")}`;
+    rejectBtn.onclick = () => rejectAccessRequest(doc.id);
+    actions.className = "member-request-actions";
+    actions.append(btn, rejectBtn);
+    li.append(info, actions);
     pendingRequestsList.appendChild(li);
   });
 }
 
 async function approveAccessRequest(requestId, fromMemberId) {
+  if (!isCurrentAdmin() || !currentSession?.groupId) return;
   const memberSnap = await db
     .collection("groupMembers")
     .where("groupId", "==", currentSession.groupId)
@@ -479,15 +496,31 @@ async function approveAccessRequest(requestId, fromMemberId) {
     .limit(1)
     .get();
 
-  if (!memberSnap.empty) {
-    await db.collection("groupMembers").doc(memberSnap.docs[0].id).update({
-      role: "editor",
-      canEdit: true,
-      grantedByUid: firebaseUser.uid
-    });
-  }
+  if (memberSnap.empty) throw new Error(tx("group_member_not_found"));
+  const batch = db.batch();
+  batch.update(memberSnap.docs[0].ref, {
+    role: "editor",
+    canEdit: true,
+    grantedByUid: firebaseUser.uid
+  });
+  batch.update(db.collection("accessRequests").doc(requestId), { status: "approved" });
+  await batch.commit();
+  await refreshSettingsPanels();
+}
 
-  await db.collection("accessRequests").doc(requestId).update({ status: "approved" });
+async function rejectAccessRequest(requestId) {
+  if (!isCurrentAdmin() || !requestId) return;
+  await db.collection("accessRequests").doc(requestId).update({ status: "rejected" });
+  await refreshSettingsPanels();
+}
+
+async function setMemberEditRole(memberDocId, canEditMember) {
+  if (!isCurrentAdmin() || !firebaseUser?.uid || !memberDocId) throw new Error(tx("admin_only"));
+  await db.collection("groupMembers").doc(memberDocId).update({
+    role: canEditMember ? "editor" : "viewer",
+    canEdit: !!canEditMember,
+    grantedByUid: canEditMember ? firebaseUser.uid : firebase.firestore.FieldValue.delete()
+  });
   await refreshSettingsPanels();
 }
 
@@ -1140,31 +1173,31 @@ async function finishGroupAccountSetup(user, pendingSetup) {
 }
 
 async function joinGroupWithCredentials() {
-  if (!auth) {
-    appAlert(tx("login_first"));
-    return;
-  }
+  if (!auth || !db || !functions || !firebaseUser) throw new Error(tx("group_join_backend_missing"));
+  const provider = resolveAuthProviderName(firebaseUser);
+  if (provider === "group") throw new Error(tx("group_join_personal_login_required"));
   const groupName = groupActionUsername.value.trim();
   const password = groupActionPassword.value;
   if (!groupName || !password) {
     appAlert(tx("username_password_required"));
     return;
   }
-  const email = await getGroupAuthEmail(groupName);
-  try {
-    await auth.signInWithEmailAndPassword(email, password);
-  } catch (error) {
-    if (error?.code === "auth/user-not-found" || error?.code === "auth/invalid-email") {
-      throw new Error(tx("group_username_not_found"));
-    }
-    if (error?.code === "auth/wrong-password" || error?.code === "auth/invalid-credential") {
-      throw new Error(tx("wrong_password"));
-    }
-    if (error?.code === "auth/operation-not-allowed") {
-      throw new Error(tx("group_password_provider_disabled"));
-    }
-    throw error;
-  }
+  const result = await functions.httpsCallable("joinGroupWithPassword")({ groupName, password });
+  const { groupId, role, canEdit } = result.data || {};
+  if (!groupId || role !== "viewer" || canEdit !== false) throw new Error(tx("group_join_failed"));
+  const memberId = `gmail_${firebaseUser.uid}`;
+  currentSession = {
+    type: "gmail", uid: firebaseUser.uid, email: firebaseUser.email,
+    authProvider: provider, displayName: getAuthDisplayName(firebaseUser, provider) || firebaseUser.displayName || firebaseUser.email,
+    photoURL: getAuthPhotoURL(firebaseUser, provider), groupId, memberId, role: "viewer", canEdit: false
+  };
+  saveSession();
+  await loadGroupSharedData();
+  syncTransactionState();
+  updateUI();
+  applyAuthState();
+  groupActionUsername.value = "";
+  groupActionPassword.value = "";
 }
 
 async function handleGroupAccountAuth(user) {
@@ -2109,6 +2142,7 @@ function initFirebase() {
   firebase.initializeApp(firebaseConfig);
   auth = firebase.auth();
   db = firebase.firestore();
+  functions = firebase.app().functions("us-central1");
   googleProvider = new firebase.auth.GoogleAuthProvider();
   googleProvider.setCustomParameters({ prompt: "select_account" });
   facebookProvider = new firebase.auth.FacebookAuthProvider();
@@ -2121,7 +2155,7 @@ function initFirebase() {
 function registerServiceWorker() {
   if (!("serviceWorker" in navigator)) return;
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("./sw.js?v=56").catch(() => { });
+    navigator.serviceWorker.register("./sw.js?v=57").catch(() => { });
   });
 }
 
@@ -2338,8 +2372,6 @@ clearDataBtn.addEventListener("click", async () => {
               canEdit: true,
               createdAt: firebase.firestore.FieldValue.serverTimestamp()
             });
-          } else if (myMembershipSnap.data()?.role !== "admin") {
-            await myMembershipRef.update({ role: "admin", canEdit: true });
           }
 
           const inviteSnap = await db.collection("invitations").where("groupId", "==", groupId).get();

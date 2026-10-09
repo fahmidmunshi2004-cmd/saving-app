@@ -232,14 +232,41 @@ function saveData(syncRemote = true) {
 
   const canSyncGroupFinance = syncRemote && currentSession?.groupId && db && (isCurrentAdmin() || !!currentSession?.canEdit);
   if (canSyncGroupFinance) {
-    db.collection("groupFinance").doc(currentSession.groupId).set({
+    const groupFinanceUpdate = {
       income,
       expense,
       breakdown,
       transactions,
-      deletedTransactions,
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-    }, { merge: true }).catch(() => { });
+    };
+    if (isCurrentAdmin()) groupFinanceUpdate.deletedTransactions = deletedTransactions;
+    const financeRef = db.collection("groupFinance").doc(currentSession.groupId);
+    db.runTransaction(async (transaction) => {
+      const snapshot = await transaction.get(financeRef);
+      if (!snapshot.exists) throw new Error("Shared group finance is missing.");
+      const remote = snapshot.data() || {};
+      if (!isCurrentAdmin()) {
+        const remoteTransactions = Array.isArray(remote.transactions) ? remote.transactions : [];
+        const localIds = new Set(transactions.map((item) => item?.id).filter(Boolean));
+        const additions = transactions.filter((item) => item?.id && !remoteTransactions.some((existing) => existing?.id === item.id));
+        if (additions.length !== 1 || transactions.length !== remoteTransactions.length + 1
+          || remoteTransactions.some((item) => !localIds.has(item?.id))) {
+          throw new Error("A group editor can only add a single new transaction at a time.");
+        }
+        groupFinanceUpdate.transactions = [...remoteTransactions, additions[0]];
+        groupFinanceUpdate.income = Number(remote.income || 0) + (additions[0].type === "income" ? Number(additions[0].amount || 0) : 0);
+        groupFinanceUpdate.expense = Number(remote.expense || 0) + (additions[0].type === "expense" ? Number(additions[0].amount || 0) : 0);
+        groupFinanceUpdate.breakdown = { ...(remote.breakdown || {}) };
+        if (additions[0].type === "expense") {
+          const category = String(additions[0].category || "");
+          groupFinanceUpdate.breakdown[category] = Number(groupFinanceUpdate.breakdown[category] || 0) + Number(additions[0].amount || 0);
+        }
+      }
+      transaction.update(financeRef, groupFinanceUpdate);
+    }).catch((error) => {
+      console.error("Group finance sync failed", error);
+      if (typeof appAlert === "function") appAlert(error.message || "Could not save group transaction.");
+    });
     return;
   }
 

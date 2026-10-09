@@ -212,5 +212,16 @@
     "facebook_link_failed": "Could not link Facebook to this account.",
     "social_account_linked": "Both sign-in methods are now linked to this account.",
     "social_link_email_mismatch": "Sign in with the account that uses this email, then retry the other sign-in method.",
-    "social_link_failed": "Could not link the sign-in methods."
+    "social_link_failed": "Could not link the sign-in methods.",
+  "group_join_backend_missing": "Secure group joining is not deployed yet. Ask the app admin to deploy the Firebase join function.",
+  "group_join_personal_login_required": "Sign in with your own Google, Facebook, or email account before joining a group.",
+  "group_join_failed": "Could not join the group. Please check the group details and try again.",
+  "make_editor": "Allow adding transactions",
+  "make_viewer": "Remove edit access",
+  "updating_member_role": "Updating member access...",
+  "role_update_failed": "Could not update member access.",
+  "group_member_not_found": "This group member could not be found.",
+  "admin_only": "Only the group admin can do this.",
+  "reject": "Reject",
+  "group_action_help_join_password": "Sign in with your own Google, Facebook, or email account first. Then enter the group name and password to join as a viewer."
 }
