@@ -102,7 +102,6 @@ const firebaseConfig = {
 
 let auth = null;
 let db = null;
-let functions = null;
 let googleProvider = null;
 let facebookProvider = null;
 let firebaseUser = null;

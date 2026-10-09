@@ -11,6 +11,7 @@ async function getCurrentMemberDoc() {
 }
 
 const LANG_STORAGE_KEY = "vault_lang";
+const GROUP_JOIN_API_URL = window.GROUP_JOIN_API_URL || "";
 let currentLang = "en";
 const LANGUAGE_OPTIONS = [
   { code: "en", name: "English", native: "English", flagCode: "us", locale: "en-US", dir: "ltr" },
@@ -294,8 +295,6 @@ function getFriendlyGroupError(error, fallback = "Group action failed") {
   const message = String(error?.message || error || "").toLowerCase();
   const code = String(error?.code || "").toLowerCase();
   if (message.includes("join_group_backend_missing")) return t("group_join_backend_missing");
-  if (code.includes("functions/not-found") || code.includes("functions/internal")) return t("group_join_backend_missing");
-  if (code.includes("functions/unauthenticated")) return t("group_join_invalid_credentials");
   if (message.includes("permission")) {
     return t("group_action_permission_tip");
   }
@@ -1177,7 +1176,7 @@ async function finishGroupAccountSetup(user, pendingSetup) {
 }
 
 async function joinGroupWithCredentials() {
-  if (!auth || !db || !functions || !firebaseUser) throw new Error(tx("group_join_backend_missing"));
+  if (!auth || !db || !firebaseUser || !GROUP_JOIN_API_URL) throw new Error(tx("group_join_backend_missing"));
   const provider = resolveAuthProviderName(firebaseUser);
   if (provider === "group") throw new Error(tx("group_join_personal_login_required"));
   const groupName = groupActionUsername.value.trim();
@@ -1186,19 +1185,25 @@ async function joinGroupWithCredentials() {
     appAlert(tx("username_password_required"));
     return;
   }
-  let result;
+  let response;
   try {
-    result = await functions.httpsCallable("joinGroupWithPassword")({ groupName, password });
+    const idToken = await firebaseUser.getIdToken();
+    response = await fetch(`${GROUP_JOIN_API_URL.replace(/\/$/, "")}/join`, {
+      method: "POST",
+      headers: { "content-type": "application/json", authorization: `Bearer ${idToken}` },
+      body: JSON.stringify({ groupName, password })
+    });
   } catch (error) {
-    if (["functions/not-found", "functions/internal", "functions/unavailable"].includes(error?.code)) {
-      throw new Error(tx("group_join_backend_missing"));
-    }
-    if (error?.code === "functions/unauthenticated") {
-      throw new Error(tx("group_join_invalid_credentials"));
-    }
-    throw error;
+    throw new Error(tx("group_join_backend_missing"));
   }
-  const { groupId, role, canEdit } = result.data || {};
+  const responseData = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    if (["wrong-password", "unauthenticated"].includes(responseData.error)) throw new Error(tx("group_join_invalid_credentials"));
+    if (["already-admin"].includes(responseData.error)) throw new Error(tx("group_already_admin"));
+    if (response.status >= 500) throw new Error(tx("group_join_service_error"));
+    throw new Error(responseData.message || tx("group_join_failed"));
+  }
+  const { groupId, role, canEdit } = responseData;
   if (!groupId || role !== "viewer" || canEdit !== false) throw new Error(tx("group_join_failed"));
   const memberId = `gmail_${firebaseUser.uid}`;
   currentSession = {
@@ -2157,7 +2162,6 @@ function initFirebase() {
   firebase.initializeApp(firebaseConfig);
   auth = firebase.auth();
   db = firebase.firestore();
-  functions = firebase.app().functions("us-central1");
   googleProvider = new firebase.auth.GoogleAuthProvider();
   googleProvider.setCustomParameters({ prompt: "select_account" });
   facebookProvider = new firebase.auth.FacebookAuthProvider();
