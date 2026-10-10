@@ -659,18 +659,29 @@ function applyAuthState() {
   const avatar = document.createElement("span");
   avatar.className = "auth-avatar";
   const fallbackLetter = (loginLabel.trim()[0] || currentSession.email?.trim()[0] || "?").toLocaleUpperCase();
-  const photoURL = (firebaseUser ? getAuthPhotoURL(firebaseUser, loginProvider) : "") || currentSession.photoURL || "";
+  const photoURLs = firebaseUser
+    ? getAuthPhotoURLs(firebaseUser, loginProvider, currentSession.photoURL)
+    : [currentSession.photoURL].filter(Boolean);
   const showAvatarFallback = () => {
+    avatar.replaceChildren();
     avatar.classList.add("auth-avatar-fallback");
     avatar.textContent = fallbackLetter;
   };
-  if (photoURL) {
+  if (photoURLs.length) {
     const photo = document.createElement("img");
-    photo.src = photoURL;
     photo.alt = "";
-    photo.referrerPolicy = "no-referrer";
-    photo.onerror = showAvatarFallback;
+    photo.decoding = "async";
+    let photoIndex = 0;
+    photo.onerror = () => {
+      photoIndex += 1;
+      if (photoIndex < photoURLs.length) {
+        photo.src = photoURLs[photoIndex];
+      } else {
+        showAvatarFallback();
+      }
+    };
     avatar.appendChild(photo);
+    photo.src = photoURLs[0];
   } else {
     showAvatarFallback();
   }
@@ -1080,6 +1091,21 @@ function getAuthPhotoURL(user, providerName) {
   return user?.providerData?.find((provider) => provider.providerId === providerId)?.photoURL
     || user?.photoURL
     || "";
+}
+
+function getAuthPhotoURLs(user, providerName, sessionPhotoURL = "") {
+  const urls = [getAuthPhotoURL(user, providerName), sessionPhotoURL];
+  if (providerName === "facebook") {
+    const facebookProfile = user?.providerData?.find((provider) => provider.providerId === "facebook.com");
+    const facebookUid = facebookProfile?.uid || user?.uid;
+    if (facebookUid) {
+      const profilePicture = new URL(`https://graph.facebook.com/${encodeURIComponent(facebookUid)}/picture`);
+      profilePicture.searchParams.set("type", "large");
+      urls.push(profilePicture.toString());
+    }
+    urls.push(facebookProfile?.photoURL, user?.photoURL);
+  }
+  return [...new Set(urls.filter((url) => typeof url === "string" && /^https:\/\//i.test(url)))];
 }
 
 function finalizeLoginFlow() {
@@ -2313,7 +2339,7 @@ function initFirebase() {
 function registerServiceWorker() {
   if (!("serviceWorker" in navigator)) return;
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("./sw.js?v=59").catch(() => { });
+    navigator.serviceWorker.register("./sw.js?v=65").catch(() => { });
   });
 }
 
@@ -2433,11 +2459,15 @@ async function startSocialLogin(provider, button, providerName) {
       if (facebookCredential?.accessToken) {
         try {
           const pictureUrl = new URL("https://graph.facebook.com/me");
-          pictureUrl.searchParams.set("fields", "picture.type(large)");
+          pictureUrl.searchParams.set("fields", "picture.width(160).height(160)");
           pictureUrl.searchParams.set("access_token", facebookCredential.accessToken);
           const pictureResponse = await fetch(pictureUrl.toString(), { cache: "no-store" });
           const pictureData = await pictureResponse.json();
-          facebookPhotoURL = pictureData?.picture?.data?.url || facebookPhotoURL;
+          if (!pictureResponse.ok || pictureData?.error) {
+            throw new Error(pictureData?.error?.message || `Facebook Graph API returned ${pictureResponse.status}`);
+          }
+          const picture = pictureData?.picture?.data;
+          if (picture?.url && !picture.is_silhouette) facebookPhotoURL = picture.url;
         } catch (photoError) {
           console.warn("Could not retrieve the Facebook profile picture", photoError);
         }

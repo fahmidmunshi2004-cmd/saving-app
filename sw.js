@@ -1,4 +1,4 @@
-const CACHE_NAME = "jomao-v64";
+const CACHE_NAME = "jomao-v65";
 const ASSETS = [
   "./",
   "./index.html",
