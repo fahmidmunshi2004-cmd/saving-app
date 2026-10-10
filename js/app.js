@@ -1230,7 +1230,40 @@ async function createGroupFromGmail() {
   } catch (error) {
     sessionStorage.removeItem(pendingSetupKey);
     if (error?.code === "auth/email-already-in-use") {
-      throw new Error(tx("group_username_exists"));
+      const shouldReplace = await appConfirm(
+        tx("group_duplicate_replace_confirm", { name: groupName }),
+        tx("delete_group_credentials_title")
+      );
+      if (!shouldReplace) return;
+      const credentials = await promptGroupDeleteCredentials([groupName]);
+      if (!credentials) {
+        closeEditModalCleanup();
+        return;
+      }
+      if (!firebaseUser || resolveAuthProviderName(firebaseUser) === "group") {
+        closeEditModalCleanup();
+        throw new Error(tx("group_delete_personal_login_required"));
+      }
+      const idToken = await firebaseUser.getIdToken();
+      const response = await fetch(`${GROUP_JOIN_API_URL.replace(/\/$/, "")}/delete-owned-groups`, {
+        method: "POST",
+        headers: { "content-type": "application/json", authorization: `Bearer ${idToken}` },
+        body: JSON.stringify(credentials[0])
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        closeEditModalCleanup();
+        if (result.error === "invalid-group-credentials") throw new Error(tx("group_existing_password_wrong"));
+        throw new Error(result.message || tx("group_delete_failed"));
+      }
+      sessionStorage.setItem(pendingSetupKey, JSON.stringify({ email, groupName }));
+      try {
+        await auth.createUserWithEmailAndPassword(email, password);
+      } catch (retryError) {
+        sessionStorage.removeItem(pendingSetupKey);
+        throw retryError;
+      }
+      return;
     }
     if (error?.code === "auth/operation-not-allowed") {
       throw new Error(tx("group_password_provider_disabled"));

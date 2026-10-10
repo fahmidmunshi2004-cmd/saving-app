@@ -217,34 +217,40 @@ async function handleDeleteOwnedGroups(request, env, origin) {
   }
   const groupName = String(input.groupName || "").normalize("NFKC").trim().replace(/\s+/g, " ");
   const normalizedGroupName = groupName.toLocaleLowerCase();
-  if (!groupName || groupName.length > 100) {
-    return reply(400, { error: "invalid-argument", message: "Enter the exact group name to delete." }, origin);
+  const groupPassword = String(input.groupPassword || "");
+  if (!groupName || groupName.length > 100 || !groupPassword) {
+    return reply(400, { error: "invalid-argument", message: "Enter the group name and its existing password." }, origin);
   }
 
   try {
-    const serviceToken = await googleAccessToken(env);
-    const groupQuery = {
-      structuredQuery: {
-        from: [{ collectionId: "groups" }],
-        where: { fieldFilter: { field: { fieldPath: "createdByUid" }, op: "EQUAL", value: { stringValue: user.sub } } }
-      }
-    };
-    const groupRows = await firestoreRequest(env.FIREBASE_PROJECT_ID, serviceToken, ":runQuery", {
-      method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(groupQuery)
-    });
-    const matching = groupRows.filter((row) => row.document && String(decodeFields(row.document.fields).name || "").normalize("NFKC").trim().replace(/\s+/g, " ").toLocaleLowerCase() === normalizedGroupName);
-    if (!matching.length) return reply(404, { error: "not-found", message: "No group with this name belongs to your account." }, origin);
     const groupEmail = await groupAuthEmail(groupName);
-    const authResponse = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${encodeURIComponent(env.FIREBASE_API_KEY)}`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ email: groupEmail, password: String(input.groupPassword || ""), returnSecureToken: true }) });
+    const authResponse = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${encodeURIComponent(env.FIREBASE_API_KEY)}`, {
+      method: "POST", headers: { "content-type": "application/json" },
+      body: JSON.stringify({ email: groupEmail, password: groupPassword, returnSecureToken: true })
+    });
     const groupAuth = await authResponse.json().catch(() => ({}));
-    if (!authResponse.ok || !groupAuth.idToken) return reply(401, { error: "invalid-group-credentials", message: "The group password is incorrect." }, origin);
+    if (!authResponse.ok || !groupAuth.idToken || !groupAuth.localId) {
+      return reply(401, { error: "invalid-group-credentials", message: "The existing group password is incorrect." }, origin);
+    }
+
+    const serviceToken = await googleAccessToken(env);
+    const allGroups = await firestoreRequest(env.FIREBASE_PROJECT_ID, serviceToken, ":runQuery", {
+      method: "POST", headers: { "content-type": "application/json" },
+      body: JSON.stringify({ structuredQuery: { from: [{ collectionId: "groups" }] } })
+    });
+    const matching = allGroups.filter((row) => row.document
+      && String(decodeFields(row.document.fields).name || "").normalize("NFKC").trim().replace(/\s+/g, " ").toLocaleLowerCase() === normalizedGroupName);
+    if (matching.some((row) => decodeFields(row.document.fields).createdByUid !== groupAuth.localId)) {
+      return reply(403, { error: "group-owner-mismatch", message: "This name is attached to a different active group owner. Its data was not deleted." }, origin);
+    }
+
     for (const row of matching) {
       const groupId = row.document.name.split("/").pop();
-      const memberId = `gmail_${user.sub}`;
-      const memberPath = `/groupMembers/${encodeURIComponent(`${groupId}__${memberId}`)}`;
+      const ownerMemberId = `gmail_${groupAuth.localId}`;
+      const memberPath = `/groupMembers/${encodeURIComponent(`${groupId}__${ownerMemberId}`)}`;
       const ownerMember = await firestoreRequest(env.FIREBASE_PROJECT_ID, serviceToken, memberPath).catch(() => null);
       if (!ownerMember || decodeFields(ownerMember.fields).role !== "admin") {
-        throw new Error("Owner admin membership was not found; refusing to delete this group.");
+        throw new Error("Group admin membership was not found; refusing to remove active group data.");
       }
 
       for (const collectionId of ["groupMembers", "invitations", "accessRequests"]) {
@@ -262,22 +268,18 @@ async function handleDeleteOwnedGroups(request, env, origin) {
       await firestoreRequest(env.FIREBASE_PROJECT_ID, serviceToken, `/groups/${encodeURIComponent(groupId)}`, { method: "DELETE" });
     }
 
-    const isOwnedByCaller = matching.some((row) => decodeFields(row.document.fields).createdByUid === user.sub);
-    if (!isOwnedByCaller) return reply(404, { error: "not-found", message: "No group with this name belongs to your account." }, origin);
-
     const deleteResponse = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:delete?key=${encodeURIComponent(env.FIREBASE_API_KEY)}`, {
       method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ idToken: groupAuth.idToken })
     });
     if (!deleteResponse.ok) {
       return reply(502, { error: "auth-delete-failed", message: "Group data was removed, but its sign-in account could not be deleted." }, origin);
     }
-    return reply(200, { deleted: matching.length }, origin);
+    return reply(200, { deletedGroups: matching.length, deletedGroupAccount: true }, origin);
   } catch (error) {
     console.error("Owned group deletion failed", error?.message || "unknown error");
     return reply(500, { error: "internal", message: "Could not permanently delete the group account." }, origin);
   }
 }
-
 export default {
   async fetch(request, env) {
     const origin = request.headers.get("origin") || "*";
