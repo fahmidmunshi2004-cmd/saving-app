@@ -1253,20 +1253,9 @@ async function createGroupFromGmail() {
   }
   const email = await getGroupAuthEmail(groupName);
   const pendingSetupKey = "jomao_pending_group_setup";
-  // Stop duplicate names before creating a Firebase Auth account. The hashed
-  // email is the group account's stable ID, so this also blocks casing/spacing variants.
-  try {
-    await auth.signInWithEmailAndPassword(email, password);
-    await auth.signOut();
-    appAlert(tx("group_username_exists"));
-    return;
-  } catch (error) {
-    if (error?.code === "auth/wrong-password" || error?.code === "auth/invalid-credential") {
-      appAlert(tx("group_username_exists"));
-      return;
-    }
-    if (error?.code !== "auth/user-not-found" && error?.code !== "auth/invalid-email") throw error;
-  }
+  // The normalized name hashes to a stable, unique Firebase Auth email.
+  // Let createUser enforce uniqueness; sign-in checks cannot distinguish
+  // unknown accounts when Firebase email-enumeration protection is enabled.
   sessionStorage.setItem(pendingSetupKey, JSON.stringify({ email, groupName, password }));
   try {
     await auth.createUserWithEmailAndPassword(email, password);
