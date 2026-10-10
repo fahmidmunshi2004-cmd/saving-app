@@ -36,7 +36,7 @@ async function loadI18n() {
   i18nLoadPromise = Promise.all(
     langCodes.map(async (code) => {
       try {
-        const response = await fetch(`${I18N_DIR}/${code}.json?v=17`, { cache: "no-store" });
+        const response = await fetch(`${I18N_DIR}/${code}.json?v=18`, { cache: "no-store" });
         if (!response.ok) {
           throw new Error(`Failed to load ${code} i18n JSON (${response.status})`);
         }
@@ -2354,7 +2354,7 @@ function initFirebase() {
 function registerServiceWorker() {
   if (!("serviceWorker" in navigator)) return;
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("./sw.js?v=66").catch(() => { });
+    navigator.serviceWorker.register("./sw.js?v=67").catch(() => { });
   });
 }
 
