@@ -4424,3 +4424,8 @@ input:not(:placeholder-shown)+.floating-label {
         transition-duration: .01ms !important;
     }
 }
+
+
+#groupActionHelpText {
+    margin-top: 10px;
+}
