@@ -1085,6 +1085,25 @@ h6,
     grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
+.game-puzzle-stats {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    margin: 0 0 12px;
+    color: var(--muted);
+    font-size: .9rem;
+}
+
+.game-puzzle-stats strong {
+    color: var(--text);
+    font-variant-numeric: tabular-nums;
+}
+
+.game-fifteen-grid + .game-action-btn {
+    width: 100%;
+    margin-top: 12px;
+}
+
 .game-lights-grid .game-cell,
 .game-maze-grid .game-cell,
 .game-fifteen-grid .game-cell {

@@ -210,6 +210,8 @@ body.modal-active {
     font-size: 24px;
     font-weight: 700;
     line-height: 1.3;
+    text-decoration: none;
+    border-bottom: 0;
 }
 
 .modal-icon {
@@ -234,6 +236,10 @@ body.modal-active {
 .modal-message .edit-form { display: grid; gap: 0; }
 .modal-message .edit-meta { margin: 0 0 6px; color: var(--muted, #666); font-size: .8rem; }
 .modal-message .edit-field { margin-top: 0; }
+.modal-message .edit-field + .edit-field { margin-top: 8px; }
+.modal-message.edit-mode .modal-copy { margin-bottom: 12px; }
+.modal-message.edit-mode .edit-form > .edit-field:last-of-type { margin-bottom: 0; }
+.modal-container:has(.modal-message.edit-mode) .modal-actions .btn { margin-top: 4px; }
 .modal-message .edit-error { min-height: 0; color: #d11414; font-size: .82rem; font-weight: 700; }
 
 @keyframes roadRunnerIn {

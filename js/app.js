@@ -300,13 +300,41 @@ function getFriendlyGroupError(error, fallback = "Group action failed") {
   return error?.message || fallback;
 }
 
-function showCreatedGroupCredentials(name, password) {
+function groupCredentialsStorageKey(uid) {
+  return uid ? `jomao_group_credentials_${uid}` : "";
+}
+
+function showCreatedGroupCredentials(name, password, uid = currentSession?.uid) {
   if (!createdGroupCredentialsCard) return;
-  createdGroupName.textContent = name;
-  createdGroupPassword.textContent = password;
-  createdGroupCredentialsCard.classList.remove("hidden");
-  if (!document.getElementById("settingsView")?.classList.contains("active")) showView("settingsView");
-  createdGroupCredentialsCard.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  // Keep the password only in this browser tab's session, never in Firestore/localStorage.
+  const storageKey = groupCredentialsStorageKey(uid);
+  if (storageKey && password) {
+    sessionStorage.setItem(storageKey, JSON.stringify({ name, password }));
+  }
+  renderGroupCredentialsCard();
+  if (!createdGroupCredentialsCard.classList.contains("hidden")) {
+    if (!document.getElementById("settingsView")?.classList.contains("active")) showView("settingsView");
+    createdGroupCredentialsCard.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }
+}
+
+function renderGroupCredentialsCard() {
+  if (!createdGroupCredentialsCard) return;
+  const isGroupAdmin = !!currentSession && currentSession.type === "gmail"
+    && currentSession.authProvider === "group" && isCurrentAdmin();
+  createdGroupCredentialsCard.classList.toggle("hidden", !isGroupAdmin);
+  if (!isGroupAdmin) {
+    createdGroupName.textContent = "";
+    createdGroupPassword.textContent = "";
+    if (copyCreatedGroupPasswordBtn) copyCreatedGroupPasswordBtn.disabled = true;
+    return;
+  }
+  const cached = sessionStorage.getItem(groupCredentialsStorageKey(currentSession.uid));
+  let credentials = null;
+  try { credentials = cached ? JSON.parse(cached) : null; } catch (_) { }
+  createdGroupName.textContent = credentials?.name || currentSession.displayName || "";
+  createdGroupPassword.textContent = credentials?.password || "";
+  copyCreatedGroupPasswordBtn.disabled = !credentials?.password;
 }
 
 async function copyCredential(value, button) {
@@ -354,6 +382,7 @@ function forceHistoryManagerPanel() {
 }
 
 async function refreshSettingsPanels() {
+  renderGroupCredentialsCard();
   if (!currentSession) {
     accountTypeText.innerText = "-";
     accountRoleText.innerText = "-";
@@ -1201,7 +1230,7 @@ function openGroupActionForm(mode = "create") {
 }
 
 async function getGroupAuthEmail(groupName) {
-  const normalizedName = String(groupName || "").normalize("NFKC").trim().toLocaleLowerCase().replace(/\s+/g, " ");
+  const normalizedName = String(groupName || "").normalize("NFKC").trim().replace(/\s+/g, " ").toLocaleLowerCase();
   const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(normalizedName));
   const nameKey = Array.from(new Uint8Array(digest), (value) => value.toString(16).padStart(2, "0")).join("");
   return `group-${nameKey}@groups.jomao.app`;
@@ -1224,45 +1253,27 @@ async function createGroupFromGmail() {
   }
   const email = await getGroupAuthEmail(groupName);
   const pendingSetupKey = "jomao_pending_group_setup";
-  sessionStorage.setItem(pendingSetupKey, JSON.stringify({ email, groupName }));
+  // Stop duplicate names before creating a Firebase Auth account. The hashed
+  // email is the group account's stable ID, so this also blocks casing/spacing variants.
+  try {
+    await auth.signInWithEmailAndPassword(email, password);
+    await auth.signOut();
+    appAlert(tx("group_username_exists"));
+    return;
+  } catch (error) {
+    if (error?.code === "auth/wrong-password" || error?.code === "auth/invalid-credential") {
+      appAlert(tx("group_username_exists"));
+      return;
+    }
+    if (error?.code !== "auth/user-not-found" && error?.code !== "auth/invalid-email") throw error;
+  }
+  sessionStorage.setItem(pendingSetupKey, JSON.stringify({ email, groupName, password }));
   try {
     await auth.createUserWithEmailAndPassword(email, password);
   } catch (error) {
     sessionStorage.removeItem(pendingSetupKey);
     if (error?.code === "auth/email-already-in-use") {
-      const shouldReplace = await appConfirm(
-        tx("group_duplicate_replace_confirm", { name: groupName }),
-        tx("delete_group_credentials_title")
-      );
-      if (!shouldReplace) return;
-      const credentials = await promptGroupDeleteCredentials([groupName]);
-      if (!credentials) {
-        closeEditModalCleanup();
-        return;
-      }
-      if (!firebaseUser || resolveAuthProviderName(firebaseUser) === "group") {
-        closeEditModalCleanup();
-        throw new Error(tx("group_delete_personal_login_required"));
-      }
-      const idToken = await firebaseUser.getIdToken();
-      const response = await fetch(`${GROUP_JOIN_API_URL.replace(/\/$/, "")}/delete-owned-groups`, {
-        method: "POST",
-        headers: { "content-type": "application/json", authorization: `Bearer ${idToken}` },
-        body: JSON.stringify(credentials[0])
-      });
-      const result = await response.json().catch(() => ({}));
-      if (!response.ok) {
-        closeEditModalCleanup();
-        if (result.error === "invalid-group-credentials") throw new Error(tx("group_existing_password_wrong"));
-        throw new Error(result.message || tx("group_delete_failed"));
-      }
-      sessionStorage.setItem(pendingSetupKey, JSON.stringify({ email, groupName }));
-      try {
-        await auth.createUserWithEmailAndPassword(email, password);
-      } catch (retryError) {
-        sessionStorage.removeItem(pendingSetupKey);
-        throw retryError;
-      }
+      appAlert(tx("group_username_exists"));
       return;
     }
     if (error?.code === "auth/operation-not-allowed") {
@@ -1273,7 +1284,7 @@ async function createGroupFromGmail() {
 }
 
 async function finishGroupAccountSetup(user, pendingSetup) {
-  const { groupName } = pendingSetup;
+  const { groupName, password } = pendingSetup;
   await user.updateProfile({ displayName: groupName });
   const memberId = `gmail_${user.uid}`;
   const groupRef = db.collection("groups").doc();
@@ -1311,7 +1322,7 @@ async function finishGroupAccountSetup(user, pendingSetup) {
   applyAuthState();
   groupActionUsername.value = "";
   groupActionPassword.value = "";
-  showCreatedGroupCredentials(groupName, password);
+  showCreatedGroupCredentials(groupName, password, user.uid);
   appAlert(tx("group_account_created"));
 }
 
@@ -2514,6 +2525,8 @@ logoutBtn?.addEventListener("click", async () => {
   if (!ok) return;
   try {
     await withLoader(tx("logging_out"), async () => {
+      const credentialsKey = groupCredentialsStorageKey(currentSession?.uid);
+      if (credentialsKey) sessionStorage.removeItem(credentialsKey);
       if (auth && auth.currentUser) {
         await auth.signOut();
       } else {
