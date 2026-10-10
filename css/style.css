@@ -1720,6 +1720,19 @@ h6,
     grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
+.game-board-memory .game-cell {
+    width: min(20vw, 76px);
+    height: min(20vw, 76px);
+    min-width: 0;
+    min-height: 0;
+    font-size: 1.15rem;
+}
+
+.game-board-memory .game-cell.is-open,
+.game-board-memory .game-cell[data-matched] {
+    font-size: clamp(1.8rem, 7vw, 2.55rem);
+}
+
 .game-cell.is-open {
     background: var(--brand);
     color: #fff;

@@ -60,7 +60,7 @@ function decodeFields(fields = {}) {
   return Object.fromEntries(Object.entries(fields).map(([key, value]) => [key, decodedValue(value)]));
 }
 
-async function verifyUser(request, env) {
+async function verifyUser(request, env, { allowGroupAccount = false } = {}) {
   const token = request.headers.get("authorization")?.replace(/^Bearer\s+/i, "");
   if (!token) throw Object.assign(new Error("Sign in with your personal account first."), { status: 401, code: "unauthenticated" });
   const { payload } = await jwtVerify(token, PUBLIC_KEYS, {
@@ -70,7 +70,7 @@ async function verifyUser(request, env) {
   if (!payload.sub || payload.firebase?.sign_in_provider === "anonymous") {
     throw Object.assign(new Error("Use a Google, Facebook, or email account first."), { status: 401, code: "unauthenticated" });
   }
-  if (String(payload.email || "").toLowerCase().endsWith("@groups.jomao.app")) {
+  if (!allowGroupAccount && String(payload.email || "").toLowerCase().endsWith("@groups.jomao.app")) {
     throw Object.assign(new Error("Sign in with your personal Google, Facebook, or email account."), { status: 401, code: "unauthenticated" });
   }
   return payload;
@@ -206,7 +206,9 @@ async function handleJoin(request, env, origin) {
 async function handleDeleteOwnedGroups(request, env, origin) {
   let user;
   try {
-    user = await verifyUser(request, env);
+    // Group admins can clear their own group. The group name/password below
+    // re-authenticate the owner before any group records or auth account are deleted.
+    user = await verifyUser(request, env, { allowGroupAccount: true });
   } catch (error) {
     return reply(error.status || 401, { error: error.code || "unauthenticated", message: error.message }, origin);
   }

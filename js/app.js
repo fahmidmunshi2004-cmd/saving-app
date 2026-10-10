@@ -876,7 +876,7 @@ function getSigningInText(providerName) {
   const names = { google: "Google", facebook: "Facebook", email: "Email" };
   const providerLabel = names[providerName] || names.email;
   return currentLang === "bn"
-    ? `${providerLabel} à¦¦à¦¿à¦¯à¦¼à§‡ à¦¸à¦¾à¦‡à¦¨ à¦‡à¦¨ à¦•à¦°à¦¾ à¦¹à¦šà§à¦›à§‡...`
+    ? `${providerLabel} দিয়ে সাইন ইন করা হচ্ছে...`
     : `Signing in with ${providerLabel}...`;
 }
 
@@ -2218,7 +2218,7 @@ function downloadReportPdf() {
   const totalRecords = Number(transactions.length || 0);
 
   const rows = [...transactions].reverse().map((txn) => {
-    const typeLabel = txn.type === "income" ? "à¦‡à¦¨à¦•à¦¾à¦®" : "à¦–à¦°à¦š";
+    const typeLabel = txn.type === "income" ? "আয়" : "খরচ";
     return `<tr>
       <td>${escapeHtml(txn.time || "-")}</td>
       <td>${escapeHtml(typeLabel)}</td>
@@ -2272,10 +2272,10 @@ function downloadReportPdf() {
   </table>
   <div class="totals">
     <div class="totals-row">
-      <div>à¦®à§‹à¦Ÿ à¦‡à¦¨à¦•à¦¾à¦®<strong>${escapeHtml(formatMoney(totalIncome))}</strong></div>
-      <div>à¦®à§‹à¦Ÿ à¦–à¦°à¦š<strong>${escapeHtml(formatMoney(totalExpense))}</strong></div>
-      <div>à¦®à§‹à¦Ÿ à¦¬à§à¦¯à¦¾à¦²à§‡à¦¨à§à¦¸<strong>${escapeHtml(formatMoney(totalBalance))}</strong></div>
-      <div>à¦®à§‹à¦Ÿ à¦°à§‡à¦•à¦°à§à¦¡<strong>${escapeHtml(String(totalRecords))}</strong></div>
+      <div>মোট আয়<strong>${escapeHtml(formatMoney(totalIncome))}</strong></div>
+      <div>মোট খরচ<strong>${escapeHtml(formatMoney(totalExpense))}</strong></div>
+      <div>মোট ব্যালেন্স<strong>${escapeHtml(formatMoney(totalBalance))}</strong></div>
+      <div>মোট রেকর্ড<strong>${escapeHtml(String(totalRecords))}</strong></div>
     </div>
   </div>
 </body>

@@ -430,11 +430,16 @@
       });
     },
     memory() {
-      const icons = ["🍎", "🍋", "🍇", "🍒", "🥝", "🍉", "🍎", "🍋", "🍇", "🍒", "🥝", "🍉"].sort(() => Math.random() - 0.5);
+      const fruits = ["🍎", "🍋", "🍇", "🍒", "🥝", "🍉", "🍊", "🍐", "🍓", "🍍"];
+      const icons = [...fruits, ...fruits];
+      for (let i = icons.length - 1; i > 0; i--) {
+        const j = random(i + 1);
+        [icons[i], icons[j]] = [icons[j], icons[i]];
+      }
       const opened = [];
       let matched = 0;
       let locked = false;
-      frame("Tap two cards to find each matching pair. Match all six pairs.", numberedBoard("game-board-memory", 12));
+      frame("Tap two cards to find each matching pair. Match all ten pairs.", numberedBoard("game-board-memory", icons.length));
       body.querySelectorAll("[data-cell]").forEach((cell, i) => { cell.textContent = "?"; });
       on(body, "click", (event) => {
         const cell = event.target.closest("[data-cell]");
