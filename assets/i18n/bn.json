@@ -76,6 +76,7 @@
     "add_another_group": "অন্য গ্রুপ যোগ করুন",
     "group_action": "গ্রুপ অ্যাকশন",
     "group_password": "গ্রুপ পাসওয়ার্ড",
+    "group_password_unavailable": "এই ব্রাউজারে সংরক্ষিত নেই",
     "created_group_credentials": "তৈরি অ্যাকাউন্টের তথ্য",
     "copy": "কপি",
     "copied": "কপি হয়েছে",

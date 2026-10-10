@@ -333,7 +333,7 @@ function renderGroupCredentialsCard() {
   let credentials = null;
   try { credentials = cached ? JSON.parse(cached) : null; } catch (_) { }
   createdGroupName.textContent = credentials?.name || currentSession.displayName || "";
-  createdGroupPassword.textContent = credentials?.password || "";
+  createdGroupPassword.textContent = credentials?.password || tx("group_password_unavailable");
   copyCreatedGroupPasswordBtn.disabled = !credentials?.password;
 }
 

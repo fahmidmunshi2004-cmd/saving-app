@@ -76,6 +76,7 @@
     "add_another_group": "Add Another Group",
     "group_action": "Group Action",
     "group_password": "Group Password",
+    "group_password_unavailable": "Not saved in this browser",
     "created_group_credentials": "Created Account Credentials",
     "copy": "Copy",
     "copied": "Copied",
