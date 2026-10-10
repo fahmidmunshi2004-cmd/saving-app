@@ -445,12 +445,16 @@ async function refreshSettingsPanels() {
     const row = document.createElement("div");
     const meta = document.createElement("div");
     const labelEl = document.createElement("span");
+    const avatar = document.createElement("span");
     const label = m.label || m.email || m.memberId || "Member";
     const role = m.role || "viewer";
     row.className = "member-main";
+    avatar.className = "member-avatar";
+    avatar.innerHTML = '<i class="fa-solid fa-user"></i>';
     meta.className = "member-meta";
     labelEl.className = "member-label";
     labelEl.textContent = label;
+    row.appendChild(avatar);
     row.appendChild(labelEl);
     meta.textContent = t(`role_${role}`) || role;
     row.appendChild(meta);
@@ -460,7 +464,7 @@ async function refreshSettingsPanels() {
 
     if (isCurrentAdmin() && role === "editor") {
       const accessBtn = document.createElement("button");
-      accessBtn.className = "btn income-btn";
+      accessBtn.className = "btn expense-btn";
       accessBtn.innerHTML = `<i class="fa-solid fa-eye"></i> ${tx("make_viewer")}`;
       accessBtn.onclick = () => withLoader(tx("updating_member_role"), async () => {
         await setMemberEditRole(doc.id, false);
@@ -484,7 +488,10 @@ async function refreshSettingsPanels() {
       }
     }
 
-    if (actions.childElementCount) li.appendChild(actions);
+    if (actions.childElementCount) {
+      if (actions.childElementCount > 1) actions.classList.add("member-actions-split");
+      li.appendChild(actions);
+    }
     groupMembersList.appendChild(li);
   });
 

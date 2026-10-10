@@ -289,6 +289,17 @@ html[data-theme="dark"] #groupMembersList .member-meta {
     color: #fff !important;
 }
 
+html[data-theme="dark"] #groupMembersList .member-avatar {
+    background: rgba(255, 77, 121, 0.15);
+    color: #ff91ad;
+}
+
+html[data-theme="dark"] #groupMembersList .member-actions .danger-btn {
+    background: rgba(255, 77, 121, 0.1);
+    border-color: rgba(255, 77, 121, 0.45);
+    color: #ff91ad !important;
+}
+
 html[data-theme="dark"] .wallet-rate-chart-wrap,
 html[data-theme="dark"] .chart-wrap,
 html[data-theme="dark"] .table-wrap,
