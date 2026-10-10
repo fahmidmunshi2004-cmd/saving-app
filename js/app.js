@@ -36,7 +36,7 @@ async function loadI18n() {
   i18nLoadPromise = Promise.all(
     langCodes.map(async (code) => {
       try {
-        const response = await fetch(`${I18N_DIR}/${code}.json?v=16`, { cache: "no-store" });
+        const response = await fetch(`${I18N_DIR}/${code}.json?v=17`, { cache: "no-store" });
         if (!response.ok) {
           throw new Error(`Failed to load ${code} i18n JSON (${response.status})`);
         }
@@ -370,6 +370,12 @@ function canManageHistory() {
   return false;
 }
 
+function canRequestEditAccess() {
+  return !!currentSession?.groupId
+    && !isCurrentAdmin()
+    && currentSession.role !== "editor";
+}
+
 function forceHistoryManagerPanel() {
   if (!deletedTransactionsCard || !deletedTransactionsList) return;
   const allowed = canManageHistory();
@@ -421,7 +427,7 @@ async function refreshSettingsPanels() {
     inviteCard.classList.toggle("hidden", !isCurrentAdmin());
     pendingRequestsCard.classList.toggle("hidden", !isCurrentAdmin());
     forceHistoryManagerPanel();
-    requestAccessCard.classList.toggle("hidden", isCurrentAdmin());
+    requestAccessCard.classList.toggle("hidden", !canRequestEditAccess());
     return;
   }
 
@@ -449,16 +455,17 @@ async function refreshSettingsPanels() {
     meta.textContent = t(`role_${role}`) || role;
     row.appendChild(meta);
     li.appendChild(row);
+    const actions = document.createElement("div");
+    actions.className = "member-actions";
 
     if (isCurrentAdmin() && role === "editor") {
       const accessBtn = document.createElement("button");
       accessBtn.className = "btn income-btn";
-      accessBtn.style.marginTop = "8px";
       accessBtn.innerHTML = `<i class="fa-solid fa-eye"></i> ${tx("make_viewer")}`;
       accessBtn.onclick = () => withLoader(tx("updating_member_role"), async () => {
         await setMemberEditRole(doc.id, false);
       }).catch((error) => appAlert(error.message || tx("role_update_failed")));
-      li.appendChild(accessBtn);
+      actions.appendChild(accessBtn);
     }
 
     if (isCurrentAdmin()) {
@@ -473,17 +480,18 @@ async function refreshSettingsPanels() {
             await removeGroupMember(doc.id, label);
           }).catch((e) => appAlert(e.message || tx("kick_failed")));
         };
-        li.appendChild(kickBtn);
+        actions.appendChild(kickBtn);
       }
     }
 
+    if (actions.childElementCount) li.appendChild(actions);
     groupMembersList.appendChild(li);
   });
 
   inviteCard.classList.toggle("hidden", !isCurrentAdmin());
   pendingRequestsCard.classList.toggle("hidden", !isCurrentAdmin());
   forceHistoryManagerPanel();
-  requestAccessCard.classList.toggle("hidden", isCurrentAdmin());
+  requestAccessCard.classList.toggle("hidden", !canRequestEditAccess());
   groupActionsCard.classList.toggle("hidden", currentSession.type !== "gmail");
   groupActionFormCard.classList.add("hidden");
 
@@ -2339,7 +2347,7 @@ function initFirebase() {
 function registerServiceWorker() {
   if (!("serviceWorker" in navigator)) return;
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("./sw.js?v=65").catch(() => { });
+    navigator.serviceWorker.register("./sw.js?v=66").catch(() => { });
   });
 }
 
