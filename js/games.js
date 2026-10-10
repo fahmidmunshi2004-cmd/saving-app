@@ -631,7 +631,7 @@
     },
     fifteen() {
       let board=[],moves=0,startedAt=0,timerId=0,solved=false;
-      const isSolvable=tiles=>{let inversions=0;const numbers=tiles.filter(Boolean);for(let i=0;i<numbers.length;i++)for(let j=i+1;j<numbers.length;j++)if(numbers[i]>numbers[j])inversions++;const blankRowFromBottom=4-Math.floor(tiles.indexOf(0)/4);return (inversions+blankRowFromBottom)%2===1;};
+      const isSolvable=tiles=>{let inversions=0;const numbers=tiles.filter(Boolean);for(let i=0;i<numbers.length;i++)for(let j=i+1;j<numbers.length;j++)if(numbers[i]>numbers[j])inversions++;const blankRowFromBottom=4-Math.floor(tiles.indexOf(0)/4);return (inversions+blankRowFromBottom)%2===0;};
       const elapsed=()=>startedAt?Math.floor((Date.now()-startedAt)/1000):0;
       const formatTime=seconds=>`${Math.floor(seconds/60)}:${String(seconds%60).padStart(2,"0")}`;
       const draw=()=>{body.querySelectorAll("[data-tile]").forEach((tile,index)=>{tile.textContent=board[index]||"";tile.disabled=solved;});const moveLabel=el("[data-puzzle-moves]"),timeLabel=el("[data-puzzle-time]");if(moveLabel)moveLabel.textContent=String(moves);if(timeLabel)timeLabel.textContent=formatTime(elapsed());};
