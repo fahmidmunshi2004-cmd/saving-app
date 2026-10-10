@@ -1,6 +1,6 @@
 # Group join Worker
 
-This Worker lets a signed-in Google, Facebook, or email user join a group with its group name and password without Firebase Cloud Functions or Blaze. The Worker verifies the Firebase ID token, checks the existing group login through Firebase Authentication, and writes a viewer membership to Firestore with a dedicated service account.
+This Worker lets a signed-in Google, Facebook, or email user join a group with its group name and password without Firebase Cloud Functions or Blaze. It also permanently deletes an owned group and its group login after verifying the signed-in owner, exact group name, and group password.
 
 ## One-time Cloudflare setup
 

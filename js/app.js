@@ -970,6 +970,57 @@ async function sendAuthPasswordReset() {
   }
 }
 
+function promptGroupDeleteCredentials(groupNames) {
+  return new Promise((resolve) => {
+    const entries = [];
+    let index = 0;
+    const showNext = () => {
+      if (index >= groupNames.length) { resolve(entries); return; }
+      const groupName = groupNames[index];
+      modalTitle.innerText = "";
+      modalTitle.classList.add("hidden");
+      modalOkBtn.parentElement?.classList.remove("single-btn");
+      modalOkBtn.innerHTML = `<i class="fa-solid fa-check"></i> ${tx("continue")}`;
+      modalCancelBtn.innerHTML = `<i class="fa-solid fa-xmark"></i> ${tx("cancel")}`;
+      modalCancelBtn.classList.remove("hidden");
+      modalMessage.className = "modal-message edit-mode";
+      modalMessage.innerHTML = `<div class="edit-form"><div class="modal-icon modal-icon-warn"><i class="fa-solid fa-trash-can"></i></div><div class="modal-copy-title">${escapeHtml(tx("delete_group_credentials_title"))}</div><div class="modal-copy">${escapeHtml(tx("delete_group_credentials_message", { name: groupName }))}</div><div class="field edit-field"><input id="deleteGroupNameConfirm" type="text" placeholder=" " autocomplete="off"><label class="floating-label" for="deleteGroupNameConfirm">${escapeHtml(tx("group_name"))}</label></div><div class="field edit-field"><input id="deleteGroupPasswordConfirm" type="password" placeholder=" " autocomplete="current-password"><label class="floating-label" for="deleteGroupPasswordConfirm">${escapeHtml(tx("group_password"))}</label></div><p id="deleteGroupCredentialError" class="auth-form-error" role="alert"></p></div>`;
+      prepareModalMotion();
+      const cleanup = () => {
+        modalOkBtn.removeEventListener("click", onOk);
+        modalCancelBtn.removeEventListener("click", onCancel);
+        appModal.removeEventListener("click", onOverlayClick);
+      };
+      const finish = (value) => {
+        cleanup();
+        closeModalMotion(() => {
+          if (value === null) { closeEditModalCleanup(); resolve(null); return; }
+          entries.push({ groupName, ...value });
+          index += 1;
+          showNext();
+        });
+      };
+      const onOk = () => {
+        const enteredName = document.getElementById("deleteGroupNameConfirm")?.value.trim();
+        const groupPassword = document.getElementById("deleteGroupPasswordConfirm")?.value || "";
+        if (enteredName !== groupName || !groupPassword) {
+          const error = document.getElementById("deleteGroupCredentialError");
+          if (error) error.textContent = tx("delete_group_credentials_invalid");
+          return;
+        }
+        finish({ groupPassword });
+      };
+      const onCancel = () => finish(null);
+      const onOverlayClick = (event) => { if (isModalOverlayTarget(event)) finish(null); };
+      modalOkBtn.addEventListener("click", onOk);
+      modalCancelBtn.addEventListener("click", onCancel);
+      appModal.addEventListener("click", onOverlayClick);
+      setTimeout(() => document.getElementById("deleteGroupNameConfirm")?.focus(), 50);
+    };
+    showNext();
+  });
+}
+
 function resolveAuthProviderName(user) {
   if (user?.email?.endsWith("@groups.jomao.app")) return "group";
   if (activeSocialProviderName === "facebook" || activeSocialProviderName === "google") {
@@ -993,7 +1044,8 @@ function getAuthDisplayName(user, providerName) {
 function getAuthPhotoURL(user, providerName) {
   if (providerName === "facebook") {
     const facebookProfile = user?.providerData?.find((provider) => provider.providerId === "facebook.com");
-    return facebookProfile?.photoURL || user?.photoURL || "";
+    const cachedFacebookPhoto = user?.uid ? sessionStorage.getItem(`facebook_photo_${user.uid}`) : "";
+    return cachedFacebookPhoto || facebookProfile?.photoURL || user?.photoURL || "";
   }
   const providerId = providerName === "facebook" ? "facebook.com" : "google.com";
   return user?.providerData?.find((provider) => provider.providerId === providerId)?.photoURL
@@ -2344,13 +2396,28 @@ async function startSocialLogin(provider, button, providerName) {
     if (providerName === "facebook") {
       const facebookCredential = firebase.auth.FacebookAuthProvider.credentialFromResult(result);
       const facebookProfile = result.user?.providerData?.find((item) => item.providerId === "facebook.com");
-      const facebookPhotoURL = result.user?.photoURL || facebookProfile?.photoURL ||
-        (facebookCredential?.accessToken && facebookProfile?.uid
-          ? `https://graph.facebook.com/${encodeURIComponent(facebookProfile.uid)}/picture?type=large&access_token=${encodeURIComponent(facebookCredential.accessToken)}`
-          : "");
+      let facebookPhotoURL = facebookProfile?.photoURL || "";
+      if (facebookCredential?.accessToken) {
+        try {
+          const pictureUrl = new URL("https://graph.facebook.com/me");
+          pictureUrl.searchParams.set("fields", "picture.type(large)");
+          pictureUrl.searchParams.set("access_token", facebookCredential.accessToken);
+          const pictureResponse = await fetch(pictureUrl.toString(), { cache: "no-store" });
+          const pictureData = await pictureResponse.json();
+          facebookPhotoURL = pictureData?.picture?.data?.url || facebookPhotoURL;
+        } catch (photoError) {
+          console.warn("Could not retrieve the Facebook profile picture", photoError);
+        }
+      }
+      facebookPhotoURL = facebookPhotoURL || result.user?.photoURL || "";
       if (facebookPhotoURL) {
-        currentSession = { ...(currentSession || {}), authProvider: "facebook", photoURL: facebookPhotoURL };
-        saveSession();
+        sessionStorage.setItem(`facebook_photo_${result.user.uid}`, facebookPhotoURL);
+        if (currentSession?.uid === result.user.uid) {
+          currentSession.authProvider = "facebook";
+          currentSession.photoURL = facebookPhotoURL;
+          saveSession();
+          applyAuthState();
+        }
       }
     }
     activeSocialProviderName = "";
@@ -2431,6 +2498,20 @@ logoutBtn?.addEventListener("click", async () => {
 clearDataBtn.addEventListener("click", async () => {
   const ok = await appConfirm(tx("clear_data_confirm"), tx("clear_data_title"));
   if (!ok) return;
+  let deletionCredentials = [];
+  if (db && firebaseUser?.uid) {
+    try {
+      const ownedGroups = await db.collection("groups").where("createdByUid", "==", firebaseUser.uid).get();
+      const groupNames = [...new Map(ownedGroups.docs.map((doc) => String(doc.data()?.name || "").normalize("NFKC").trim().replace(/\s+/g, " ")).filter(Boolean).map((name) => [name.toLocaleLowerCase(), name])).values()];
+      if (groupNames.length) {
+        deletionCredentials = await promptGroupDeleteCredentials(groupNames);
+        if (!deletionCredentials) { closeEditModalCleanup(); return; }
+      }
+    } catch (error) {
+      appAlert(error?.message || tx("group_delete_failed"));
+      return;
+    }
+  }
   let remoteClearError = "";
   showLoader(tx("resetting_data"));
   try {
@@ -2438,49 +2519,16 @@ clearDataBtn.addEventListener("click", async () => {
       if (db && firebaseUser?.uid) {
         const myMemberId = `gmail_${firebaseUser.uid}`;
 
-        // Delete all groups owned by this Gmail, even if the current session is not inside that group.
-        const ownedGroupsSnap = await db
-          .collection("groups")
-          .where("createdByUid", "==", firebaseUser.uid)
-          .get();
-
-        for (const groupDoc of ownedGroupsSnap.docs) {
-          const groupId = groupDoc.id;
-          const myMembershipRef = db.collection("groupMembers").doc(`${groupId}__${myMemberId}`);
-
-          // Restore the owner's admin membership only if a legacy group is missing it.
-          const myMembershipSnap = await myMembershipRef.get();
-          if (!myMembershipSnap.exists) {
-            await myMembershipRef.set({
-              groupId,
-              memberId: myMemberId,
-              type: "gmail",
-              label: firebaseUser.email || "Admin",
-              role: "admin",
-              canEdit: true,
-              createdAt: firebase.firestore.FieldValue.serverTimestamp()
-            });
-          }
-
-          const inviteSnap = await db.collection("invitations").where("groupId", "==", groupId).get();
-          for (const doc of inviteSnap.docs) await doc.ref.delete();
-
-          const reqSnap = await db.collection("accessRequests").where("groupId", "==", groupId).get();
-          for (const doc of reqSnap.docs) await doc.ref.delete();
-
-          const membersSnap = await db.collection("groupMembers").where("groupId", "==", groupId).get();
-          const selfMemberDocId = `${groupId}__${myMemberId}`;
-          for (const doc of membersSnap.docs) {
-            if (doc.id !== selfMemberDocId) {
-              await doc.ref.delete();
-            }
-          }
-
-          await db.collection("groupFinance").doc(groupId).delete();
-          await db.collection("groups").doc(groupId).delete();
-          await myMembershipRef.delete();
+        for (const credentials of deletionCredentials) {
+          const idToken = await firebaseUser.getIdToken();
+          const response = await fetch(`${GROUP_JOIN_API_URL.replace(/\/$/, "")}/delete-owned-groups`, {
+            method: "POST",
+            headers: { "content-type": "application/json", authorization: `Bearer ${idToken}` },
+            body: JSON.stringify(credentials)
+          });
+          const result = await response.json().catch(() => ({}));
+          if (!response.ok) throw new Error(result.message || tx("group_delete_failed"));
         }
-
         // Remove any remaining memberships/credentials linked to this Gmail (joined groups etc.).
         const myMembershipsSnap = await db.collection("groupMembers").where("memberId", "==", myMemberId).get();
         for (const doc of myMembershipsSnap.docs) {
@@ -2495,6 +2543,10 @@ clearDataBtn.addEventListener("click", async () => {
       }
     } catch (err) {
       remoteClearError = err?.message || "Remote clear failed";
+    }
+    if (remoteClearError) {
+      appAlert(tx("group_delete_failed") + `\n\n${remoteClearError}`);
+      return;
     }
 
     income = 0;
