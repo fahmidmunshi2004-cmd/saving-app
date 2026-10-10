@@ -142,6 +142,8 @@
     "invite_compose_opened": "Invite compose opened. Please share this link manually if needed:\n\n{link}",
     "invite_expired": "This invite link has expired. Ask the admin for a new invite.",
     "invite_mismatch": "This invite is for {invited}. You are signed in as {current}.",
+    "invite_accept_failed": "We couldn't accept this invite. Please check your connection and try again.",
+    "invite_accept_permission_error": "Invite acceptance was blocked. Please make sure you signed in with the Gmail address the invite was sent to, then ask the admin to resend the invite if needed.",
     "admin_only_delete": "Only the admin can delete transactions.",
     "invite_mismatch_title": "Invite Mismatch",
     "delete_transaction_confirm": "Do you want to delete this transaction?",

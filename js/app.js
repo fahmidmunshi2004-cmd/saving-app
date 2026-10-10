@@ -640,18 +640,7 @@ function applyAuthState() {
     photo.src = photoURL;
     photo.alt = "";
     photo.referrerPolicy = "no-referrer";
-    photo.onerror = () => {
-      const providerId = loginProvider === "facebook" ? "facebook.com" : "google.com";
-      const providerPhoto = firebaseUser?.providerData?.find((provider) => provider.providerId === providerId)?.photoURL
-        || firebaseUser?.photoURL
-        || "";
-      if (providerPhoto && photo.src !== providerPhoto) {
-        photo.onerror = showAvatarFallback;
-        photo.src = providerPhoto;
-      } else {
-        showAvatarFallback();
-      }
-    };
+    photo.onerror = showAvatarFallback;
     avatar.appendChild(photo);
   } else {
     showAvatarFallback();
@@ -725,7 +714,13 @@ async function processInviteLink() {
   if (!token || !groupId) return;
 
   const invRef = db.collection("invitations").doc(token);
-  const invSnap = await invRef.get();
+  let invSnap;
+  try {
+    invSnap = await invRef.get();
+  } catch (error) {
+    console.error("Unable to read group invite", error);
+    throw new Error(tx("invite_accept_failed"));
+  }
   if (!invSnap.exists) return;
   const inv = invSnap.data();
   if (inv.status !== "pending" || inv.groupId !== groupId) return;
@@ -769,7 +764,15 @@ async function processInviteLink() {
   }
   batch.set(memberRef, membershipData, { merge: true });
   batch.update(invRef, { status: "accepted", acceptedAt: firebase.firestore.FieldValue.serverTimestamp() });
-  await batch.commit();
+  try {
+    await batch.commit();
+  } catch (error) {
+    console.error("Unable to accept group invite", error);
+    if (error?.code === "permission-denied") {
+      throw new Error(tx("invite_accept_permission_error"));
+    }
+    throw new Error(tx("invite_accept_failed"));
+  }
 
   currentSession = {
     type: "gmail",
@@ -990,9 +993,7 @@ function getAuthDisplayName(user, providerName) {
 function getAuthPhotoURL(user, providerName) {
   if (providerName === "facebook") {
     const facebookProfile = user?.providerData?.find((provider) => provider.providerId === "facebook.com");
-    return facebookProfile?.photoURL || user?.photoURL || (facebookProfile?.uid
-      ? `https://graph.facebook.com/${encodeURIComponent(facebookProfile.uid)}/picture?type=large`
-      : "");
+    return facebookProfile?.photoURL || user?.photoURL || "";
   }
   const providerId = providerName === "facebook" ? "facebook.com" : "google.com";
   return user?.providerData?.find((provider) => provider.providerId === providerId)?.photoURL
@@ -1049,6 +1050,26 @@ async function handleGoogleAuthUser(user) {
     }
 
     await processInviteLink();
+
+    if (new URLSearchParams(window.location.search).has("inviteToken") && currentSession?.groupId) {
+      const joinedGroupId = currentSession.groupId;
+      const joinedMemberId = `gmail_${firebaseUser.uid}`;
+      const joinedMember = await resolveMembershipForUser(joinedMemberId, joinedGroupId);
+      if (joinedMember) {
+        currentSession = {
+          type: "gmail", uid: firebaseUser.uid, email: firebaseUser.email, authProvider,
+          displayName: getAuthDisplayName(firebaseUser, authProvider),
+          photoURL: getAuthPhotoURL(firebaseUser, authProvider),
+          groupId: joinedMember.groupId, memberId: joinedMemberId,
+          role: joinedMember.role || "viewer", canEdit: !!joinedMember.canEdit
+        };
+        saveSession();
+        await loadGroupSharedData();
+        syncTransactionState();
+        updateUI();
+        applyAuthState();
+      }
+    }
 
     if (sameGoogleAccount && currentSession?.type === "gmail" && currentSession.uid === firebaseUser.uid) {
       currentSession.authProvider = authProvider;
@@ -2320,6 +2341,18 @@ async function startSocialLogin(provider, button, providerName) {
     activeSocialProviderName = providerName;
     const result = await auth.signInWithPopup(provider);
     sessionStorage.setItem("vault_auth_provider", providerName);
+    if (providerName === "facebook") {
+      const facebookCredential = firebase.auth.FacebookAuthProvider.credentialFromResult(result);
+      const facebookProfile = result.user?.providerData?.find((item) => item.providerId === "facebook.com");
+      const facebookPhotoURL = result.user?.photoURL || facebookProfile?.photoURL ||
+        (facebookCredential?.accessToken && facebookProfile?.uid
+          ? `https://graph.facebook.com/${encodeURIComponent(facebookProfile.uid)}/picture?type=large&access_token=${encodeURIComponent(facebookCredential.accessToken)}`
+          : "");
+      if (facebookPhotoURL) {
+        currentSession = { ...(currentSession || {}), authProvider: "facebook", photoURL: facebookPhotoURL };
+        saveSession();
+      }
+    }
     activeSocialProviderName = "";
     if (pendingSocialCredential && providerName !== pendingSocialCredential.providerName) {
       const pending = pendingSocialCredential;
