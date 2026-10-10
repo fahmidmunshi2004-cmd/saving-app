@@ -1,4 +1,4 @@
-﻿let income = 0;
+let income = 0;
 let expense = 0;
 let canEdit = false;
 let expenseChart = null;
@@ -85,6 +85,11 @@ const groupActionUsername = document.getElementById("groupActionUsername");
 const groupActionPassword = document.getElementById("groupActionPassword");
 const groupActionSubmitBtn = document.getElementById("groupActionSubmitBtn");
 const groupActionHelpText = document.getElementById("groupActionHelpText");
+const createdGroupCredentialsCard = document.getElementById("createdGroupCredentialsCard");
+const createdGroupName = document.getElementById("createdGroupName");
+const createdGroupPassword = document.getElementById("createdGroupPassword");
+const copyCreatedGroupNameBtn = document.getElementById("copyCreatedGroupNameBtn");
+const copyCreatedGroupPasswordBtn = document.getElementById("copyCreatedGroupPasswordBtn");
 const langSwitcher = document.getElementById("langSwitcher");
 const langCurrentLabel = document.getElementById("langCurrentLabel");
 const langCurrentFlag = document.getElementById("langCurrentFlag");

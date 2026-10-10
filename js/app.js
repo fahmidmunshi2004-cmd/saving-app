@@ -300,6 +300,26 @@ function getFriendlyGroupError(error, fallback = "Group action failed") {
   return error?.message || fallback;
 }
 
+function showCreatedGroupCredentials(name, password) {
+  if (!createdGroupCredentialsCard) return;
+  createdGroupName.textContent = name;
+  createdGroupPassword.textContent = password;
+  createdGroupCredentialsCard.classList.remove("hidden");
+  if (!document.getElementById("settingsView")?.classList.contains("active")) showView("settingsView");
+  createdGroupCredentialsCard.scrollIntoView({ behavior: "smooth", block: "nearest" });
+}
+
+async function copyCredential(value, button) {
+  try {
+    await navigator.clipboard.writeText(value);
+    const original = button.textContent;
+    button.textContent = tx("copied");
+    setTimeout(() => { button.textContent = original; }, 1400);
+  } catch (_) {
+    appAlert(tx("copy_failed"));
+  }
+}
+
 const BUTTON_CLICK_SOUND_SRC = "assets/btn-click-sound.mp3";
 const buttonClickSoundTemplate = new Audio(BUTTON_CLICK_SOUND_SRC);
 buttonClickSoundTemplate.preload = "auto";
@@ -380,7 +400,11 @@ async function refreshSettingsPanels() {
   groupMembersCard.classList.remove("hidden");
   groupMemberCount.innerText = String(memberSnap.size || 0);
   groupMembersList.innerHTML = "";
-  memberSnap.forEach((doc) => {
+  const sortedMembers = memberSnap.docs.slice().sort((a, b) => {
+    const rank = (role) => role === "admin" ? 0 : role === "editor" ? 1 : 2;
+    return rank(a.data().role || "viewer") - rank(b.data().role || "viewer");
+  });
+  sortedMembers.forEach((doc) => {
     const m = doc.data();
     const li = document.createElement("li");
     const row = document.createElement("div");
@@ -523,6 +547,14 @@ async function setMemberEditRole(memberDocId, canEditMember) {
     canEdit: !!canEditMember,
     grantedByUid: canEditMember ? firebaseUser.uid : firebase.firestore.FieldValue.delete()
   });
+  const memberSnap = await db.collection("groupMembers").doc(memberDocId).get();
+  const updatedMember = memberSnap.data() || {};
+  if (updatedMember.memberId === currentSession?.memberId) {
+    currentSession.role = updatedMember.role || "viewer";
+    currentSession.canEdit = !!updatedMember.canEdit;
+    setEditAccess(isCurrentAdmin() || currentSession.canEdit || (!currentSession.groupId && currentSession.type === "gmail"));
+    saveSession();
+  }
   await refreshSettingsPanels();
 }
 
@@ -538,7 +570,8 @@ async function requestEditAccess() {
       .get();
     if (!adminSnap.empty) {
       const adminData = adminSnap.docs[0].data();
-      adminEmail = (adminData.label || "").toLowerCase();
+      adminEmail = String(adminData.email || adminData.label || "").trim().toLowerCase();
+      requestAccessEmailInput.value = adminEmail;
     }
   }
 
@@ -1084,6 +1117,7 @@ async function handleGoogleAuthUser(user) {
 }
 
 function openGroupActionForm(mode = "create") {
+  createdGroupCredentialsCard?.classList.add("hidden");
   groupActionMode = mode === "join" ? "join" : "create";
   groupActionFormCard.classList.remove("hidden");
   groupActionTitle.innerText = t(groupActionMode === "join" ? "join_group" : "create_group_account");
@@ -1171,6 +1205,7 @@ async function finishGroupAccountSetup(user, pendingSetup) {
   applyAuthState();
   groupActionUsername.value = "";
   groupActionPassword.value = "";
+  showCreatedGroupCredentials(groupName, password);
   appAlert(tx("group_account_created"));
 }
 
@@ -1419,12 +1454,10 @@ function renderDeletedTransactions() {
     const deletedAtText = item.deletedAt ? new Date(item.deletedAt).toLocaleString("en-BD") : "-";
     const head = document.createElement("div");
     head.className = "deleted-head";
-    head.textContent = `${txn.type || "-"} â€¢ ${txn.category || "-"}`;
-
+    head.textContent = `${txn.type || "-"} • ${txn.category || "-"}`;
     const meta = document.createElement("div");
     meta.className = "deleted-meta";
-    meta.textContent = `${amountText} â€¢ Deleted: ${deletedAtText}`;
-
+    meta.textContent = `${amountText} • Deleted: ${deletedAtText}`;
     li.appendChild(head);
     li.appendChild(meta);
 
@@ -2221,6 +2254,9 @@ requestAccessBtn.addEventListener("click", () => {
     await requestEditAccess();
   }).catch((e) => appAlert(e.message || tx("request_failed")));
 });
+
+copyCreatedGroupNameBtn?.addEventListener("click", () => copyCredential(createdGroupName.textContent, copyCreatedGroupNameBtn));
+copyCreatedGroupPasswordBtn?.addEventListener("click", () => copyCredential(createdGroupPassword.textContent, copyCreatedGroupPasswordBtn));
 
 createGroupBtn.addEventListener("click", () => openGroupActionForm("create"));
 addAnotherGroupBtn?.addEventListener("click", () => openGroupActionForm("join"));

@@ -2638,6 +2638,21 @@ input:not(:placeholder-shown)+.floating-label {
     margin-top: 10px;
 }
 
+.created-credential-row {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.created-credential-row code {
+    overflow-wrap: anywhere;
+    padding: 8px;
+    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.05);
+}
+
 .settings-item .simple-list li {
     border-radius: 12px;
     background: linear-gradient(145deg, #ffffff, #f2f6fd);
