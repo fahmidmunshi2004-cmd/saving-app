@@ -2273,7 +2273,7 @@ function downloadReportPdf() {
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>VaultBudget Report</title>
+  <title>JOMAO REPORT</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;600;700&display=swap" rel="stylesheet">
@@ -2300,7 +2300,7 @@ function downloadReportPdf() {
   </style>
 </head>
 <body>
-  <h1>VaultBudget Report</h1>
+  <h1>JOMAO REPORT</h1>
   <p class="meta">Generated: ${escapeHtml(new Date().toLocaleString("en-BD"))}</p>
   <div class="summary">
     <div class="card"><div class="label">Income</div><div class="value">${escapeHtml(formatMoney(totalIncome))}</div></div>
