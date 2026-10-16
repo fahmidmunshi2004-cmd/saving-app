@@ -53,6 +53,7 @@ const expenseBtn = document.getElementById("expenseBtn");
 const navButtons = document.querySelectorAll(".nav-btn");
 const views = document.querySelectorAll(".view");
 const downloadPdfBtn = document.getElementById("downloadPdfBtn");
+const downloadPngBtn = document.getElementById("downloadPngBtn");
 const expenseChartCanvas = document.getElementById("expenseColumnChart");
 const incomePieChartCanvas = document.getElementById("incomePieChart");
 const walletRateChartCanvas = document.getElementById("walletRateChart");

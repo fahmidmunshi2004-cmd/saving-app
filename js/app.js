@@ -2247,97 +2247,80 @@ function escapeHtml(value) {
     .replace(/'/g, "&#39;");
 }
 
+function getReportTitle() {
+  const ownerName = String(currentSession?.displayName || currentSession?.username || currentSession?.email || "").trim().replace(/\s+/g, " ");
+  return ownerName ? `${ownerName} Money Report` : "Jomao Money Report";
+}
+
+function getReportFileName(extension) {
+  return `${getReportTitle().replace(/[\\/:*?"<>|]+/g, "-").replace(/\s+/g, " ").trim()}.${extension}`;
+}
+
+function buildReportContent() {
+  const totalIncome = Number(income || 0);
+  const totalExpense = Number(expense || 0);
+  const totalBalance = totalIncome - totalExpense;
+  const totalRecords = Number(transactions.length || 0);
+  const rows = [...transactions].reverse().map((txn) => {
+    const typeLabel = txn.type === "income" ? "আয়" : "খরচ";
+    return `<tr><td>${escapeHtml(txn.time || "-")}</td><td>${escapeHtml(typeLabel)}</td><td>${escapeHtml(txn.category || "-")}</td><td>${escapeHtml(formatMoney(Number(txn.amount || 0)))}</td></tr>`;
+  }).join("");
+  return `<section class="report-content"><h1>${escapeHtml(getReportTitle())}</h1>
+  <p class="meta">Generated: ${escapeHtml(new Date().toLocaleString("en-BD"))}</p>
+  <div class="summary"><div class="card"><div class="label">Income</div><div class="value">${escapeHtml(formatMoney(totalIncome))}</div></div>
+  <div class="card"><div class="label">Expense</div><div class="value">${escapeHtml(formatMoney(totalExpense))}</div></div>
+  <div class="card"><div class="label">Balance</div><div class="value">${escapeHtml(formatMoney(totalBalance))}</div></div></div>
+  <table><thead><tr><th>Time</th><th>Type</th><th>Category</th><th>Amount</th></tr></thead><tbody>${rows || "<tr><td colspan='4'>No transactions yet</td></tr>"}</tbody></table>
+  <div class="totals"><div class="totals-row"><div>মোট আয়<strong>${escapeHtml(formatMoney(totalIncome))}</strong></div><div>মোট খরচ<strong>${escapeHtml(formatMoney(totalExpense))}</strong></div><div>মোট ব্যালেন্স<strong>${escapeHtml(formatMoney(totalBalance))}</strong></div><div>মোট রেকর্ড<strong>${escapeHtml(String(totalRecords))}</strong></div></div></div></section>`;
+}
+
+function getReportStyles() {
+  return `:root{color-scheme:light}*{box-sizing:border-box;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}body{font-family:"Noto Sans Bengali",sans-serif;margin:24px;color:#101828;background:#fff}.report-content{width:100%;background:#fff}h1{margin:0 0 8px;font-size:22px}.meta{margin:0 0 14px;color:#475467;font-size:13px}.summary{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}.card{border:1px solid #eaecf0;border-radius:10px;padding:10px}.label{font-size:12px;color:#667085}.value{font-size:15px;font-weight:700;margin-top:4px}table{width:100%;border-collapse:collapse}th,td{border:1px solid #eaecf0;padding:8px;text-align:left;font-size:12px}th{background:#ff014f!important;color:#fff!important}tr:nth-child(even) td{background:#fff4f8}.totals{margin-top:14px;border:1px solid #eaecf0;border-radius:10px;overflow:hidden}.totals-row{display:grid;grid-template-columns:repeat(4,1fr)}.totals-row div{padding:10px;border-right:1px solid #eaecf0;font-size:12px}.totals-row div:last-child{border-right:0}.totals-row strong{display:block;margin-top:5px;font-size:14px;color:#101828}`;
+}
+
 function downloadReportPdf() {
   const printWindow = window.open("", "_blank");
   if (!printWindow) {
     appAlert(tx("popup_blocked"));
     return;
   }
-  const totalIncome = Number(income || 0);
-  const totalExpense = Number(expense || 0);
-  const totalBalance = totalIncome - totalExpense;
-  const totalRecords = Number(transactions.length || 0);
-
-  const rows = [...transactions].reverse().map((txn) => {
-    const typeLabel = txn.type === "income" ? "আয়" : "খরচ";
-    return `<tr>
-      <td>${escapeHtml(txn.time || "-")}</td>
-      <td>${escapeHtml(typeLabel)}</td>
-      <td>${escapeHtml(txn.category || "-")}</td>
-      <td>${escapeHtml(formatMoney(Number(txn.amount || 0)))}</td>
-    </tr>`;
-  }).join("");
-
-  const html = `<!doctype html>
-<html lang="bn">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>JOMAO REPORT</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;600;700&display=swap" rel="stylesheet">
-  <style>
-    :root { color-scheme: light; }
-    * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-    body { font-family: "Noto Sans Bengali", sans-serif; margin: 24px; color: #101828; }
-    h1 { margin: 0 0 8px; font-size: 22px; }
-    .meta { margin: 0 0 14px; color: #475467; font-size: 13px; }
-    .summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 14px; }
-    .card { border: 1px solid #eaecf0; border-radius: 10px; padding: 10px; }
-    .label { font-size: 12px; color: #667085; }
-    .value { font-size: 15px; font-weight: 700; margin-top: 4px; }
-    table { width: 100%; border-collapse: collapse; }
-    th, td { border: 1px solid #eaecf0; padding: 8px; text-align: left; font-size: 12px; }
-    th { background: #ff014f !important; color: #fff !important; }
-    tr:nth-child(even) td { background: #fff4f8; }
-    .totals { margin-top: 14px; border: 1px solid #eaecf0; border-radius: 10px; overflow: hidden; }
-    .totals-row { display: grid; grid-template-columns: repeat(4, 1fr); }
-    .totals-row div { padding: 10px; border-right: 1px solid #eaecf0; font-size: 12px; }
-    .totals-row div:last-child { border-right: 0; }
-    .totals-row strong { display: block; margin-top: 5px; font-size: 14px; color: #101828; }
-    @media print { body { margin: 12mm; } }
-  </style>
-</head>
-<body>
-  <h1>JOMAO REPORT</h1>
-  <p class="meta">Generated: ${escapeHtml(new Date().toLocaleString("en-BD"))}</p>
-  <div class="summary">
-    <div class="card"><div class="label">Income</div><div class="value">${escapeHtml(formatMoney(totalIncome))}</div></div>
-    <div class="card"><div class="label">Expense</div><div class="value">${escapeHtml(formatMoney(totalExpense))}</div></div>
-    <div class="card"><div class="label">Balance</div><div class="value">${escapeHtml(formatMoney(totalBalance))}</div></div>
-  </div>
-  <table>
-    <thead><tr><th>Time</th><th>Type</th><th>Category</th><th>Amount</th></tr></thead>
-    <tbody>${rows || "<tr><td colspan='4'>No transactions yet</td></tr>"}</tbody>
-  </table>
-  <div class="totals">
-    <div class="totals-row">
-      <div>মোট আয়<strong>${escapeHtml(formatMoney(totalIncome))}</strong></div>
-      <div>মোট খরচ<strong>${escapeHtml(formatMoney(totalExpense))}</strong></div>
-      <div>মোট ব্যালেন্স<strong>${escapeHtml(formatMoney(totalBalance))}</strong></div>
-      <div>মোট রেকর্ড<strong>${escapeHtml(String(totalRecords))}</strong></div>
-    </div>
-  </div>
-</body>
-</html>`;
-
+  const html = `<!doctype html><html lang="bn"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>${escapeHtml(getReportTitle())}</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;600;700&display=swap" rel="stylesheet"><style>${getReportStyles()}@media print{body{margin:12mm}}</style></head><body>${buildReportContent()}</body></html>`;
   printWindow.document.open();
   printWindow.document.write(html);
   printWindow.document.close();
   printWindow.onload = async () => {
-    try {
-      if (printWindow.document?.fonts?.ready) {
-        await printWindow.document.fonts.ready;
-      }
-    } catch (_) {
-      // no-op
-    }
+    try { if (printWindow.document?.fonts?.ready) await printWindow.document.fonts.ready; } catch (_) { }
+    printWindow.document.title = getReportFileName("pdf");
     printWindow.focus();
     printWindow.print();
   };
 }
 
+async function downloadReportPng() {
+  if (typeof html2canvas !== "function") {
+    appAlert("PNG export is unavailable. Please refresh and try again.");
+    return;
+  }
+  const container = document.createElement("div");
+  container.setAttribute("aria-hidden", "true");
+  container.style.cssText = "position:fixed;left:-10000px;top:0;width:1920px;background:#fff;z-index:-1";
+  container.innerHTML = `<style>${getReportStyles()}</style>${buildReportContent()}`;
+  document.body.appendChild(container);
+  try {
+    if (document.fonts?.ready) await document.fonts.ready;
+    const report = container.querySelector(".report-content");
+    const canvas = await html2canvas(report, { backgroundColor: "#ffffff", scale: 1, width: 1920, windowWidth: 1920, useCORS: true, logging: false });
+    const link = document.createElement("a");
+    link.download = getReportFileName("png");
+    link.href = canvas.toDataURL("image/png");
+    link.click();
+  } catch (error) {
+    console.error("PNG report export failed", error);
+    appAlert("Could not create the PNG report. Please try again.");
+  } finally {
+    container.remove();
+  }
+}
 function initFirebase() {
   firebase.initializeApp(firebaseConfig);
   auth = firebase.auth();
@@ -2389,6 +2372,7 @@ navButtons.forEach((btn) => btn.addEventListener("click", async () => {
   }
 }));
 downloadPdfBtn.addEventListener("click", downloadReportPdf);
+downloadPngBtn?.addEventListener("click", downloadReportPng);
 
 sendInviteBtn.addEventListener("click", () => {
   withLoader(tx("sending_invite"), async () => {
