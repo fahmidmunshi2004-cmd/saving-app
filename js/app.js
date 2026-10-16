@@ -2303,13 +2303,13 @@ async function downloadReportPng() {
   }
   const container = document.createElement("div");
   container.setAttribute("aria-hidden", "true");
-  container.style.cssText = "position:fixed;left:-10000px;top:0;width:826px;padding:16px;background:#fff;z-index:-1";
-  container.innerHTML = `<style>${getReportStyles()}</style><div class="report-frame">${buildReportContent()}</div>`;
+  container.style.cssText = "position:fixed;left:-10000px;top:0;width:826px;background:#fff;z-index:-1";
+  container.innerHTML = `<style>${getReportStyles()}.report-frame{box-sizing:border-box!important;width:826px!important;padding:16px!important;margin:0!important;background:#fff!important;overflow:hidden!important}.report-frame>.report-content{box-sizing:border-box!important;width:100%!important}</style><div class="report-frame">${buildReportContent()}</div>`;
   document.body.appendChild(container);
   try {
     if (document.fonts?.ready) await document.fonts.ready;
     const report = container.querySelector(".report-frame");
-    const canvas = await html2canvas(report, { backgroundColor: "#ffffff", scale: 3, width: 826, windowWidth: 826, useCORS: true, logging: false });
+    const canvas = await html2canvas(report, { backgroundColor: "#ffffff", scale: 3, width: 826, height: report.scrollHeight, windowWidth: 826, useCORS: true, logging: false });
     const link = document.createElement("a");
     link.download = getReportFileName("png");
     link.href = canvas.toDataURL("image/png");
