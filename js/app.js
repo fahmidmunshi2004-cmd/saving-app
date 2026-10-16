@@ -2303,7 +2303,7 @@ async function downloadReportPng() {
   }
   const container = document.createElement("div");
   container.setAttribute("aria-hidden", "true");
-  container.style.cssText = "position:fixed;left:-10000px;top:0;width:794px;background:#fff;z-index:-1";
+  container.style.cssText = "position:fixed;left:-10000px;top:0;width:794px;padding:16px;background:#fff;z-index:-1";
   container.innerHTML = `<style>${getReportStyles()}</style>${buildReportContent()}`;
   document.body.appendChild(container);
   try {
