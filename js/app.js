@@ -65,6 +65,29 @@ function getLocaleForLang() {
   return option?.locale || "en-US";
 }
 
+function formatTransactionTime(value) {
+  if (!value) return "-";
+  const raw = String(value).trim();
+  const wasBengali = /[০-৯]/.test(raw);
+  let date = new Date(raw);
+  if (Number.isNaN(date.getTime())) {
+    const normalized = raw.replace(/[০-৯]/g, (digit) => String("০১২৩৪৫৬৭৮৯".indexOf(digit)))
+      .replace(/\u200e|\u200f/g, "");
+    const match = normalized.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})(?:,?\s+(\d{1,2}):(\d{2})(?::(\d{2}))?\s*(AM|PM)?)?/i);
+    if (match) {
+      let hour = Number(match[4] || 0);
+      const meridiem = String(match[7] || "").toUpperCase();
+      if (meridiem === "PM" && hour < 12) hour += 12;
+      if (meridiem === "AM" && hour === 12) hour = 0;
+      const month = Number(wasBengali ? match[2] : match[1]);
+      const day = Number(wasBengali ? match[1] : match[2]);
+      date = new Date(Number(match[3]), month - 1, day, hour, Number(match[5] || 0), Number(match[6] || 0));
+    }
+  }
+  if (Number.isNaN(date.getTime())) return raw;
+  return date.toLocaleString(getLocaleForLang());
+}
+
 function getLanguageOption(code) {
   return LANGUAGE_OPTIONS.find((item) => item.code === code) || LANGUAGE_OPTIONS[0];
 }
@@ -1809,7 +1832,7 @@ function renderTransactions() {
     const action = document.createElement("td");
     const chip = document.createElement("span");
 
-    time.innerText = txn.time;
+    time.innerText = formatTransactionTime(txn.time);
     time.setAttribute("data-label", t("time"));
     chip.className = `type-chip ${txn.type === "income" ? "type-income" : "type-expense"}`;
     chip.innerHTML = txn.type === "income"
@@ -2263,10 +2286,10 @@ function buildReportContent() {
   const totalRecords = Number(transactions.length || 0);
   const rows = [...transactions].reverse().map((txn) => {
     const typeLabel = txn.type === "income" ? "আয়" : "খরচ";
-    return `<tr><td>${escapeHtml(txn.time || "-")}</td><td>${escapeHtml(typeLabel)}</td><td>${escapeHtml(txn.category || "-")}</td><td>${escapeHtml(formatMoney(Number(txn.amount || 0)))}</td></tr>`;
+    return `<tr><td>${escapeHtml(formatTransactionTime(txn.time))}</td><td>${escapeHtml(typeLabel)}</td><td>${escapeHtml(txn.category || "-")}</td><td>${escapeHtml(formatMoney(Number(txn.amount || 0)))}</td></tr>`;
   }).join("");
   return `<section class="report-content"><h1>${escapeHtml(getReportTitle())}</h1>
-  <p class="meta">Generated: ${escapeHtml(new Date().toLocaleString("en-BD"))}</p>
+  <p class="meta">Generated: ${escapeHtml(new Date().toLocaleString(getLocaleForLang()))}</p>
   <div class="summary"><div class="card"><div class="label">Income</div><div class="value">${escapeHtml(formatMoney(totalIncome))}</div></div>
   <div class="card"><div class="label">Expense</div><div class="value">${escapeHtml(formatMoney(totalExpense))}</div></div>
   <div class="card"><div class="label">Balance</div><div class="value">${escapeHtml(formatMoney(totalBalance))}</div></div></div>
