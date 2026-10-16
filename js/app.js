@@ -2303,13 +2303,13 @@ async function downloadReportPng() {
   }
   const container = document.createElement("div");
   container.setAttribute("aria-hidden", "true");
-  container.style.cssText = "position:fixed;left:-10000px;top:0;width:794px;padding:16px;background:#fff;z-index:-1";
-  container.innerHTML = `<style>${getReportStyles()}</style>${buildReportContent()}`;
+  container.style.cssText = "position:fixed;left:-10000px;top:0;width:826px;padding:16px;background:#fff;z-index:-1";
+  container.innerHTML = `<style>${getReportStyles()}</style><div class="report-frame">${buildReportContent()}</div>`;
   document.body.appendChild(container);
   try {
     if (document.fonts?.ready) await document.fonts.ready;
-    const report = container.querySelector(".report-content");
-    const canvas = await html2canvas(report, { backgroundColor: "#ffffff", scale: 3, width: 794, windowWidth: 794, useCORS: true, logging: false });
+    const report = container.querySelector(".report-frame");
+    const canvas = await html2canvas(report, { backgroundColor: "#ffffff", scale: 3, width: 826, windowWidth: 826, useCORS: true, logging: false });
     const link = document.createElement("a");
     link.download = getReportFileName("png");
     link.href = canvas.toDataURL("image/png");
