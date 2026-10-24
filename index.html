@@ -39,8 +39,10 @@
     <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png?v=59" />
     <link rel="icon" type="image/png" sizes="48x48" href="assets/icons/favicon-48.png?v=59" />
     <link rel="shortcut icon" href="assets/icons/favicon-32.png?v=59" />
-    <link rel="preload" href="assets/font/Nohemi-Regular-BF6a4e01a26b011.ttf?v=59" as="font" type="font/ttf" crossorigin />
-    <link rel="preload" href="assets/font/Nohemi-Medium-BF6a4e01a26b011.ttf?v=59" as="font" type="font/ttf" crossorigin />
+    <link rel="preload" href="assets/font/Nohemi-Regular-BF6a4e01a26b011.ttf?v=59" as="font" type="font/ttf"
+        crossorigin />
+    <link rel="preload" href="assets/font/Nohemi-Medium-BF6a4e01a26b011.ttf?v=59" as="font" type="font/ttf"
+        crossorigin />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -99,9 +101,12 @@
                         </div>
                     </div>
                     <div class="login-benefits">
-                        <span><i class="fa-solid fa-shield-halved"></i> <span data-i18n="auth_secure_safe">Secure &amp; safe</span></span>
-                        <span><i class="fa-solid fa-bolt"></i> <span data-i18n="auth_fast_access">Fast access</span></span>
-                        <span><i class="fa-regular fa-heart"></i> <span data-i18n="auth_better_tomorrow">Better tomorrow</span></span>
+                        <span><i class="fa-solid fa-shield-halved"></i> <span data-i18n="auth_secure_safe">Secure &amp;
+                                safe</span></span>
+                        <span><i class="fa-solid fa-bolt"></i> <span data-i18n="auth_fast_access">Fast
+                                access</span></span>
+                        <span><i class="fa-regular fa-heart"></i> <span data-i18n="auth_better_tomorrow">Better
+                                tomorrow</span></span>
                     </div>
                 </aside>
                 <div class="login-form-panel">
@@ -113,7 +118,8 @@
                     <div id="authFormContent" class="auth-form-content" data-mode="signin">
                         <img class="auth-form-logo" src="assets/icons/main-logo.png?v=59" alt="" />
                         <h2 id="authFormTitle" data-i18n="auth_welcome_back">Welcome Back!</h2>
-                        <p id="authFormSubtitle" data-i18n="auth_login_subtitle">Log in to continue your financial journey.</p>
+                        <p id="authFormSubtitle" data-i18n="auth_login_subtitle">Log in to continue your financial
+                            journey.</p>
                         <form id="emailAuthForm" novalidate>
                             <div id="authNameField" class="auth-input-wrap hidden">
                                 <i class="fa-regular fa-user" aria-hidden="true"></i>
@@ -137,10 +143,12 @@
                             <div id="authSignInOptions" class="auth-options">
                                 <label class="auth-remember"><input id="authRemember" type="checkbox" checked />
                                     <span data-i18n="auth_remember_me">Remember me</span></label>
-                                <button id="authForgotPassword" data-i18n="auth_forgot_password" type="button">Forgot password?</button>
+                                <button id="authForgotPassword" data-i18n="auth_forgot_password" type="button">Forgot
+                                    password?</button>
                             </div>
                             <button id="emailAuthSubmit" class="auth-submit" type="submit">
-                                <span data-i18n="auth_login">Login</span><i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+                                <span data-i18n="auth_login">Login</span><i class="fa-solid fa-arrow-right"
+                                    aria-hidden="true"></i>
                             </button>
                             <p id="emailAuthError" class="auth-form-error" role="status" aria-live="polite"></p>
                         </form>
@@ -148,8 +156,8 @@
                         <div class="login-actions">
                             <button id="googleLoginBtn" class="btn expense-btn" type="button"
                                 aria-label="Sign in with Google">
-                                <img class="login-provider-logo google-provider-logo"
-                                    src="assets/icons/google.png?v=59" alt="Google" />
+                                <img class="login-provider-logo google-provider-logo" src="assets/icons/google.png?v=59"
+                                    alt="Google" />
                             </button>
                             <button id="facebookLoginBtn" class="btn facebook-login-btn" type="button"
                                 aria-label="Sign in with Facebook">
@@ -293,7 +301,7 @@
                         <button id="downloadPdfBtn" type="button" class="mini-btn"><i class="fa-solid fa-file-pdf"></i>
                             <span data-i18n="download_pdf">Download PDF</span></button>
                         <button id="downloadPngBtn" type="button" class="mini-btn"><i class="fa-solid fa-image"></i>
-                            <span data-i18n="download_png">Download PNG</span></button>
+                            <span data-i18n="Download Png">Download PNG</span></button>
                     </div>
                 </div>
                 <div class="table-wrap">
@@ -405,8 +413,12 @@
                 </div>
                 <div id="createdGroupCredentialsCard" class="settings-item hidden">
                     <strong data-i18n="created_group_credentials">Created Account Credentials</strong><br />
-                    <div class="created-credential-row"><span data-i18n="group_name">Name</span><code id="createdGroupName"></code><button id="copyCreatedGroupNameBtn" class="btn income-btn" type="button" data-i18n="copy">Copy</button></div>
-                    <div class="created-credential-row"><span data-i18n="group_password">Password</span><code id="createdGroupPassword"></code><button id="copyCreatedGroupPasswordBtn" class="btn income-btn" type="button" data-i18n="copy">Copy</button></div>
+                    <div class="created-credential-row"><span data-i18n="group_name">Name</span><code
+                            id="createdGroupName"></code><button id="copyCreatedGroupNameBtn" class="btn income-btn"
+                            type="button" data-i18n="copy">Copy</button></div>
+                    <div class="created-credential-row"><span data-i18n="group_password">Password</span><code
+                            id="createdGroupPassword"></code><button id="copyCreatedGroupPasswordBtn"
+                            class="btn income-btn" type="button" data-i18n="copy">Copy</button></div>
                 </div>
                 <div class="settings-item">
                     <strong data-i18n="account_type">Account Type</strong><br />
