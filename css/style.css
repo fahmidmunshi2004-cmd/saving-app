@@ -1569,7 +1569,6 @@ h6,
 }
 
 .game-stage {
-    margin-top: 18px;
     overflow: hidden;
     border: 1px solid color-mix(in srgb, var(--brand) 26%, var(--stroke));
     border-radius: 18px;
